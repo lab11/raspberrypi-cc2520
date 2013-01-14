@@ -4,13 +4,10 @@
 #include "CC2520RpiDriver.h"
 
 module CC2520RpiSendP {
-
   provides {
     interface Init as SoftwareInit @exactlyonce();
-
     interface BareSend;
   }
-
 }
 
 implementation {
@@ -34,15 +31,13 @@ implementation {
 
 
   void* send (void* arg) {
-    uint8_t i;
-    uint8_t ret;
     uint8_t local_len;
 
     printf("send_thread\n");
 
     // Forever loop waiting for packets to send
     while (1) {
-      ret = pthread_cond_wait(&cond_send, &mutex_send);
+      pthread_cond_wait(&cond_send, &mutex_send);
 
       // copy the packet to a local buffer
       local_len = len;
@@ -52,7 +47,7 @@ implementation {
       pthread_mutex_unlock(&mutex_send);
 
       // call the driver to send the packet
-      ret = write(cc2520_file, send_buf, local_len-1);
+      write(cc2520_file, send_buf, local_len-1);
 
       // signal that we are done
       signal BareSend.sendDone(msg_pointer, SUCCESS);
@@ -95,7 +90,6 @@ implementation {
     }
 
     return SUCCESS;
-
   }
 
   command error_t BareSend.send (message_t* msg) {

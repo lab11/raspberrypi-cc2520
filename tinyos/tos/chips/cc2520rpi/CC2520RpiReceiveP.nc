@@ -19,8 +19,13 @@ module CC2520RpiReceiveP {
 
 implementation {
 
+  int ret;
+  pthread_t receive_thread;
+
   tasklet_norace message_t* rxMsg;
   message_t rxMsgBuffer;
+
+  int cc2520_file;
 
   cc2520_header_t* getHeader (message_t* msg) {
   //  return ((void*)msg) + call Config.headerLength(msg);
@@ -33,8 +38,6 @@ implementation {
   }
 
   void* receive (void* arg) {
-    int cc2520_file;
-    int ret;
     char buf[512];
     char pbuf[2048];
     char *buf_ptr = NULL;
@@ -43,8 +46,7 @@ implementation {
 
     printf("receive_thread\n");
 
-    // Open the character device for the CC2520
-    cc2520_file = open("/dev/radio", O_RDWR);
+
 
     // Continuously receive packets
     while (1) {
@@ -84,11 +86,10 @@ implementation {
   }
 
   command error_t SoftwareInit.init() {
-    int ret;
-    pthread_t receive_thread;
+    // Open the character device for the CC2520
+    cc2520_file = open("/dev/radio", O_RDWR);
 
     ret = pthread_create(&receive_thread, NULL, &receive, NULL);
-
     if (ret) {
       //error
     }
