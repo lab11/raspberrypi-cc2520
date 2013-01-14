@@ -45,7 +45,7 @@ implementation {
 
     // Open the character device for the CC2520
     cc2520_file = open("/dev/radio", O_RDWR);
-
+/*
     // Continuously receive packets
     while (1) {
       printf("Receiving a test message...\n");
@@ -72,7 +72,7 @@ implementation {
         rxMsg = signal BareReceive.receive(rxMsg);
       }
     }
-
+*/
 //    printf("Turning off the radio...\n");
 //    ioctl(file_desc, CC2520_IO_RADIO_OFF, NULL);
 
