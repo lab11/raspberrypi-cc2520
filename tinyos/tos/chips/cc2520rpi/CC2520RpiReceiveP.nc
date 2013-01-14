@@ -19,6 +19,18 @@ module CC2520RpiReceiveP {
 
 implementation {
 
+  tasklet_norace message_t* rxMsg;
+  message_t rxMsgBuffer;
+
+  cc2520_header_t* getHeader (message_t* msg) {
+  //  return ((void*)msg) + call Config.headerLength(msg);
+    return ((void*)msg);
+  }
+
+  void* getPayload (message_t* msg) {
+  //  return ((void*)msg)  + call RadioPacket.headerLength(msg);
+    return msg->data;
+  }
 
   void* receive (void* arg) {
     int cc2520_file;
@@ -27,6 +39,7 @@ implementation {
     char pbuf[2048];
     char *buf_ptr = NULL;
     int i;
+    uint8_t* data;
 
     printf("receive_thread\n");
 
@@ -38,6 +51,8 @@ implementation {
       printf("Receiving a test message...\n");
       ret = read(cc2520_file, buf, 127);
 
+
+    //  buf = (char*) rxMsg;
       if (ret > 0) {
         buf_ptr = pbuf;
         for (i = 0; i < ret; i++) {
@@ -45,6 +60,16 @@ implementation {
         }
         *(buf_ptr) = '\0';
         printf("read %s\n", pbuf);
+
+        //memcpy(rxMsg, buf, ret);
+
+        getHeader(rxMsg)->length = (uint8_t) buf[0];
+
+        data = getPayload(rxMsg);
+
+        memcpy(data, buf+1, ret-1);
+
+        rxMsg = signal BareReceive.receive(rxMsg);
       }
     }
 
@@ -67,6 +92,8 @@ implementation {
     if (ret) {
       //error
     }
+
+    rxMsg = &rxMsgBuffer;
 
     return SUCCESS;
 

@@ -9,11 +9,13 @@ module CC2520RpiPacketP {
 implementation {
 
   async command uint8_t RadioPacket.headerLength (message_t* msg) {
-    return 0;
+    // sizeof (ieee154_simple_header_t) + sizeof(len) + 2
+    return 12;
   }
 
   async command uint8_t RadioPacket.payloadLength(message_t* msg) {
-    return 0;
+    return ((uint8_t*) msg)[0] - 2;
+    //return 100;
   }
 
 
