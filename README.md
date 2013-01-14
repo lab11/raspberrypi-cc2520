@@ -26,6 +26,25 @@ library and headers on your local machine.
     mv libbcm2835.a /usr/arm-linux-gnueabi/lib
     mv bcm2835.h /usr/arm-linux-gnueabi/include
 
+In order for the TinyOS build system to figure out all the correct paths you
+need to help it along a bit. Add the following to your `.bashrc` file:
+
+    export TOSROOTRPI=<path to git repo>/raspberrypi-cc2520/tinyos
+    export TOSMAKE_PATH="$TOSROOTRPI/support/make $TOSMAKE_PATH"
+
+#### Usage
+
+Assuming you have the correct compilers, you should be able to run the following in
+`tinyos-main/apps/Blink` and have it compile successfully:
+
+    make raspberrypi
+
+Then copy `build/raspberrypi/main.exe` to the RPI and you should be able to run
+it:
+
+    ./main.exe
+
+
 
 Hardware
 --------
