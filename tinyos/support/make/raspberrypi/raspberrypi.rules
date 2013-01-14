@@ -13,7 +13,7 @@ OBJCOPY = $(CROSS_COMPILE)-objcopy
 OBJDUMP = $(CROSS_COMPILE)-objdump
 SET_ID = tos-set-symbols
 NCC = ncc
-LIBS = -lm /opt/arm1176jzf-s/libbcm2835.a -lrt -lpthread
+LIBS = -lm -lbcm2835 -lrt -lpthread
 
 AMADDR = ActiveMessageAddressC\$$addr
 BUILDDIR ?= build/$(PLATFORM)
@@ -21,13 +21,13 @@ MAIN_EXE = $(BUILDDIR)/main.exe
 MAIN_BIN = $(BUILDDIR)/main.bin
 MAIN_IHEX = $(BUILDDIR)/main.ihex
 INSTALL_BIN = $(MAIN_BIN).out$(if $(NODEID),-$(NODEID),)
-INCLUDE_DIRS ?= $(TOSDIR)/platforms/$(PLATFORM) $(TOSROOTN)/tos/platforms/$(PLATFORM) /opt/arm1176jzf-s
+INCLUDE_DIRS ?= $(TOSDIR)/platforms/$(PLATFORM)
 #EXTRA_MODULES ?= $(TOSDIR)/platforms/$(PLATFORM)/vectors.c
-NCC_INCLUDE_DIRS = $(TOSROOTN)/tos/platforms/$(PLATFORM)
+NCC_INCLUDE_DIRS = $(TOSROOTRPI)/tos/platforms/$(PLATFORM)
 
 OPTFLAGS ?= -O3 -g
 #CFLAGS += -mcpu=cortex-m3 -mthumb -fno-strict-aliasing
-CFLAGS += $(TOSROOTN)/tos/platforms/$(PLATFORM)/signalWrapper.c
+CFLAGS += $(TOSROOTRPI)/tos/platforms/$(PLATFORM)/signalWrapper.c
 PFLAGS += $(EXTRA_MODULES)
 PFLAGS += $(foreach dir,$(INCLUDE_DIRS),-I$(dir))
 PFLAGS += -Wall -Wshadow $(NESC_FLAGS)

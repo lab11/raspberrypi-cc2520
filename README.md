@@ -15,6 +15,17 @@ You need the kernel module from https://github.com/ab500/linux-cc2520-driver.
 
 You need a copy of the main TinyOS repository and the tinyos folder from this repo.
 
+#### Installation
+
+The TinyOS code requires a library for the low level BCM2835 GPIO from
+http://www.open.com.au/mikem/bcm2835/. Download and compile it on the RPI as shown.
+In order to cross compile the tinyos code on your machine you need also need the
+library and headers on your local machine.
+
+    -insert code for that here-
+    mv libbcm2835.a /usr/arm-linux-gnueabi/lib
+    mv bcm2835.h /usr/arm-linux-gnueabi/include
+
 
 Hardware
 --------
