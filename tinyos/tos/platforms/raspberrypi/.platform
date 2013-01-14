@@ -1,0 +1,26 @@
+# Includes that should take precedence come first.  Platforms come before
+# chips because they may override files.  These must be specified as
+# @includes instead of -I's to @opts, otherwise the %T won't be processed
+# by ncc.
+
+push ( @includes,
+  "%T/lib/timer",
+  "%T/lib/serial",
+  "%T/lib/power",
+  "%T/lib/rfxlink/layers",
+  "%T/lib/rfxlink/util",
+);
+
+@opts = qw(
+
+  -gcc=arm-linux-gnueabi-gcc
+  -mcpu=arm1176jzf-s
+  -nostartfiles
+  -fnesc-target=pc
+
+);
+
+push @opts, "-fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask" if !$with_scheduler_flag;
+push @opts, "-mingw-gcc" if $cygwin;
+
+$ENV{NESC_MACHINE} = "structure_size_boundary=32, pointer=4,4 float=4,4 double=8,4 long_double=8,4 short=2,2 int=4,4 long=4,4 long_long=8,4 int1248_align=1,2,4,4 wchar_size_size=4,4 char_wchar_signed=false,true";

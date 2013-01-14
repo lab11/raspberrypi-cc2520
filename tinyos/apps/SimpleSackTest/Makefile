@@ -1,0 +1,3 @@
+COMPONENT=SimpleSackTestAppC
+include $(MAKERULES)
+
