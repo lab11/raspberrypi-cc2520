@@ -55,18 +55,18 @@ configuration CC2520RpiRadioC {
     interface AMPacket;
     interface Packet as PacketForActiveMessage;
 #endif
-/*
+
 #ifndef TFRAMES_ENABLED
     interface Ieee154Send;
     interface Receive as Ieee154Receive;
-    interface SendNotifier as Ieee154Notifier;
+ //   interface SendNotifier as Ieee154Notifier;
 
-    interface Resource as SendResource[uint8_t clint];
+ //   interface Resource as SendResource[uint8_t clint];
 
-    interface Ieee154Packet;
+ //   interface Ieee154Packet;
     interface Packet as PacketForIeee154Message;
 #endif
-*/
+
 
     interface PacketAcknowledgements;
 /*    interface LowPowerListening;
@@ -171,11 +171,11 @@ implementation
   Ieee154MessageLayerC.SubReceive -> TinyosNetworkLayerC.Ieee154Receive;
   Ieee154MessageLayerC.RadioPacket -> TinyosNetworkLayerC.Ieee154Packet;
 
-//  Ieee154Send = Ieee154MessageLayerC;
-//  Ieee154Receive = Ieee154MessageLayerC;
+  Ieee154Send = Ieee154MessageLayerC;
+  Ieee154Receive = Ieee154MessageLayerC;
 //  Ieee154Notifier = Ieee154MessageLayerC;
-//  Ieee154Packet = Ieee154PacketLayerC;
- // PacketForIeee154Message = Ieee154MessageLayerC;
+ // Ieee154Packet = Ieee154PacketLayerC;
+  PacketForIeee154Message = Ieee154MessageLayerC;
 #endif
 
 // -------- Tinyos Network
