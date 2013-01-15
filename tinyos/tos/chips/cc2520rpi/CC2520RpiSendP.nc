@@ -101,7 +101,7 @@ implementation {
 
     printf("Send packet\n");
 
-    len = 15;
+    len = 13;
     memcpy(buf, msgbuf+11, len);
     buf[0] = len;
     buf[1] |= 0x20; // request ack

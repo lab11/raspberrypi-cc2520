@@ -17,18 +17,18 @@ implementation {
   components MainC, RadioCountToLeds154P as App, LedsC;
  // components new AMSenderC(AM_RADIO_COUNT_MSG);
  // components new AMReceiverC(AM_RADIO_COUNT_MSG);
-  components CC2520RpiRadioC;
+  components Ieee154MessageC;
   components new TimerMilliC();
 //  components ActiveMessageC;
 
   App.Boot -> MainC.Boot;
 
-  App.Receive -> CC2520RpiRadioC.Ieee154Receive;
-  App.Ieee154Send -> CC2520RpiRadioC.Ieee154Send;
-  App.RadioControl -> CC2520RpiRadioC.SplitControl;
+  App.Receive -> Ieee154MessageC.Ieee154Receive;
+  App.Ieee154Send -> Ieee154MessageC.Ieee154Send;
+  App.RadioControl -> Ieee154MessageC.SplitControl;
   App.Leds -> LedsC;
   App.MilliTimer -> TimerMilliC;
-  App.Ieee154Packet -> CC2520RpiRadioC.PacketForIeee154Message;
+  App.Ieee154Packet -> Ieee154MessageC.Packet;
 }
 
 

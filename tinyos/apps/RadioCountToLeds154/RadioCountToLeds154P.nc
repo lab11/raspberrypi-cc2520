@@ -76,7 +76,7 @@ implementation {
   event message_t* Receive.receive(message_t* bufPtr,
 				                           void* payload,
                                    uint8_t len) {
-    printf("RadioCountToLedsC", "Received packet of length %hhu.\n", len);
+  //  printf("RadioCountToLedsC", "Received packet of length %hhu.\n", len);
     if (len != sizeof(radio_count_msg_t)) {return bufPtr;}
     else {
       radio_count_msg_t* rcm = (radio_count_msg_t*)payload;
