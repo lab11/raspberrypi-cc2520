@@ -103,7 +103,7 @@ implementation {
 
     len = 13;
     memcpy(buf, msgbuf+11, len);
-    buf[0] = len;
+  //  buf[0] = len;
     buf[1] |= 0x20; // request ack
    // buf[2] = 0x88;
     buf[3] = seq++;

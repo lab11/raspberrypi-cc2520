@@ -21,6 +21,7 @@ implementation {
 
   async command void RadioPacket.setPayloadLength(message_t* msg,
                                                   uint8_t length) {
+    *(((uint8_t*) msg->data) - 1) = length + 2;
   }
 
   async command uint8_t RadioPacket.maxPayloadLength() {
