@@ -69,9 +69,9 @@ configuration CC2520RpiRadioC {
 
 
     interface PacketAcknowledgements;
-/*    interface LowPowerListening;
+ //   interface LowPowerListening;
     interface PacketLink;
-
+/*
 //#ifdef TRAFFIC_MONITOR
 //    interface TrafficMonitor;
 //#endif
@@ -196,36 +196,41 @@ implementation
   components new TinyosNetworkLayerC();
 
  // TinyosNetworkLayerC.SubSend -> UniqueLayerC;
-  TinyosNetworkLayerC.SubSend -> CC2520RpiSendC.BareSend;
- // TinyosNetworkLayerC.SubReceive -> PacketLinkLayerC;
-  TinyosNetworkLayerC.SubReceive -> CC2520RpiReceiveC;
+ // TinyosNetworkLayerC.SubSend -> CC2520RpiSendC.BareSend;
+  TinyosNetworkLayerC.SubSend -> PacketLinkLayerC.Send;
+  TinyosNetworkLayerC.SubReceive -> PacketLinkLayerC;
+ // TinyosNetworkLayerC.SubReceive -> CC2520RpiReceiveC;
   TinyosNetworkLayerC.SubPacket -> Ieee154PacketLayerC.RadioPacket;
 
 // -------- IEEE 802.15.4 Packet
 
   components new Ieee154PacketLayerC();
- // Ieee154PacketLayerC.SubPacket -> PacketLinkLayerC;
-  Ieee154PacketLayerC.SubPacket -> CC2520RpiPacketC.RadioPacket;
+  Ieee154PacketLayerC.SubPacket -> PacketLinkLayerC;
+ // Ieee154PacketLayerC.SubPacket -> CC2520RpiPacketC.RadioPacket;
 /*
 // -------- UniqueLayer Send part (wired twice)
 
   components new UniqueLayerC();
   UniqueLayerC.Config -> RadioP;
   UniqueLayerC.SubSend -> PacketLinkLayerC;
-
+*/
 // -------- Packet Link
 
   components new PacketLinkLayerC();
   PacketLink = PacketLinkLayerC;
-#ifdef CC2520_HARDWARE_ACK
-  PacketLinkLayerC.PacketAcknowledgements -> RadioDriverLayerC;
-#else
-  PacketLinkLayerC.PacketAcknowledgements -> SoftwareAckLayerC;
-#endif
-  PacketLinkLayerC -> LowPowerListeningLayerC.Send;
-  PacketLinkLayerC -> LowPowerListeningLayerC.Receive;
-  PacketLinkLayerC -> LowPowerListeningLayerC.RadioPacket;
-
+//#ifdef CC2520_HARDWARE_ACK
+//  PacketLinkLayerC.PacketAcknowledgements -> RadioDriverLayerC;
+//#else
+//  PacketLinkLayerC.PacketAcknowledgements -> SoftwareAckLayerC;
+//#endif
+  PacketLinkLayerC.SubSend -> CC2520RpiSendC.BareSend;
+  PacketLinkLayerC.SubReceive -> CC2520RpiReceiveC.BareReceive;
+  PacketLinkLayerC.SubPacket -> CC2520RpiPacketC.RadioPacket;
+  PacketLinkLayerC.PacketAcknowledgements -> PAckC.PacketAcknowledgements;
+ // PacketLinkLayerC -> LowPowerListeningLayerC.Send;
+ // PacketLinkLayerC -> LowPowerListeningLayerC.Receive;
+ // PacketLinkLayerC -> LowPowerListeningLayerC.RadioPacket;
+/*
 // -------- Low Power Listening
 
 #ifdef LOW_POWER_LISTENING
