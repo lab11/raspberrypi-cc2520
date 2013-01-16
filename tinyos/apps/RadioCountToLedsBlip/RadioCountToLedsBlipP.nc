@@ -66,12 +66,12 @@ implementation {
       dest.sin6_port = htons(2001);
 
       rcm.counter = counter;
-      call UDPService.sendto(&dest, &rcm, sizeof(radio_count_msg_t));
+   //   call UDPService.sendto(&dest, &rcm, sizeof(radio_count_msg_t));
 
-      if (e == SUCCESS) {
-        dbg("RadioCountToLedsC", "RadioCountToLedsC: packet sent.\n", counter);
+   //   if (e == SUCCESS) {
+   //     dbg("RadioCountToLedsC", "RadioCountToLedsC: packet sent.\n", counter);
        // locked = TRUE;
-      }
+   //   }
    // }
   }
 

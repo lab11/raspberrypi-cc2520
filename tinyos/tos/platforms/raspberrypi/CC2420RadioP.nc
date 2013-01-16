@@ -34,7 +34,7 @@ implementation {
 
   event message_t* BareReceive.receive(message_t* msg) {
     uint8_t len = ((uint8_t*) msg)[0];
-    signal Receive.receive(msg, msg->data, len);
+    signal Receive.receive(msg, msg, len-1);
   }
 
 }
