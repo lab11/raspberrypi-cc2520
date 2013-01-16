@@ -9,7 +9,6 @@ push ( @includes,
   "%T/lib/power",
   "%T/lib/rfxlink/layers",
   "%T/lib/rfxlink/util",
-  "%T/chips/cc2420/interfaces",
 );
 
 @opts = qw(
