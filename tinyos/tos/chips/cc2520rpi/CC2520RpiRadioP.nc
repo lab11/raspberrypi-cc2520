@@ -34,6 +34,8 @@ module CC2520RpiRadioP {
     // just to get it to compile for now
     interface SplitControl;
 
+    interface RadioAddress;
+
   }
 
   uses {
@@ -47,13 +49,17 @@ module CC2520RpiRadioP {
 
 implementation {
 
+  int file_desc;
+  struct cc2520_set_address_data addr_data;
+
+  ieee_eui64_t ext_addr;
+
   // temporary
   command error_t SplitControl.start() {
 
  //   int result = 0;
-    int file_desc;
+
     struct cc2520_set_channel_data chan_data;
-    struct cc2520_set_address_data addr_data;
     struct cc2520_set_txpower_data txpower_data;
 
     printf("Testing cc2520 driver...\n");
@@ -89,6 +95,36 @@ implementation {
   command error_t SplitControl.stop () {
     signal SplitControl.stopDone(SUCCESS);
     return SUCCESS;
+  }
+
+// ----------------- RadioAddress------------------------
+
+
+
+  // fix me: convert uint64_t to ieee_eui_64
+  command ieee_eui64_t RadioAddress.getExtAddr() {
+    memset(ext_addr.data, 0, sizeof(ieee_eui64_t));
+    ext_addr.data[7] = 1;
+  }
+
+  // Change the short address of the radio.
+  async command uint16_t RadioAddress.getShortAddr() {
+    return addr_data.short_addr;
+  }
+
+  command void RadioAddress.setShortAddr(uint16_t address) {
+    addr_data.short_addr = address;
+    ioctl(file_desc, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
+  }
+
+  //Change the PAN address of the radio.
+  async command uint16_t RadioAddress.getPanAddr() {
+    return addr_data.pan_id;
+  }
+
+  command void RadioAddress.setPanAddr(uint16_t address) {
+    addr_data.pan_id = address;
+    ioctl(file_desc, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
   }
 
 
