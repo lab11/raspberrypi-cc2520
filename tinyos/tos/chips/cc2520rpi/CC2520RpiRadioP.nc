@@ -36,6 +36,9 @@ module CC2520RpiRadioP {
 
     interface RadioAddress;
 
+    interface PacketField<uint8_t> as PacketRSSI;
+    interface PacketField<uint8_t> as PacketLinkQuality;
+
   }
 
   uses {
@@ -127,6 +130,52 @@ implementation {
     ioctl(file_desc, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
   }
 
+  cc2520_metadata_t* getMeta(message_t* msg){
+    return ((void*)msg->metadata);
+  }
+
+
+  //----------------- PacketLinkQuality -----------------
+
+  async command bool PacketLinkQuality.isSet(message_t* msg) {
+    return TRUE;
+  }
+
+  async command uint8_t PacketLinkQuality.get(message_t* msg) {
+    return getMeta(msg)->lqi;
+  }
+
+  async command void PacketLinkQuality.clear(message_t* msg) {
+  }
+
+  async command void PacketLinkQuality.set(message_t* msg, uint8_t value) {
+    getMeta(msg)->lqi = value;
+  }
+
+//----------------- PacketRSSI -----------------
+
+
+
+  async command bool PacketRSSI.isSet(message_t* msg) {
+ //   return call RSSIFlag.get(msg);
+    return TRUE;
+  }
+
+  async command uint8_t PacketRSSI.get(message_t* msg) {
+    return getMeta(msg)->rssi;
+  }
+
+  async command void PacketRSSI.clear(message_t* msg) {
+//    call RSSIFlag.clear(msg);
+  }
+
+  async command void PacketRSSI.set(message_t* msg, uint8_t value) {
+    // just to be safe if the user fails to clear the packet
+  //  call TransmitPowerFlag.clear(msg);
+
+  //  call RSSIFlag.set(msg);
+    getMeta(msg)->rssi = value;
+  }
 
 
 

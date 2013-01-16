@@ -77,15 +77,15 @@ configuration CC2520RpiRadioC {
 //#endif
 
     interface RadioChannel;
-
+*/
     interface PacketField<uint8_t> as PacketLinkQuality;
-    interface PacketField<uint8_t> as PacketTransmitPower;
+ //   interface PacketField<uint8_t> as PacketTransmitPower;
     interface PacketField<uint8_t> as PacketRSSI;
 
-    interface LocalTime<TRadio> as LocalTimeRadio;
-    interface PacketTimeStamp<TRadio, uint32_t> as PacketTimeStampRadio;
-    interface PacketTimeStamp<TMilli, uint32_t> as PacketTimeStampMilli;
-*/
+ //   interface LocalTime<TRadio> as LocalTimeRadio;
+ //   interface PacketTimeStamp<TRadio, uint32_t> as PacketTimeStampRadio;
+ //   interface PacketTimeStamp<TMilli, uint32_t> as PacketTimeStampMilli;
+
 
     // Completely raw interfaces.
     // BareSend needs all of the bytes of the packet except for the CRC at the
@@ -123,6 +123,10 @@ implementation
   BarePacket = CC2520RpiBarePacketC.BarePacket;
 
   RadioAddress = RadioP.RadioAddress;
+
+  PacketLinkQuality = RadioP.PacketLinkQuality;
+  PacketRSSI = RadioP.PacketRSSI;
+
 
 //#ifdef RADIO_DEBUG
 //  components AssertC;
