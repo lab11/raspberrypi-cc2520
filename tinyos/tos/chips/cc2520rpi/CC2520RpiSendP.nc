@@ -89,13 +89,14 @@ implementation {
       //error
     }
 
+    printf("sizeof %i\n", sizeof(cc2520packet_header_t));
+
     return SUCCESS;
   }
 
   command error_t BareSend.send (message_t* msg) {
     uint8_t i;
     uint8_t* msgbuf = (uint8_t*) msg;
-    uint8_t ret;
 
     pthread_mutex_lock(&mutex_send);
 

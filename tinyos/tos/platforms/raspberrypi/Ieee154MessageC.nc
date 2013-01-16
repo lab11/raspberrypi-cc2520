@@ -46,10 +46,10 @@ configuration Ieee154MessageC  {
 } implementation {
   components CC2520RpiRadioC as Msg;
 
-  SplitControl = Msg;
+  SplitControl = Msg.SplitControl;
  // SendResource = Msg;
-  Ieee154Send  = Msg;
-  Ieee154Receive = Msg;
+  Ieee154Send  = Msg.Ieee154Send;
+  Ieee154Receive = Msg.Ieee154Receive;
  // Ieee154Packet = Msg;
   Packet = Msg.PacketForIeee154Message;
 

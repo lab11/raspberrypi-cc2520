@@ -49,7 +49,7 @@ implementation {
   // temporary
   command error_t SplitControl.start() {
 
-    int result = 0;
+ //   int result = 0;
     int file_desc;
     struct cc2520_set_channel_data chan_data;
     struct cc2520_set_address_data addr_data;

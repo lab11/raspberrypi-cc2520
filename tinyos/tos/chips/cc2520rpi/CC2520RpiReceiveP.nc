@@ -42,7 +42,7 @@ implementation {
     char pbuf[2048];
     char *buf_ptr = NULL;
     int i;
-    uint8_t* data;
+ //   uint8_t* data;
 
     printf("receive_thread\n");
 
@@ -67,7 +67,7 @@ implementation {
 
         getHeader(rxMsg)->length = (uint8_t) buf[0];
 
-        data = getPayload(rxMsg);
+     //   data = getPayload(rxMsg);
 
       //  memcpy(data, buf+1, ret-1);
         memcpy(((uint8_t*) rxMsg) + 1, buf+1, ret-1);
