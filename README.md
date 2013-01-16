@@ -29,7 +29,7 @@ library and headers on your local machine.
 In order for the TinyOS build system to figure out all the correct paths you
 need to help it along a bit. Add the following to your `.bashrc` file:
 
-    export TOSROOTRPI=<path to git repo>/raspberrypi-cc2520/tinyos
+    export TOSROOTRPI=<path to git repo>/tinyos
     export TOSMAKE_PATH="$TOSROOTRPI/support/make $TOSMAKE_PATH"
 
 #### Usage
