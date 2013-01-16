@@ -69,7 +69,8 @@ implementation {
 
         data = getPayload(rxMsg);
 
-        memcpy(data, buf+1, ret-1);
+      //  memcpy(data, buf+1, ret-1);
+        memcpy(((uint8_t*) rxMsg) + 1, buf+1, ret-1);
 
         rxMsg = signal BareReceive.receive(rxMsg);
       }
