@@ -9,6 +9,10 @@ PFLAGS += -I$(TOSROOTRPI)/tos/chips/rpi
 PFLAGS += -I$(TOSROOTRPI)/tos/platforms/raspberrypi/chips/cc2520
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/cc2520rpi
 
+PFLAGS += -DPRINTFUART_ENABLED=1
+
+PFLAGS += -DLINUX_PRINTF=1
+
 $(call TOSMake_include_platform,raspberrypi)
 
 raspberrypi: $(BUILD_DEPS)
