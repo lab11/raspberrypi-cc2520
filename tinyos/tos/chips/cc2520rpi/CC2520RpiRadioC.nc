@@ -86,6 +86,13 @@ configuration CC2520RpiRadioC {
     interface PacketTimeStamp<TRadio, uint32_t> as PacketTimeStampRadio;
     interface PacketTimeStamp<TMilli, uint32_t> as PacketTimeStampMilli;
 */
+
+    // Completely raw interfaces.
+    // BareSend needs all of the bytes of the packet except for the CRC at the
+    //  end.
+    interface BareSend;
+    // BareReceive returns the entire packet.
+    interface BareReceive;
   }
 }
 
@@ -106,6 +113,9 @@ implementation
 
   // temporary
   SplitControl = RadioP.SplitControl;
+
+  BareSend = CC2520RpiSendC.BareSend;
+  BareReceive = CC2520RpiReceiveC.BareReceive;
 
 //#ifdef RADIO_DEBUG
 //  components AssertC;
