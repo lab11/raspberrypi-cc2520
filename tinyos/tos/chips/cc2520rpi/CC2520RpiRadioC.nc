@@ -93,6 +93,7 @@ configuration CC2520RpiRadioC {
     interface BareSend;
     // BareReceive returns the entire packet.
     interface BareReceive;
+    interface Packet as BarePacket;
   }
 }
 
@@ -107,6 +108,7 @@ implementation
   components CC2520RpiReceiveC;
   components CC2520RpiSendC;
   components CC2520RpiPacketC;
+  components CC2520RpiBarePacketC;
   components CC2520RpiPacketAcknowledgementsC as PAckC;
 
   PacketAcknowledgements = PAckC.PacketAcknowledgements;
@@ -116,6 +118,7 @@ implementation
 
   BareSend = CC2520RpiSendC.BareSend;
   BareReceive = CC2520RpiReceiveC.BareReceive;
+  BarePacket = CC2520RpiBarePacketC.BarePacket;
 
 //#ifdef RADIO_DEBUG
 //  components AssertC;

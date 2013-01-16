@@ -52,7 +52,7 @@ implementation {
   }
 
   async command void RadioPacket.clear(message_t* msg) {
-
+    memset(msg, 0, sizeof(message_t));
   }
 
 }

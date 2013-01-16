@@ -33,6 +33,7 @@ module CC2520RpiRadioP {
     // temporarily here...
     // just to get it to compile for now
     interface SplitControl;
+
   }
 
   uses {
@@ -89,6 +90,9 @@ implementation {
     signal SplitControl.stopDone(SUCCESS);
     return SUCCESS;
   }
+
+
+
 
 /*
 // ----------------- CC2520DriverConfig -----------------
