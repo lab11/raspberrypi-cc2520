@@ -101,8 +101,8 @@ implementation {
 
     printf("Send packet\n");
 
-    len = 13;
-    memcpy(buf, msgbuf+11, len);
+    len = msgbuf[0];
+    memcpy(buf, msgbuf, len-1);
   //  buf[0] = len;
     buf[1] |= 0x20; // request ack
    // buf[2] = 0x88;
@@ -110,7 +110,7 @@ implementation {
     printf("Send packet %i\n", len);
 
     buf_ptr = pbuf;
-    for (i = 0; i < len; i++) {
+    for (i = 0; i < len-1; i++) {
       buf_ptr += sprintf(buf_ptr, " 0x%02X", buf[i]);
     }
     *(buf_ptr) = '\0';

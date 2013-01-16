@@ -175,7 +175,7 @@ implementation
   Ieee154Receive = Ieee154MessageLayerC;
 //  Ieee154Notifier = Ieee154MessageLayerC;
  // Ieee154Packet = Ieee154PacketLayerC;
-  PacketForIeee154Message = Ieee154MessageLayerC;
+  PacketForIeee154Message = Ieee154MessageLayerC.Packet;
 #endif
 
 // -------- Tinyos Network
@@ -186,13 +186,13 @@ implementation
   TinyosNetworkLayerC.SubSend -> CC2520RpiSendC.BareSend;
  // TinyosNetworkLayerC.SubReceive -> PacketLinkLayerC;
   TinyosNetworkLayerC.SubReceive -> CC2520RpiReceiveC;
-  TinyosNetworkLayerC.SubPacket -> Ieee154PacketLayerC;
+  TinyosNetworkLayerC.SubPacket -> Ieee154PacketLayerC.RadioPacket;
 
 // -------- IEEE 802.15.4 Packet
 
   components new Ieee154PacketLayerC();
  // Ieee154PacketLayerC.SubPacket -> PacketLinkLayerC;
-  Ieee154PacketLayerC.SubPacket -> CC2520RpiPacketC;
+  Ieee154PacketLayerC.SubPacket -> CC2520RpiPacketC.RadioPacket;
 /*
 // -------- UniqueLayer Send part (wired twice)
 
