@@ -43,11 +43,13 @@ implementation {
       local_len = len;
       memcpy(send_buf, buf, local_len-1);
 
-      // don't need the lock any more
-      pthread_mutex_unlock(&mutex_send);
-
       // call the driver to send the packet
       write(cc2520_file, send_buf, local_len-1);
+
+      printf("swrite DONE\n");
+
+      // don't need the lock any more
+      pthread_mutex_unlock(&mutex_send);
 
       // signal that we are done
       signal BareSend.sendDone(msg_pointer, SUCCESS);

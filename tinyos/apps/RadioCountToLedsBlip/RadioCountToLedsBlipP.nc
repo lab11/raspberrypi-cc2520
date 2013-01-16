@@ -44,7 +44,7 @@ implementation {
   event void RadioControl.startDone(error_t err) {
     if (err == SUCCESS) {
       call UDPService.bind(2001);
-      call MilliTimer.startPeriodic(250);
+      call MilliTimer.startPeriodic(1000);
     }
     else {
       call RadioControl.start();
@@ -66,12 +66,12 @@ implementation {
       dest.sin6_port = htons(2001);
 
       rcm.counter = counter;
-   //   call UDPService.sendto(&dest, &rcm, sizeof(radio_count_msg_t));
+      call UDPService.sendto(&dest, &rcm, sizeof(radio_count_msg_t));
 
-   //   if (e == SUCCESS) {
-   //     dbg("RadioCountToLedsC", "RadioCountToLedsC: packet sent.\n", counter);
+    //  if (e == SUCCESS) {
+      //  dbg("RadioCountToLedsC", "RadioCountToLedsC: packet sent.\n", counter);
        // locked = TRUE;
-   //   }
+     // }
    // }
   }
 

@@ -8,6 +8,7 @@ PLATFORM = raspberrypi
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/rpi
 PFLAGS += -I$(TOSROOTRPI)/tos/platforms/raspberrypi/chips/cc2520
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/cc2520rpi
+PFLAGS += -I$(TOSROOTRPI)/tos/interfaces
 
 PFLAGS += -DPRINTFUART_ENABLED=1
 

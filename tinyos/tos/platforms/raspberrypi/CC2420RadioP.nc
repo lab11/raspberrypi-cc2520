@@ -1,40 +1,46 @@
 
 module CC2420RadioP {
   provides {
-    interface Send;
-    interface Receive;
+    interface PacketAcknowledgements;
+    interface PacketLink;
   }
   uses {
-    interface BareSend;
-    interface BareReceive;
+    interface PacketMetadata;
   }
 }
 
 implementation {
 
-  command error_t Send.send (message_t* msg, uint8_t len) {
-    return call BareSend.send(msg);
+  async command error_t PacketAcknowledgements.requestAck(message_t* msg) {
+    return call PacketMetadata.requestAck(msg);
   }
 
-  command error_t Send.cancel(message_t* msg) {
-    return call BareSend.cancel(msg);
+  async command error_t PacketAcknowledgements.noAck(message_t* msg) {
+    return call PacketMetadata.noAck(msg);
   }
 
-  event void BareSend.sendDone(message_t* msg, error_t error) {
-    signal Send.sendDone(msg, error);
+  async command bool PacketAcknowledgements.wasAcked(message_t* msg) {
+    return call PacketMetadata.wasAcked(msg);
   }
 
-  command uint8_t Send.maxPayloadLength() {
-    return 126;
+  command void PacketLink.setRetries(message_t *msg, uint16_t maxRetries) {
+    return call PacketMetadata.setRetries(msg, maxRetries);
   }
 
-  command void* Send.getPayload(message_t* msg, uint8_t len) {
-    return msg->data;
+  command void PacketLink.setRetryDelay(message_t *msg, uint16_t retryDelay) {
+    return call PacketMetadata.setRetryDelay(msg, retryDelay);
   }
 
-  event message_t* BareReceive.receive(message_t* msg) {
-    uint8_t len = ((uint8_t*) msg)[0];
-    signal Receive.receive(msg, msg, len-1);
+  command uint16_t PacketLink.getRetries(message_t *msg) {
+    return call PacketMetadata.getRetries(msg);
+  }
+
+  command uint16_t PacketLink.getRetryDelay(message_t *msg) {
+    return call PacketMetadata.getRetryDelay(msg);
+  }
+
+  command bool PacketLink.wasDelivered(message_t *msg) {
+    return call PacketMetadata.wasDelivered(msg);
   }
 
 }

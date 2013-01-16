@@ -118,9 +118,14 @@ implementation
   // temporary
   SplitControl = RadioP.SplitControl;
 
-  BareSend = CC2520RpiSendC.BareSend;
-  BareReceive = CC2520RpiReceiveC.BareReceive;
+//  BareSend = CC2520RpiSendC.BareSend;
+//  BareReceive = CC2520RpiReceiveC.BareReceive;
   BarePacket = CC2520RpiBarePacketC.BarePacket;
+  CC2520RpiBarePacketC.RadioPacket -> TinyosNetworkLayerC.Ieee154Packet;
+
+  BareSend = TinyosNetworkLayerC.Ieee154Send;
+  BareReceive = TinyosNetworkLayerC.Ieee154Receive;
+//  BarePacket = TinyosNetworkLayerC.Ieee154Packet;
 
   RadioAddress = RadioP.RadioAddress;
 

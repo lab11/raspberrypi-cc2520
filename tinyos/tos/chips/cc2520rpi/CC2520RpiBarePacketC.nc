@@ -3,13 +3,15 @@ configuration CC2520RpiBarePacketC {
   provides {
     interface Packet as BarePacket;
   }
+  uses {
+  	interface RadioPacket;
+  }
 }
 
 implementation {
   components CC2520RpiBarePacketP;
-  components CC2520RpiPacketC;
 
-  CC2520RpiBarePacketP.RadioPacket -> CC2520RpiPacketC.RadioPacket;
+  CC2520RpiBarePacketP.RadioPacket = RadioPacket;
 
   BarePacket = CC2520RpiBarePacketP.BarePacket;
 }

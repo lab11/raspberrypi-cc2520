@@ -4,19 +4,18 @@ module ReadLqiP {
     interface ReadLqi;
   }
   uses {
-    interface PacketField<uint8_t> as PacketLinkQuality;
-    interface PacketField<uint8_t> as PacketRSSI;
+    interface PacketMetadata;
   }
 }
 
 implementation {
 
   command uint8_t ReadLqi.readLqi(message_t *msg) {
-    return call PacketLinkQuality.get(msg);
+    return call PacketMetadata.getLqi(msg);
   }
 
   command uint8_t ReadLqi.readRssi(message_t *msg) {
-    return call PacketRSSI.get(msg);
+    return call PacketMetadata.getRssi(msg);
   }
 
 }
