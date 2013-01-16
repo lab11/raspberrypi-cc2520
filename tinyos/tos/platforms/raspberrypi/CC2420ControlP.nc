@@ -1,4 +1,3 @@
-#include "IEEE802154.h"
 
 // Translation layer for CC2420Config to CC2520 until BLIP updates
 

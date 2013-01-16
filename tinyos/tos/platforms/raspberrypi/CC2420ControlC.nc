@@ -7,9 +7,9 @@ configuration CC2420ControlC {
 
 implementation {
 	components CC2420ControlP;
-	components CC2520RadioC;
+	components CC2520RpiRadioC;
 
-	CC2420ControlP.RadioAddress -> CC2520RadioC.RadioAddress;
+	CC2420ControlP.RadioAddress -> CC2520RpiRadioC.RadioAddress;
 
 	CC2420Config = CC2420ControlP.CC2420Config;
 }
