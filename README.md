@@ -59,5 +59,8 @@ To Do
 
 The driver needs some work to get it to work in the general TinyOS environment, as well as to work with BLIP.
 
-- [ ] Add BareReceive and BareSend interfaces to CC2520Rpi driver
+- [x] Add BareReceive and BareSend interfaces to CC2520Rpi driver
   - This allows the BLIP stack to use extended 802.15.4 addressing internally.
+- [ ] Check on how I'm setting the seq numbers
+
+
