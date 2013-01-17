@@ -91,3 +91,24 @@ PacketLink
 
 	I believe BLIP handles this. The PacketLink commands BLIP uses are
 	very simple and I wrapped them into PacketMetadata.
+
+
+Border Router
+-------------
+
+To make a proper border router application, here's what I think the TinyOS
+app needs to do.
+
+The TinyOS app creates a network interface and sets a certain ipv6 prefix to
+be routed to that interface (all in linux land). This prefix will be used to give
+all wireless nodes their addresses. Then BLIP behaves normally except if it
+receives a packet from the wsn destined for itself, it always forwards that packet
+to the linux network interface. Then linux can send it to whatever application
+is bound to that port.
+
+That last part means auxillary parts of blip have to do a little more. Right now
+there is a shell interface and maybe something else built into blip that binds to a 
+UDP port in blip. This would need to bind not to blip but to the linux routing
+architecture.
+
+Setting it up this way means adding a dhcpv6 server to the pi should be trivial.
