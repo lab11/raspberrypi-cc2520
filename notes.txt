@@ -1,0 +1,52 @@
+Some thoughts on approach:
+--------------------------
+Would it be better to perhaps just implement a new component,
+let's call it CC2520RadioInterfaceC, that exposes all of required
+Blip interfaces (see below)?
+
+I'm not sure there's much value in really duplicating the
+full hierarchy of the radio stack when we need so little of
+it. We can instead create a very lean TinyOS component that
+shouldn't take much time at all to develop, and should be
+easy enough to test. 
+
+I would propose creating that component along with a basic
+application that uses printf statements and consumes said
+component, testing basic functionality. From there we would
+have to do minimal work in blip, just replacing IPDispatchC
+with an implementation that wires up our new component.
+
+Blip Interfaces:
+-----------------------------
+SplitControl as RadioControl
+- just provides start/stop of the radio interface. this will basically
+  be a NOOP for all intents and purposes.
+- calls startDone, stopDone events at the conclusion of start/stop
+  commands.
+
+Packet as BarePacket
+- does simple byte manipulation of message_t.
+
+Send as Ieee154Send
+- queues the sending of IEEE 802.15.4 packets. will
+  need to interact with the CC2520 driver and schedule
+  sending of packets, call sendDone when complete.
+- for cancel command, just return FAIL.
+- why the heck is getPayload duplicated in this interface?
+
+Receive as Ieee154Receive
+- just a single event to be fired when packets are received.
+
+ReadLqi
+- just read the RSSI and LQI from the tail end of the packet.
+
+LowPowerListening
+- blip just sets LPL on every outgoing message. Just ignore
+  this nonsense and continue on. 
+
+PacketLink
+- this actually needs to be carefully implemented to retry
+  packets and delay appropriately. I considered implementing
+  it in the driver but it's not timing critical or important.
+- add some metadata to the packet and coordinate with the 
+  sending machinery to do this correctly.
