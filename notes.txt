@@ -4,6 +4,14 @@ Would it be better to perhaps just implement a new component,
 let's call it CC2520RadioInterfaceC, that exposes all of required
 Blip interfaces (see below)?
 
+	Yeah. I wanted to be able to compile RadioCountToLeds so I
+	connected the ActiveMessage stuff and whatnot. But CC2520RpiRadioBareC
+	does what you're talking about. Well, it's close. I don't like some of the stupid
+	interfaces BLIP wired to. So I made my own: PacketMetadata.
+
+	BLIP needs to be converted to use generic interfaces. Until then I have
+	CC2420RadioC and ReadLqiC in the platform folder to do the translation.
+
 I'm not sure there's much value in really duplicating the
 full hierarchy of the radio stack when we need so little of
 it. We can instead create a very lean TinyOS component that
@@ -16,6 +24,9 @@ component, testing basic functionality. From there we would
 have to do minimal work in blip, just replacing IPDispatchC
 with an implementation that wires up our new component.
 
+	We should fix BLIP to use generic interfaces and get it in
+	the TinyOS tree.
+
 Blip Interfaces:
 -----------------------------
 SplitControl as RadioControl
@@ -27,6 +38,9 @@ SplitControl as RadioControl
 Packet as BarePacket
 - does simple byte manipulation of message_t.
 
+	This doesn't really do anything but return pointers to message_t or simple values.
+	I implemented this in CC2520RpiRadioBareP.nc. Not quite finished yet.
+
 Send as Ieee154Send
 - queues the sending of IEEE 802.15.4 packets. will
   need to interact with the CC2520 driver and schedule
@@ -34,15 +48,39 @@ Send as Ieee154Send
 - for cancel command, just return FAIL.
 - why the heck is getPayload duplicated in this interface?
 
+	Re getPayload dup, from tep116: "The duplication of some of the
+	commands in Packet is solely for ease of use: maxPayloadLength
+	and getPayload MUST behave identically as Packet.maxPayloadLength
+	and Packet.getPayload. Their inclusion is so that components do
+	not have to wire to both Packet and the sending interface for
+	basic use cases."
+	Dumb.
+
 Receive as Ieee154Receive
 - just a single event to be fired when packets are received.
+
+	Send and Receive have to do basic manipulations on the length
+	due to what BLIP expects. See http://docs.tinyos.net/tinywiki/index.php/BLIP_2.0_Platform_Support_Guide
+	"The Bare* family of interfaces refer to methods of accessing the radio
+	where the "payload" starts at the first octet of the IEEE 802.15.4 header
+	(the length byte), and all lengths refer to the number of bytes in the frame
+	including the length byte: therefore the maximum length is 128. Note this is
+	different from the value in the 802.15.4 header since that value does not
+	include the length byte."
+
+	Also I went with the default names of the interfaces because I thought that
+	was pretty clear. ex: CC2520RpiRadioBareC.Send(). They don't really do anything
+	with 802.15.4 frames.
 
 ReadLqi
 - just read the RSSI and LQI from the tail end of the packet.
 
 LowPowerListening
 - blip just sets LPL on every outgoing message. Just ignore
-  this nonsense and continue on. 
+  this nonsense and continue on.
+
+	I've ignored LPL at this point. I don't think we really have to
+	do much, but we do need to create a file to wire to at some point.
 
 PacketLink
 - this actually needs to be carefully implemented to retry
@@ -50,3 +88,6 @@ PacketLink
   it in the driver but it's not timing critical or important.
 - add some metadata to the packet and coordinate with the 
   sending machinery to do this correctly.
+
+	I believe BLIP handles this. The PacketLink commands BLIP uses are
+	very simple and I wrapped them into PacketMetadata.
