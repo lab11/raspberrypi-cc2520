@@ -16,6 +16,8 @@ implementation {
   components new UdpSocketC() as UDPService;
   App.RadioControl -> IPStackC;
   App.UDPService   -> UDPService;
+
+  components TunC;
 }
 
 

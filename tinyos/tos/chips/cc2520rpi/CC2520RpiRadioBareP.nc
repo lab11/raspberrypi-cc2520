@@ -1,10 +1,8 @@
-
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <stdlib.h>
 #include <fcntl.h>
 
-//#include <RadioConfig.h>
 #include <CC2520RpiRadio.h>
 #include "CC2520RpiDriver.h"
 #include "CC2520RpiDriverLayer.h"
@@ -26,7 +24,12 @@ module CC2520RpiRadioBareP {
 implementation {
 
 //----------- Send ---
+  // msg: pointer to a message_t
+  // len: length of the packet including the length field at the beginning
   command error_t Send.send (message_t* msg, uint8_t len) {
+    // Need to add 1 to the length. This is because the length that
+    // CC2520RpiSend requires is the packet plus the crc bytes minus the length
+    // field.
     ((uint8_t*) msg)[0] = len+1;
     return call SubSend.send(msg);
   }
@@ -49,6 +52,9 @@ implementation {
 
 //----------- Receive ---
   event message_t* SubReceive.receive (message_t* msg) {
+    // CC2520RpiReceive returns a packet with the length set as the packet plus
+    // the checksum bytes minus the length field and this raw interface provides
+    // the length of the packet without the crc but including the length field
     uint8_t len = ((cc2520packet_header_t*) msg->header)->cc2520.length-1;
     return signal Receive.receive(msg, msg, len);
   }
