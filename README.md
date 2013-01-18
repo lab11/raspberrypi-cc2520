@@ -62,5 +62,12 @@ The driver needs some work to get it to work in the general TinyOS environment, 
 - [x] Add BareReceive and BareSend interfaces to CC2520Rpi driver
   - This allows the BLIP stack to use extended 802.15.4 addressing internally.
 - [ ] Check on how I'm setting the seq numbers
+  - For the blip driver at least, I think I'm doing good things.
+- [ ] Clean up setting RSSI, channel, etc.
+- [ ] Create BorderRouter application.
+  - Create an interface for the wireless network.
+    - Send all incoming packets to the border router to that interface.
+    - Let linux decide what to do with the packet (send to dhcp server, internet, or back to the border router app)
+    - When packets come back in use rpl to route as normal back in to the wsn
 
 

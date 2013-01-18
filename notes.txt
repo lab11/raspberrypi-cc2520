@@ -1,0 +1,136 @@
+Some thoughts on approach:
+--------------------------
+Would it be better to perhaps just implement a new component,
+let's call it CC2520RadioInterfaceC, that exposes all of required
+Blip interfaces (see below)?
+
+	Yeah. I wanted to be able to compile RadioCountToLeds so I
+	connected the ActiveMessage stuff and whatnot. But CC2520RpiRadioBareC
+	does what you're talking about. Well, it's close. I don't like some of the stupid
+	interfaces BLIP wired to. So I made my own: PacketMetadata.
+
+	BLIP needs to be converted to use generic interfaces. Until then I have
+	CC2420RadioC and ReadLqiC in the platform folder to do the translation.
+
+I'm not sure there's much value in really duplicating the
+full hierarchy of the radio stack when we need so little of
+it. We can instead create a very lean TinyOS component that
+shouldn't take much time at all to develop, and should be
+easy enough to test. 
+
+I would propose creating that component along with a basic
+application that uses printf statements and consumes said
+component, testing basic functionality. From there we would
+have to do minimal work in blip, just replacing IPDispatchC
+with an implementation that wires up our new component.
+
+	We should fix BLIP to use generic interfaces and get it in
+	the TinyOS tree.
+
+Blip Interfaces:
+-----------------------------
+SplitControl as RadioControl
+- just provides start/stop of the radio interface. this will basically
+  be a NOOP for all intents and purposes.
+- calls startDone, stopDone events at the conclusion of start/stop
+  commands.
+
+Packet as BarePacket
+- does simple byte manipulation of message_t.
+
+	This doesn't really do anything but return pointers to message_t or simple values.
+	I implemented this in CC2520RpiRadioBareP.nc. Not quite finished yet.
+
+Send as Ieee154Send
+- queues the sending of IEEE 802.15.4 packets. will
+  need to interact with the CC2520 driver and schedule
+  sending of packets, call sendDone when complete.
+- for cancel command, just return FAIL.
+- why the heck is getPayload duplicated in this interface?
+
+	Re getPayload dup, from tep116: "The duplication of some of the
+	commands in Packet is solely for ease of use: maxPayloadLength
+	and getPayload MUST behave identically as Packet.maxPayloadLength
+	and Packet.getPayload. Their inclusion is so that components do
+	not have to wire to both Packet and the sending interface for
+	basic use cases."
+	Dumb.
+
+Receive as Ieee154Receive
+- just a single event to be fired when packets are received.
+
+	Send and Receive have to do basic manipulations on the length
+	due to what BLIP expects. See http://docs.tinyos.net/tinywiki/index.php/BLIP_2.0_Platform_Support_Guide
+	"The Bare* family of interfaces refer to methods of accessing the radio
+	where the "payload" starts at the first octet of the IEEE 802.15.4 header
+	(the length byte), and all lengths refer to the number of bytes in the frame
+	including the length byte: therefore the maximum length is 128. Note this is
+	different from the value in the 802.15.4 header since that value does not
+	include the length byte."
+
+	Also I went with the default names of the interfaces because I thought that
+	was pretty clear. ex: CC2520RpiRadioBareC.Send(). They don't really do anything
+	with 802.15.4 frames.
+
+		Ahh. From that page I see "IPDispatchC should reference a generic Ieee154 component, something like BareIeee154C or something." We shall (eventually)
+		implement that BareIeee154C interface instead of all this adopting.
+
+		Also... I thinkkk I support extended addresses, but I'm not sure how well.
+		Needs to be tested. 
+
+ReadLqi
+- just read the RSSI and LQI from the tail end of the packet.
+
+LowPowerListening
+- blip just sets LPL on every outgoing message. Just ignore
+  this nonsense and continue on.
+
+	I've ignored LPL at this point. I don't think we really have to
+	do much, but we do need to create a file to wire to at some point.
+
+PacketLink
+- this actually needs to be carefully implemented to retry
+  packets and delay appropriately. I considered implementing
+  it in the driver but it's not timing critical or important.
+- add some metadata to the packet and coordinate with the 
+  sending machinery to do this correctly.
+
+	I believe BLIP handles this. The PacketLink commands BLIP uses are
+	very simple and I wrapped them into PacketMetadata.
+
+		The big thing it does is provide a little bit more reliability.
+		As it stands right now the PacketLink layer is responsible
+		for sending the packet multiple times if the driver returns
+		an error code. 
+
+
+Border Router
+-------------
+
+To make a proper border router application, here's what I think the TinyOS
+app needs to do.
+
+The TinyOS app creates a network interface and sets a certain ipv6 prefix to
+be routed to that interface (all in linux land). This prefix will be used to give
+all wireless nodes their addresses. Then BLIP behaves normally except if it
+receives a packet from the wsn destined for itself, it always forwards that packet
+to the linux network interface. Then linux can send it to whatever application
+is bound to that port.
+
+That last part means auxillary parts of blip have to do a little more. Right now
+there is a shell interface and maybe something else built into blip that binds to a 
+UDP port in blip. This would need to bind not to blip but to the linux routing
+architecture.
+
+Setting it up this way means adding a dhcpv6 server to the pi should be trivial.
+
+	That sounds really good! Just out of curiosity, has anyone explored using 
+	stateless autoconfiguration? I think it might be a much better match
+	for this stuff than a dhcpv6 server. 
+
+	I think for now we can stick with using the PPP tunneling interface to get
+	this stuff online, just with the changes to blip you mentioned to make sure
+	all packets get routed to the linux host. 
+
+
+
