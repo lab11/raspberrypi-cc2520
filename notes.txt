@@ -72,6 +72,12 @@ Receive as Ieee154Receive
 	was pretty clear. ex: CC2520RpiRadioBareC.Send(). They don't really do anything
 	with 802.15.4 frames.
 
+		Ahh. From that page I see "IPDispatchC should reference a generic Ieee154 component, something like BareIeee154C or something." We shall (eventually)
+		implement that BareIeee154C interface instead of all this adopting.
+
+		Also... I thinkkk I support extended addresses, but I'm not sure how well.
+		Needs to be tested. 
+
 ReadLqi
 - just read the RSSI and LQI from the tail end of the packet.
 
@@ -91,6 +97,11 @@ PacketLink
 
 	I believe BLIP handles this. The PacketLink commands BLIP uses are
 	very simple and I wrapped them into PacketMetadata.
+
+		The big thing it does is provide a little bit more reliability.
+		As it stands right now the PacketLink layer is responsible
+		for sending the packet multiple times if the driver returns
+		an error code. 
 
 
 Border Router
@@ -112,3 +123,14 @@ UDP port in blip. This would need to bind not to blip but to the linux routing
 architecture.
 
 Setting it up this way means adding a dhcpv6 server to the pi should be trivial.
+
+	That sounds really good! Just out of curiosity, has anyone explored using 
+	stateless autoconfiguration? I think it might be a much better match
+	for this stuff than a dhcpv6 server. 
+
+	I think for now we can stick with using the PPP tunneling interface to get
+	this stuff online, just with the changes to blip you mentioned to make sure
+	all packets get routed to the linux host. 
+
+
+
