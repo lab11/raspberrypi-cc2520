@@ -102,6 +102,9 @@ PacketLink
 		As it stands right now the PacketLink layer is responsible
 		for sending the packet multiple times if the driver returns
 		an error code. 
+	
+			Ah now I see where packetlink does get wired into the 
+			stack. Need to add that to the bare driver stack.
 
 
 Border Router
