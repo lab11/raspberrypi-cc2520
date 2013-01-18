@@ -11,6 +11,9 @@ Software
 
 You need the kernel module from https://github.com/ab500/linux-cc2520-driver.
 
+You also need to enable IPV6. Edit `/etc/modules` and add `ipv6` to the end
+of the file.
+
 ### TinyOS
 
 You need a copy of the main TinyOS repository and the tinyos folder from this repo.
