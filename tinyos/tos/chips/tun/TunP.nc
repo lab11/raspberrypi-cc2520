@@ -66,6 +66,7 @@ implementation {
     tun_file = open("/dev/net/tun", O_RDWR);
     if (tun_file < 0) {
       // error
+      printf("no net/tun\n");
     }
 
     // Clear the ifr struct
@@ -77,6 +78,7 @@ implementation {
     // Setup the interface
     err = ioctl(tun_file, TUNSETIFF, (void *) &ifr);
     if (err < 0) {
+      printf("bad ioctl\n");
       close(tun_file);
     }
 
