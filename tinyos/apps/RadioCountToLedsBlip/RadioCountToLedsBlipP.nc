@@ -66,7 +66,7 @@ implementation {
       dest.sin6_port = htons(2001);
 
       rcm.counter = counter;
-      call UDPService.sendto(&dest, &rcm, sizeof(radio_count_msg_t));
+   //   call UDPService.sendto(&dest, &rcm, sizeof(radio_count_msg_t));
 
     //  if (e == SUCCESS) {
       //  dbg("RadioCountToLedsC", "RadioCountToLedsC: packet sent.\n", counter);
@@ -80,8 +80,10 @@ implementation {
                                   uint16_t len,
                                   struct ip6_metadata *meta) {
 
-    if (len != sizeof(radio_count_msg_t)) {return;}
-    else {
+    if (len != sizeof(radio_count_msg_t)) {
+      printf("RCTLB: bad len\n");
+      return;
+    } else {
       rcm_ptr = (radio_count_msg_t*)payload;
       if (rcm_ptr->counter & 0x1) {
         call Leds.led0On();

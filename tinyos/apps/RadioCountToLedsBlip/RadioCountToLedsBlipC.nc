@@ -17,7 +17,7 @@ implementation {
   App.RadioControl -> IPStackC;
   App.UDPService   -> UDPService;
 
-  components TunC;
+  components BorderC;
 }
 
 
