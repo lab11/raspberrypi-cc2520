@@ -21,6 +21,7 @@ implementation {
 
   int tun_file;
   pthread_t receive_thread;
+  uint8_t out_buf[2048];
 
   command error_t IPForward.send(struct in6_addr *next_hop,
                                  struct ip6_packet *msg,
@@ -46,11 +47,22 @@ implementation {
     int len;
     uint8_t buf[2048];
 
+    struct ip6_hdr *iph;
+    void *payload;
+
     printf("receive thread tun\n");
 
     while (1) {
       len = read(tun_file, buf, 2048);
       printf("got p\n");
+
+      // need to skip over the packet info header from the tun device
+      memcpy(out_buf, buf+sizeof(struct tun_pi), len);
+
+      // set up pointers and signal to the next layer
+      iph = (struct ip6_hdr*) out_buf;
+      payload = (iph + 1);
+      signal IPForward.recv(iph, payload, NULL);
     }
 
     return NULL;
