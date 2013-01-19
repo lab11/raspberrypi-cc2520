@@ -55,7 +55,7 @@ implementation {
 
     // Save the meta information about the packet
     // TODO add these functions
-    meta = transfer_buffer + ((*transfer_buffer)+1);
+    meta = (cc2520_metadata_t*) transfer_buffer + ((*transfer_buffer)+1);
  //   call PacketMetadata.setLqi(meta->lqi);
  //   call PacketMetadata.setRssi(meta->rssi);
  //   call PacketMetadata.setWasAcked(meta->ack);

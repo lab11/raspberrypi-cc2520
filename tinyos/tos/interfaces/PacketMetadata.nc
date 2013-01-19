@@ -4,6 +4,9 @@
 interface PacketMetadata {
   command uint8_t getLqi (message_t* msg);
   command uint8_t getRssi (message_t* msg);
+  command void setLqi (message_t *msg, uint8_t lqi);
+  command void setRssi (message_t *msg, uint8_t rssi);
+
 
   /**
    * Set the maximum number of times attempt message delivery
@@ -32,12 +35,6 @@ interface PacketMetadata {
    * @return the delay between retry attempts in ms for this message
    */
   command uint16_t getRetryDelay(message_t *msg);
-
-  /**
-   * @param 'message_t* ONE msg'
-   * @return TRUE if the message was delivered.
-   */
-  command bool wasDelivered(message_t *msg);
 
   /**
    * Tell a protocol that when it sends this packet, it should use synchronous
@@ -79,4 +76,7 @@ interface PacketMetadata {
    */
 
   async command bool wasAcked(message_t* msg);
+
+  command void setWasAcked (message_t* msg, bool ack);
+
 }

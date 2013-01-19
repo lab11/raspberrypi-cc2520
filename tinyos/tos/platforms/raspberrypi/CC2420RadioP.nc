@@ -40,7 +40,7 @@ implementation {
   }
 
   command bool PacketLink.wasDelivered(message_t *msg) {
-    return call PacketMetadata.wasDelivered(msg);
+    return call PacketMetadata.wasAcked(msg);
   }
 
 }

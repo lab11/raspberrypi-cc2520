@@ -131,7 +131,8 @@ implementation {
   }
 
   ieee154_simple_header_t* getHeaderIeee (message_t* msg) {
-    return &(((ieee154_simple_header_t*) msg->header)->ieee154);
+    cc2520packet_header_t* hdr = (cc2520packet_header_t*) msg->header;
+    return &(hdr->ieee154);
   }
 
   command uint8_t PacketMetadata.getLqi (message_t* msg) {
