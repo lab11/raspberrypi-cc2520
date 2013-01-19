@@ -54,11 +54,10 @@ implementation {
     memcpy((uint8_t*) rxMsg, transfer_buffer, (*transfer_buffer)+1);
 
     // Save the meta information about the packet
-    // TODO add these functions
     meta = (cc2520_metadata_t*) transfer_buffer + ((*transfer_buffer)+1);
- //   call PacketMetadata.setLqi(meta->lqi);
- //   call PacketMetadata.setRssi(meta->rssi);
- //   call PacketMetadata.setWasAcked(meta->ack);
+    call PacketMetadata.setLqi(rxMsg, meta->lqi);
+    call PacketMetadata.setRssi(rxMsg, meta->rssi);
+    call PacketMetadata.setWasAcked(rxMsg, meta->ack);
 
     pthread_mutex_unlock(&mutex_receive);
 
