@@ -21,17 +21,37 @@ implementation {
 
   int tun_file;
   pthread_t receive_thread;
+  uint8_t in_buf[2048];
   uint8_t out_buf[2048];
 
   command error_t IPForward.send(struct in6_addr *next_hop,
                                  struct ip6_packet *msg,
                                  void *data) {
+    size_t len;
+    int ret;
+
+    // skip the frame header
+    uint8_t* out_buf_start = out_buf + sizeof(struct tun_pi);
+
     printf("TUNP: send\n");
+
+    len = iov_len(msg->ip6_data) + sizeof(struct ip6_hdr);
+
+    // copy the header and body into the frame
+    memcpy(out_buf_start, &msg->ip6_hdr, sizeof(struct ip6_hdr));
+    iov_read(msg->ip6_data, 0, len, out_buf_start + sizeof(struct ip6_hdr));
+
+    ret = write(tun_file, out_buf, len + sizeof(struct tun_pi));
+    if (ret < 0) {
+      printf("TUNP: send failed\n");
+    }
+
+
     return SUCCESS;
   }
 
-
-
+  // Runs a command on the local system using
+  // the kernel command interpreter.
   int ssystem(const char *fmt, ...) {
     char cmd[128];
     va_list ap;
@@ -42,7 +62,6 @@ implementation {
     fflush(stdout);
     return system(cmd);
   }
-
 
   void* receive (void* arg) {
     int len;
@@ -58,19 +77,16 @@ implementation {
       printf("got p\n");
 
       // need to skip over the packet info header from the tun device
-      memcpy(out_buf, buf+sizeof(struct tun_pi), len);
+      memcpy(in_buf, buf+sizeof(struct tun_pi), len);
 
       // set up pointers and signal to the next layer
-      iph = (struct ip6_hdr*) out_buf;
+      iph = (struct ip6_hdr*) in_buf;
       payload = (iph + 1);
       signal IPForward.recv(iph, payload, NULL);
     }
 
     return NULL;
   }
-
-
-
 
   command error_t SoftwareInit.init() {
     struct ifreq ifr;
