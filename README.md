@@ -48,6 +48,9 @@ it:
     ./main.exe
 
 
+#### Testing
+
+Run BorderRouter on the rpi, Node on mote and mcast.py on the rpi. Then watch the packets fly!
 
 Hardware
 --------
