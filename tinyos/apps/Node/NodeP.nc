@@ -30,7 +30,7 @@ implementation {
   struct in6_addr llmc;
 
   event void Boot.booted() {
-    inet_pton6("2001::1", &random_dest);
+    inet_pton6("2001:638:709:1235::1", &random_dest);
     inet_pton6("ff02::1", &llmc);
 
     call RadioControl.start();
@@ -66,7 +66,8 @@ implementation {
    //   inet_pton6("ff02::1", &dest.sin6_addr);
 
       // some other random address
-      inet_pton6("2001::1", &dest.sin6_addr);
+     // inet_pton6("2001::1", &dest.sin6_addr);
+      inet_pton6("2001:638:709:1235::1", &dest.sin6_addr);
       dest.sin6_port = htons(2001);
 
       call UDPService.sendto(&dest, &counter, 2);
