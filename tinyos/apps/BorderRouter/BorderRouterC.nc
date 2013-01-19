@@ -1,8 +1,9 @@
-#include "RadioCountToLedsBlip.h"
 
-configuration RadioCountToLedsBlipC {}
+configuration BorderRouterC {}
 implementation {
-  components MainC, RadioCountToLedsBlipP as App, LedsC;
+  components MainC;
+  components BorderRouterP as App;
+  components LedsC;
   components new TimerMilliC();
 
   App.Boot -> MainC.Boot;

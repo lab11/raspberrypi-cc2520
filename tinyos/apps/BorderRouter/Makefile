@@ -1,4 +1,4 @@
-COMPONENT=RadioCountToLedsBlipC
+COMPONENT=BorderRouterC
 
 # use rpl
 PFLAGS += -DRPL_ROUTING -DRPL_STORING_MODE -I$(LOWPAN_ROOT)/tos/lib/net/rpl

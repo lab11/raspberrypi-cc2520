@@ -17,7 +17,6 @@ implementation {
   App.RadioControl -> IPStackC;
   App.UDPService   -> UDPService;
 
-  components BorderC;
 }
 
 

@@ -1,23 +1,13 @@
 #include "Timer.h"
-#include "RadioCountToLedsBlip.h"
 
  #include <stdio.h>
 
 #include <lib6lowpan/lib6lowpan.h>
 #include <lib6lowpan/ip.h>
 
-/**
- * Implementation of the RadioCountToLeds application. RadioCountToLeds
- * maintains a 4Hz counter, broadcasting its value in an AM packet
- * every time it gets updated. A RadioCountToLeds node that hears a counter
- * displays the bottom three bits on its LEDs. This application is a useful
- * test to show that basic AM communication and timers work.
- *
- * @author Philip Levis
- * @date   June 6 2005
- */
 
-module RadioCountToLedsBlipP @safe() {
+
+module BorderRouterP @safe() {
   uses {
     interface Boot;
     interface Leds;
