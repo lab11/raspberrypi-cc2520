@@ -22,6 +22,9 @@ module CC2520RpiReceiveP {
     interface Init as SoftwareInit @exactlyonce();
     interface BareReceive;
   }
+  uses {
+    interface PacketMetadata;
+  }
 }
 
 implementation {
@@ -42,12 +45,20 @@ implementation {
   //  receiving a packet.
   // This function runs in the main thread.
   void receive_done (int sig) {
+    cc2520_metadata_t* meta;
 
     // Request a lock on the transfer buffer
     pthread_mutex_lock(&mutex_receive);
 
     // Copy the shared transfer buffer to the main thread only rxMsg buffer
     memcpy((uint8_t*) rxMsg, transfer_buffer, (*transfer_buffer)+1);
+
+    // Save the meta information about the packet
+    // TODO add these functions
+    meta = transfer_buffer + ((*transfer_buffer)+1);
+ //   call PacketMetadata.setLqi(meta->lqi);
+ //   call PacketMetadata.setRssi(meta->rssi);
+ //   call PacketMetadata.setWasAcked(meta->ack);
 
     pthread_mutex_unlock(&mutex_receive);
 
@@ -79,8 +90,7 @@ implementation {
         pthread_mutex_lock(&mutex_receive);
 
         // Copy the raw packet out of the character device buffer
-        // Don't copy the 2 byte CRC
-        memcpy(transfer_buffer, buf, ret-2);
+        memcpy(transfer_buffer, buf, ret);
 
         pthread_mutex_unlock(&mutex_receive);
 
