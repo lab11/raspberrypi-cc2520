@@ -43,7 +43,7 @@ implementation {
   }
 
   command uint8_t Send.maxPayloadLength () {
-    return 126;
+    return 128;
   }
 
   command void* Send.getPayload (message_t* msg, uint8_t len) {
@@ -54,7 +54,7 @@ implementation {
   event message_t* SubReceive.receive (message_t* msg) {
     // CC2520RpiReceive returns a packet with the length set as the packet plus
     // the checksum bytes minus the length field and this raw interface provides
-    // the length of the packet without the crc but including the length field
+    // the length of the packet without the meta but including the length field
     uint8_t len = ((cc2520packet_header_t*) msg->header)->cc2520.length-1;
     return signal Receive.receive(msg, msg, len);
   }
@@ -74,7 +74,7 @@ implementation {
   }
 
   command uint8_t Packet.maxPayloadLength() {
-    return 126;
+    return 128;
   }
 
   command void* Packet.getPayload (message_t* msg, uint8_t len) {
@@ -130,14 +130,24 @@ implementation {
     return &(((cc2520packet_metadata_t*) msg->metadata)->cc2520);
   }
 
+  ieee154_simple_header_t* getHeaderIeee (message_t* msg) {
+    return &(((ieee154_simple_header_t*) msg->header)->ieee154);
+  }
+
   command uint8_t PacketMetadata.getLqi (message_t* msg) {
-  //  return getMetaCC2520(msg)->lqi;
-    return 255;
+    return getMetaCC2520(msg)->lqi;
   }
 
   command uint8_t PacketMetadata.getRssi (message_t* msg) {
-  //  return getMetaCC2520(msg)->rssi;
-    return 255;
+    return getMetaCC2520(msg)->rssi;
+  }
+
+  command void PacketMetadata.setLqi (message_t *msg, uint8_t lqi) {
+    getMetaCC2520(msg)->lqi = lqi;
+  }
+
+  command void PacketMetadata.setRssi (message_t *msg, uint8_t rssi) {
+    getMetaCC2520(msg)->rssi = rssi;
   }
 
   command void PacketMetadata.setRetries (message_t *msg, uint16_t maxRetries) {
@@ -149,28 +159,28 @@ implementation {
     getMetaLink(msg)->retryDelay = retryDelay;
   }
 
-  command uint16_t PacketMetadata.getRetries(message_t *msg) {
+  command uint16_t PacketMetadata.getRetries (message_t *msg) {
     return getMetaLink(msg)->maxRetries;
   }
 
-  command uint16_t PacketMetadata.getRetryDelay(message_t *msg) {
+  command uint16_t PacketMetadata.getRetryDelay (message_t *msg) {
     getMetaLink(msg)->retryDelay;
   }
 
-  command bool PacketMetadata.wasDelivered(message_t *msg) {
-    return TRUE;
+  async command error_t PacketMetadata.requestAck (message_t* msg) {
+    getHeaderIeee(msg)->fcf &= ~(uint16_t)(1 << IEEE154_FCF_ACK_REQ);
   }
 
-  async command error_t PacketMetadata.requestAck(message_t* msg) {
-    return SUCCESS;
+  async command error_t PacketMetadata.noAck (message_t* msg) {
+    getHeaderIeee(msg)->fcf &= ~(uint16_t)(1 << IEEE154_FCF_ACK_REQ);
   }
 
-  async command error_t PacketMetadata.noAck(message_t* msg) {
-    return SUCCESS;
+  async command bool PacketMetadata.wasAcked (message_t* msg) {
+    return getMetaCC2520(msg)->ack;
   }
 
-  async command bool PacketMetadata.wasAcked(message_t* msg) {
-    return TRUE;
+  command void PacketMetadata.setWasAcked (message_t* msg, bool ack) {
+    getMetaCC2520(msg)->ack = ack;
   }
 
 }
