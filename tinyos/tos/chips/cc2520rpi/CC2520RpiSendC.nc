@@ -14,6 +14,10 @@ implementation {
 
   BareSend = SendP.BareSend;
 
+  //experimenting
+  components new TimerMilliC();
+  SendP.Timer -> TimerMilliC;
+
 }
 
 
