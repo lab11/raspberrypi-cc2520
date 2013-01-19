@@ -13,6 +13,7 @@ implementation {
     struct cc2520_set_channel_data chan_data;
     struct cc2520_set_txpower_data txpower_data;
     struct cc2520_set_address_data addr_data;
+    struct cc2520_set_lpl_data lpl_data;
 
     printf("Testing cc2520 driver...\n");
     cc2520_file = open("/dev/radio", O_RDWR);
@@ -31,6 +32,10 @@ implementation {
     printf("Setting tx power\n");
     txpower_data.txpower = CC2520_TXPOWER_0DBM;
     ioctl(cc2520_file, CC2520_IO_RADIO_SET_TXPOWER, &txpower_data);
+
+    printf("Disable LPL\n");
+    lpl_data.enabled = FALSE;
+    ioctl(cc2520_file, CC2520_IO_RADIO_SET_LPL, &lpl_data);
 
     printf("Turning on the radio...\n");
     ioctl(cc2520_file, CC2520_IO_RADIO_INIT, NULL);
