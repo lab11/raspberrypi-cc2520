@@ -27,9 +27,11 @@ implementation {
 
 
   struct in6_addr random_dest;
+  struct in6_addr llmc;
 
   event void Boot.booted() {
     inet_pton6("2001::1", &random_dest);
+    inet_pton6("ff02::1", &llmc);
 
     call RadioControl.start();
   }
@@ -37,7 +39,10 @@ implementation {
   event void RadioControl.startDone(error_t err) {
 
     if (err == SUCCESS) {
-      call ForwardingTable.addRoute(random_dest.s6_addr, 128, NULL, ROUTE_IFACE_154);
+      call ForwardingTable.addRoute(random_dest.s6_addr,
+                                    128,
+                                    llmc.s6_addr,
+                                    ROUTE_IFACE_154);
 
       call UDPService.bind(2001);
       call MilliTimer.startPeriodic(1000);
