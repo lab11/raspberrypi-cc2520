@@ -62,10 +62,10 @@ implementation {
 
 
     // link-local multicast
-   //   inet_pton6("ff02::1", &dest.sin6_addr);
+      inet_pton6("ff02::1", &dest.sin6_addr);
 
       // some other random address
-      inet_pton6("2001::1", &dest.sin6_addr);
+   //   inet_pton6("2001::1", &dest.sin6_addr);
       dest.sin6_port = htons(2001);
 
       rcm.counter = counter;
