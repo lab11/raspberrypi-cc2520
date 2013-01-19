@@ -61,12 +61,15 @@ implementation {
  //   } else {
 
 
+    // link-local multicast
+   //   inet_pton6("ff02::1", &dest.sin6_addr);
 
-      inet_pton6("ff02::1", &dest.sin6_addr);
+      // some other random address
+      inet_pton6("2001::1", &dest.sin6_addr);
       dest.sin6_port = htons(2001);
 
       rcm.counter = counter;
-   //   call UDPService.sendto(&dest, &rcm, sizeof(radio_count_msg_t));
+      call UDPService.sendto(&dest, &rcm, sizeof(radio_count_msg_t));
 
     //  if (e == SUCCESS) {
       //  dbg("RadioCountToLedsC", "RadioCountToLedsC: packet sent.\n", counter);
@@ -81,7 +84,7 @@ implementation {
                                   struct ip6_metadata *meta) {
 
     if (len != sizeof(radio_count_msg_t)) {
-      printf("RCTLB: bad len\n");
+     // printf("RCTLB: bad len\n");
       return;
     } else {
       rcm_ptr = (radio_count_msg_t*)payload;

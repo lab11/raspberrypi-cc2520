@@ -26,6 +26,7 @@ implementation {
   command error_t IPForward.send(struct in6_addr *next_hop,
                                  struct ip6_packet *msg,
                                  void *data) {
+    printf("TUNP: send\n");
     return SUCCESS;
   }
 
