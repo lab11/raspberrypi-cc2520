@@ -16,6 +16,21 @@ including Alarms, should run asynchronously, but at the same time they
 need to preserve the idea of being able to disable interrupts globally.
 Additionally modifying the scheduler's task queue will require an
 atomic section.
+- (hopefully) NonIssue: In TinyOS interrupt handlers run to completion.
+Once they start they would run completely and not be preempted. In Linux
+this just isn't something we can absolutely guarantee. Linux will let
+tasks preempt each other all the time, especially in user-land. I'm
+pretty sure that TinyOS discourages developers from relying on this
+assumption, so only 'bad' code will break it. The rule is basically
+that all shared data structures need to be protected by atomic sections.
+
+TinyOS: Async Events Preempt Tasks and Run to Completion
+Linux: Async Events Preempt Tasks, but could be potentially
+preempted by the current running Task to make progress. 
+
+IF this becomes a problem we can implement more of a user-land scheduler
+(think the EECS482 project more-or-less), run everything on a single Linux
+thread and prevent this behavior, it's just a LOT more work. 
 
 System Layout:
 ==============
