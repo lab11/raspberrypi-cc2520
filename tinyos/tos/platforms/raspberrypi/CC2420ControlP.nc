@@ -14,6 +14,7 @@ implementation {
 
   command error_t CC2420Config.sync() {
     signal CC2420Config.syncDone(SUCCESS);
+    return SUCCESS;
   }
 
   command uint8_t CC2420Config.getChannel() {

@@ -59,7 +59,7 @@ implementation {
   }
 
   command error_t SoftwareInit.init() {
-    int ret;
+    //int ret;
 
     // Open the character device for the CC2520
     cc2520_file = open("/dev/radio", O_RDWR);
@@ -144,6 +144,9 @@ implementation {
 
     // call the driver to send the packet
     ret = write(cc2520_file, buf, len-1);
+    if (ret < 0) {
+      printf("CC2520RpiSendP: failed write()\n");
+    }
 
     call Timer.startOneShot(100);
 

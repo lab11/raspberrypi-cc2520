@@ -165,15 +165,17 @@ implementation {
   }
 
   command uint16_t PacketMetadata.getRetryDelay (message_t *msg) {
-    getMetaLink(msg)->retryDelay;
+    return getMetaLink(msg)->retryDelay;
   }
 
   async command error_t PacketMetadata.requestAck (message_t* msg) {
     getHeaderIeee(msg)->fcf &= ~(uint16_t)(1 << IEEE154_FCF_ACK_REQ);
+    return SUCCESS;
   }
 
   async command error_t PacketMetadata.noAck (message_t* msg) {
     getHeaderIeee(msg)->fcf &= ~(uint16_t)(1 << IEEE154_FCF_ACK_REQ);
+    return SUCCESS;
   }
 
   async command bool PacketMetadata.wasAcked (message_t* msg) {
