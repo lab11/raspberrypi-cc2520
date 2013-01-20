@@ -42,24 +42,12 @@ implementation {
   event void MilliTimer.fired() {
     error_t e;
     struct sockaddr_in6 dest;
+
+    // Test transmission of blink packet data.
     counter++;
-    dbg("RadioCountToLedsC", "RadioCountToLedsC: timer fired, counter is %hu.\n", counter);
-  //  if (locked) {
-  //    return;
- //   } else {
-
-
-
-      inet_pton6("ff02::1", &dest.sin6_addr);
-      dest.sin6_port = htons(2001);
-
-   //   call UDPService.sendto(&dest, &rcm, sizeof(radio_count_msg_t));
-
-    //  if (e == SUCCESS) {
-      //  dbg("RadioCountToLedsC", "RadioCountToLedsC: packet sent.\n", counter);
-       // locked = TRUE;
-     // }
-   // }
+    inet_pton6("ff02::1", &dest.sin6_addr);
+    dest.sin6_port = htons(2001);
+    call UDPService.sendto(&dest, &counter, 2);
   }
 
   event void UDPService.recvfrom (struct sockaddr_in6 *from,
