@@ -9,10 +9,10 @@
 #   mcast    (receivers, IPv4)
 #   mcast  -6  (receivers, IPv6)
 
-MYPORT = 2007
+MYPORT = 2001
 MYGROUP_4 = '225.0.0.250'
 MYGROUP_6 = 'fe80::fffe:12'
-MYGROUP_6 = '2001:638:709:1234::fffe:11'
+MYGROUP_6 = '2001:638:709:1234::fffe:1'
 #me='fe80::2e41:38ff:fe89:9a2'
 me='::1'
 MYTTL = 10 # Increase to reach other networks
