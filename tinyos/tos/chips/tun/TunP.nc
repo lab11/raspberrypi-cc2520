@@ -24,6 +24,7 @@ implementation {
   uint8_t in_buf[2048];
   uint8_t out_buf[2048];
 
+  // todo: add timer and sendDone
   command error_t IPForward.send(struct in6_addr *next_hop,
                                  struct ip6_packet *msg,
                                  void *data) {
