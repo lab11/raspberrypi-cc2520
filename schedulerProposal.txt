@@ -1,0 +1,92 @@
+Raspberry Pi - TinyOS Scheduling Approach - Proposal
+===================================================
+Goals:
+- Support atomic sections
+- Support concurrent transmission of radio packets from
+dedicated threads (necessary for performance)
+- Don't segfault or blow up
+
+Problems:
+- MAIN PROBLEM: The sendDone and receive events need to be run by tasks
+within the scheduler, they are NOT async. Using threads effectively runs 
+them as async tasks, allowing them to preempt and run concurrently with 
+other tasks, something that TinyOS explicitly denies.
+- Secondary: We currently don't support atomic sections. Some things,
+including Alarms, should run asynchronously, but at the same time they
+need to preserve the idea of being able to disable interrupts globally.
+Additionally modifying the scheduler's task queue will require an
+atomic section.
+
+System Layout:
+==============
+
+Mutexes
+-------
+atomic_mutex - Acquired anytime a thread enters an atomic section.
+By calling it simply from TinyOS's built-in global interrupt
+enable/disable functions we will ensure that atomic sections
+don't interweave.
+
+radio_mutex - Mostly used for sleeping the radio threads. Contains
+a condition variable that the send thread will wait on.
+
+Threads
+---------------
+
+main thread:
+- Runs TinyOS main task scheduling loop. Doesn't do
+anything too special.
+
+radio send thread:
+- Waits for signal of condition variable. Sends the
+current packet and posts sendDone to the task scheduler.
+
+radio receive thread:
+- Waits for read() to return a packet. Upon reception
+of a packet, posts receive to the task scheduler.
+
+alarm callback threads:
+- I think that when the alarms fire they occur on
+separate threads. That's fine, TinyOS alarms are
+suppose to be async, and they have machinery in
+place to convert async events to sync ones when
+they are converted to timers. No code changes.
+
+Scenarios:
+=============================
+
+Calling Send:
+----------------------------------------------------------
+A task running on the main thread calls Send. Send also
+executes on the main thread. It acquires radio_lock and
+signals for the radio send thread to wake up. It stores
+a pointer to the message_t in the RadioSend component and
+it returns SUCCESS.
+
+The radio thread wakes up and executes. This is completely
+non-TinyOS code. It finishes and it's time to call sendDone.
+The radio thread calls post() with a task defined in the
+component who's sole purpose is to signal sendDone.
+Because the scheduler is already built to handle this kind
+of situation it will acquire atomix_mutex for us and add
+this event to the task queue. 
+
+The task will run, and signal sendDone. sendDone will
+run synchronously. 
+
+A Packet Comes In:
+------------------------------------------------------------
+The radio receive thread, which has been blocking on a read()
+call to the cc2520 driver, is woken up by the kernel with
+a new packet. It copies the data into a message_t and calls
+post() with a task defined in the component who's sole purpose
+is to signal receive. 
+
+Because the scheduler is already built to handle this kind
+of situation it will acquire atomix_mutex for us and add
+this event to the task queue. 
+
+The task will run, and signal receive. Receive will run
+synchronously with respect to the other tasks. 
+
+
