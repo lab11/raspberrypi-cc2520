@@ -96,6 +96,7 @@ implementation {
     return msg;
   }
 
+
 //----------- Receive ---
   event message_t* SubReceive.receive (message_t* msg) {
     // CC2520RpiReceive returns a packet with the length set as the packet plus
@@ -104,6 +105,8 @@ implementation {
     uint8_t len = ((cc2520packet_header_t*) msg->header)->cc2520.length-1;
     return signal Receive.receive(msg, msg, len);
   }
+
+
 
 //----------- Packet ---
   command void Packet.clear (message_t* msg) {
