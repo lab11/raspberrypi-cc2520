@@ -12,6 +12,7 @@ module CC2520RpiRadioBareP {
     interface Send;
     interface Receive;
     interface Packet;
+    interface LowPowerListening;
     interface PacketMetadata;
     interface RadioAddress;
   }
@@ -79,6 +80,24 @@ implementation {
 
   command void* Packet.getPayload (message_t* msg, uint8_t len) {
     return msg;
+  }
+
+// ----------------- Low Power Listening ---
+  command void LowPowerListening.setLocalWakeupInterval (uint16_t interval) {
+
+  }
+
+  command uint16_t LowPowerListening.getLocalWakeupInterval () {
+    return 10;
+  }
+
+  command void LowPowerListening.setRemoteWakeupInterval (message_t *msg,
+                                                          uint16_t interval) {
+
+  }
+
+  command uint16_t LowPowerListening.getRemoteWakeupInterval (message_t *msg) {
+    return 10;
   }
 
 // ----------------- RadioAddress------------------------

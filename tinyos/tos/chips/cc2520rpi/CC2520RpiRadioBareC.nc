@@ -13,6 +13,7 @@ configuration CC2520RpiRadioBareC {
     interface Send;
     interface Receive;
     interface Packet;
+    interface LowPowerListening;
     interface PacketMetadata;
     interface RadioAddress;
   }
@@ -30,10 +31,11 @@ implementation {
 
   CC2520RpiLinkC.SubSend -> CC2520RpiSendC.BareSend;
 
-  SplitControl = CC2520RpiSplitControlC.SplitControl;
-  Send = CC2520RpiRadioBareP.Send;
-  Receive = CC2520RpiRadioBareP.Receive;
-  Packet = CC2520RpiRadioBareP.Packet;
-  PacketMetadata = CC2520RpiRadioBareP.PacketMetadata;
-  RadioAddress = CC2520RpiRadioBareP.RadioAddress;
+  SplitControl      = CC2520RpiSplitControlC.SplitControl;
+  Send              = CC2520RpiRadioBareP.Send;
+  Receive           = CC2520RpiRadioBareP.Receive;
+  Packet            = CC2520RpiRadioBareP.Packet;
+  LowPowerListening = CC2520RpiRadioBareP.LowPowerListening;
+  PacketMetadata    = CC2520RpiRadioBareP.PacketMetadata;
+  RadioAddress      = CC2520RpiRadioBareP.RadioAddress;
 }

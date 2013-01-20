@@ -4,8 +4,6 @@
  * Author: Brad Campbell
  */
 
-#include <PacketLinkLayer.h>
-#include <RadioAssert.h>
 
 module CC2520RpiLinkP {
   provides {
