@@ -45,10 +45,26 @@
 #include <Ieee154PacketLayer.h>
 #include <ActiveMessageLayer.h>
 #include <MetadataFlagsLayer.h>
-#include <CC2520RpiDriverLayer.h>
 #include <TimeStampingLayer.h>
 #include <LowPowerListeningLayer.h>
 #include <PacketLinkLayer.h>
+
+typedef nx_struct cc2520_header_t
+{
+  nxle_uint8_t length;
+} cc2520_header_t;
+
+
+typedef struct cc2520_metadata_t
+{
+  uint8_t lqi;
+  union
+  {
+    uint8_t power;
+    uint8_t ack;
+    uint8_t rssi;
+  };
+} cc2520_metadata_t;
 
 /**
  * CC2520 Security Header

@@ -5,7 +5,6 @@
 
 #include <CC2520RpiRadio.h>
 #include "CC2520RpiDriver.h"
-#include "CC2520RpiDriverLayer.h"
 
 module CC2520RpiRadioP {
   provides {

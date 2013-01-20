@@ -39,7 +39,6 @@
 
 #include <Timer.h>
 #include <message.h>
-#include <CC2520RpiDriverLayer.h>
 
 // This is the default value of the PA_POWER field of the TXCTL register.
 #ifndef CC2520_DEF_RFPOWER
