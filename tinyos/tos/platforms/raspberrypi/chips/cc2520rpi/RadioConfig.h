@@ -52,7 +52,7 @@
 
 // The number of microseconds a sending mote will wait for an acknowledgement
 #ifndef SOFTWAREACK_TIMEOUT
-#define SOFTWAREACK_TIMEOUT	800
+#define SOFTWAREACK_TIMEOUT	2500
 #endif
 
 #ifndef LPL_WINDOW
