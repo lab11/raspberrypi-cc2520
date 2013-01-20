@@ -32,6 +32,7 @@ implementation {
   struct cc2520_set_ack_data ack_data = {SOFTWAREACK_TIMEOUT};
   struct cc2520_set_txpower_data txpower_data = {CC2520_DEF_RFPOWER};
   struct cc2520_set_lpl_data lpl_data = {0, 0, FALSE};
+  struct cc2520_set_print_messages_data print_data = {TRUE};
 
   command error_t SplitControl.start () {
 
@@ -52,6 +53,7 @@ implementation {
     ioctl(cc2520_file, CC2520_IO_RADIO_SET_ACK, &ack_data);
     ioctl(cc2520_file, CC2520_IO_RADIO_SET_TXPOWER, &txpower_data);
     ioctl(cc2520_file, CC2520_IO_RADIO_SET_LPL, &lpl_data);
+    ioctl(cc2520_file, CC2520_IO_RADIO_SET_PRINT, &print_data);
 
     // turn on
     ioctl(cc2520_file, CC2520_IO_RADIO_INIT, NULL);
