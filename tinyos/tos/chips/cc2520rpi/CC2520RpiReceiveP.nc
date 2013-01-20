@@ -111,7 +111,7 @@ implementation {
     return NULL;
   }
 
-  command error_t SoftwareInit.init() {
+  command error_t SoftwareInit.init () {
     // We pass a buffer back and forth between
     // the upper layers. 
     rx_msg_ptr = &rx_msg_buf;
@@ -121,6 +121,8 @@ implementation {
     // Lock on the transfer buffer that is shared between the main thread and
     // the receive thread
     pthread_mutex_init(&mutex_receive, NULL);
+
+    pthread_cond_init(&cond_pending, NULL);
 
     // Start a dedicated receiving thread.
     pthread_create(&receive_thread, NULL, &receive, NULL);

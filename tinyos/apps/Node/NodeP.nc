@@ -55,28 +55,17 @@ implementation {
   event void MilliTimer.fired() {
     error_t e;
     struct sockaddr_in6 dest;
+    
     counter++;
     dbg("RadioCountToLedsC", "RadioCountToLedsC: timer fired, counter is %hu.\n", counter);
-  //  if (locked) {
-  //    return;
- //   } else {
 
+    // some other random address
+    // inet_pton6("2001::1", &dest.sin6_addr);
 
-    // link-local multicast
-   //   inet_pton6("ff02::1", &dest.sin6_addr);
-
-      // some other random address
-     // inet_pton6("2001::1", &dest.sin6_addr);
-      inet_pton6("2001:638:709:1235::1", &dest.sin6_addr);
-      dest.sin6_port = htons(2001);
-
-      call UDPService.sendto(&dest, &counter, 2);
-
-    //  if (e == SUCCESS) {
-      //  dbg("RadioCountToLedsC", "RadioCountToLedsC: packet sent.\n", counter);
-       // locked = TRUE;
-     // }
-   // }
+    // This is the address of the RPi Border Router
+    inet_pton6("2001:638:709:1235::1", &dest.sin6_addr);
+    dest.sin6_port = htons(2001);
+    call UDPService.sendto(&dest, &counter, 2);
   }
 
   event void UDPService.recvfrom (struct sockaddr_in6 *from,
