@@ -5,6 +5,7 @@
 
 #include <CC2520RpiRadio.h>
 #include "CC2520RpiDriver.h"
+#include <RadioConfig.h>
 
 module CC2520RpiRadioP {
   provides {
@@ -139,7 +140,7 @@ implementation {
 
     } else if (interval != LPL_interval) {
       // set the window and interval
-      lpl_data.window   = interval;
+      lpl_data.window   = LPL_WINDOW;
       lpl_data.interval = interval;
       lpl_data.enabled  = TRUE;
       ioctl(cc2520_file, CC2520_IO_RADIO_OFF, NULL);
