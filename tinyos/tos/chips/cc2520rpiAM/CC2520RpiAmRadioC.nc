@@ -107,7 +107,7 @@ implementation
 // -------- RadioP
 
   components CC2520RpiAmRadioP as AmRadioP;
-  components CC2520RpiRadioC as RadioC;
+  components CC2520RpiRadioP as RadioP;
   components CC2520RpiReceiveC;
   components CC2520RpiSendC;
   components CC2520RpiAmPacketC;
@@ -115,12 +115,12 @@ implementation
   components CC2520RpiAmPacketMetadataC;
 
   // dummy wiring
-  AmRadioP.Send -> RadioC.Send;
-  AmRadioP.Receive -> RadioC.Receive;
+  AmRadioP.Send -> RadioP.Send;
+  AmRadioP.Receive -> RadioP.Receive;
 
   PacketAcknowledgements = AmRadioP.PacketAcknowledgements;
 
-  SplitControl = RadioC.SplitControl;
+  SplitControl = RadioP.SplitControl;
 
 //  BareSend = CC2520RpiSendC.BareSend;
 //  BareReceive = CC2520RpiReceiveC.BareReceive;
@@ -131,12 +131,12 @@ implementation
   BareReceive = TinyosNetworkLayerC.Ieee154Receive;
 //  BarePacket = TinyosNetworkLayerC.Ieee154Packet;
 
-  RadioAddress = RadioC.RadioAddress;
+  RadioAddress = RadioP.RadioAddress;
 
   PacketLinkQuality = AmRadioP.PacketLinkQuality;
   PacketRSSI = AmRadioP.PacketRSSI;
 
-  AmRadioP.PacketMetadata -> RadioC.PacketMetadata;
+  AmRadioP.PacketMetadata -> RadioP.PacketMetadata;
 
 
 //#ifdef RADIO_DEBUG

@@ -8,9 +8,9 @@ configuration CC2520RpiAmPacketMetadataC {
 
 implementation {
   components CC2520RpiAmPacketMetadataP;
-  components CC2520RpiRadioC;
+  components CC2520RpiRadioP as RadioP;
 
-  CC2520RpiAmPacketMetadataP.PacketMetadata -> CC2520RpiRadioC.PacketMetadata;
+  CC2520RpiAmPacketMetadataP.PacketMetadata -> RadioP.PacketMetadata;
 
   PacketLinkQuality = CC2520RpiAmPacketMetadataP.PacketLinkQuality;
   PacketRSSI = CC2520RpiAmPacketMetadataP.PacketRSSI;

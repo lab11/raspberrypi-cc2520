@@ -3,6 +3,7 @@
 #include <sys/ioctl.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <signal.h>
 
 
 #include <CC2520RpiRadio.h>
@@ -10,6 +11,7 @@
 #include <Tasklet.h>
 
 #include "CC2520RpiDriver.h"
+#include "signalWrapper.h"
 
 
 // Handles all of the configuration settings for all of the layers.

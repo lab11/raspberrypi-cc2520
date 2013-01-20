@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <stdio.h>
+//#include <signal.h>
 
 /* This is the low level receive module that gets packets from the CC2520 kernel
  * module.
