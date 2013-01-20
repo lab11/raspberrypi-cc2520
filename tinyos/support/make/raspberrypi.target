@@ -5,12 +5,16 @@ PLATFORM = raspberrypi
 #PFLAGS += -DCC2520_DEF_CHANNEL=$(CC2520_CHANNEL)
 #endif
 
-PFLAGS += -I$(TOSROOTRPI)/tos/chips/rpi
-PFLAGS += -I$(TOSROOTRPI)/tos/platforms/raspberrypi/chips/cc2520
+PFLAGS += -I$(TOSROOTRPI)/tos/platforms/raspberrypi
+PFLAGS += -I$(TOSROOTRPI)/tos/platforms/raspberrypi/chips/cc2420
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/cc2520rpi
-PFLAGS += -I$(TOSROOTRPI)/tos/interfaces
-PFLAGS += -I$(TOSROOTRPI)/tos/lib/net/blip
+PFLAGS += -I$(TOSROOTRPI)/tos/chips/rpi
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/tun
+PFLAGS += -I$(TOSROOTRPI)/tos/interfaces
+
+PFLAGS += -I$(TOSROOTRPI)/tos/platforms/raspberrypi/chips/cc2520rpi
+PFLAGS += -I$(TOSROOTRPI)/tos/lib/net/blip
+
 
 PFLAGS += -DPRINTFUART_ENABLED=1
 

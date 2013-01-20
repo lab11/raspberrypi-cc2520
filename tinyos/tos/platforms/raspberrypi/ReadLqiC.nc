@@ -6,10 +6,6 @@ configuration ReadLqiC {
 }
 
 implementation {
-  components ReadLqiP;
-  components CC2520RpiRadioBareC;
-
-  ReadLqiP.PacketMetadata -> CC2520RpiRadioBareC.PacketMetadata;
-
-  ReadLqi = ReadLqiP.ReadLqi;
+  components CC2420RadioC;
+  ReadLqi = CC2420RadioC.ReadLqi;
 }

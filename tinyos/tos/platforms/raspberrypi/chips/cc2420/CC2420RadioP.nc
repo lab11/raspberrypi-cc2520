@@ -1,16 +1,50 @@
 
-// Translation layer for CC2420Config to CC2520 until BLIP updates
-
-module CC2420ControlP {
+module CC2420RadioP {
   provides {
+    interface PacketAcknowledgements;
+    interface PacketLink;
     interface CC2420Config;
+    interface ReadLqi;
   }
   uses {
+    interface PacketMetadata;
     interface RadioAddress;
   }
 }
 
 implementation {
+
+  async command error_t PacketAcknowledgements.requestAck(message_t* msg) {
+    return call PacketMetadata.requestAck(msg);
+  }
+
+  async command error_t PacketAcknowledgements.noAck(message_t* msg) {
+    return call PacketMetadata.noAck(msg);
+  }
+
+  async command bool PacketAcknowledgements.wasAcked(message_t* msg) {
+    return call PacketMetadata.wasAcked(msg);
+  }
+
+  command void PacketLink.setRetries(message_t *msg, uint16_t maxRetries) {
+    return call PacketMetadata.setRetries(msg, maxRetries);
+  }
+
+  command void PacketLink.setRetryDelay(message_t *msg, uint16_t retryDelay) {
+    return call PacketMetadata.setRetryDelay(msg, retryDelay);
+  }
+
+  command uint16_t PacketLink.getRetries(message_t *msg) {
+    return call PacketMetadata.getRetries(msg);
+  }
+
+  command uint16_t PacketLink.getRetryDelay(message_t *msg) {
+    return call PacketMetadata.getRetryDelay(msg);
+  }
+
+  command bool PacketLink.wasDelivered(message_t *msg) {
+    return call PacketMetadata.wasAcked(msg);
+  }
 
   command error_t CC2420Config.sync() {
     signal CC2420Config.syncDone(SUCCESS);
@@ -65,6 +99,14 @@ implementation {
 
   async command bool CC2420Config.isAutoAckEnabled() {
     return TRUE;
+  }
+
+  command uint8_t ReadLqi.readLqi(message_t *msg) {
+    return call PacketMetadata.getLqi(msg);
+  }
+
+  command uint8_t ReadLqi.readRssi(message_t *msg) {
+    return call PacketMetadata.getRssi(msg);
   }
 
 }

@@ -29,7 +29,8 @@ implementation {
   int cc2520_file = -1;
   struct cc2520_set_channel_data chan_data = {CC2520_DEF_CHANNEL};
   struct cc2520_set_address_data addr_data = {0, 0, DEFINED_TOS_AM_GROUP};
-  struct cc2520_set_txpower_data txpower_data = {CC2520_TXPOWER_0DBM};
+  struct cc2520_set_ack_data ack_data = {SOFTWAREACK_TIMEOUT};
+  struct cc2520_set_txpower_data txpower_data = {CC2520_DEF_RFPOWER};
   struct cc2520_set_lpl_data lpl_data = {0, 0, FALSE};
 
   command error_t SplitControl.start () {
@@ -48,6 +49,7 @@ implementation {
     // set properties
     ioctl(cc2520_file, CC2520_IO_RADIO_SET_CHANNEL, &chan_data);
     ioctl(cc2520_file, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
+    ioctl(cc2520_file, CC2520_IO_RADIO_SET_ACK, &ack_data);
     ioctl(cc2520_file, CC2520_IO_RADIO_SET_TXPOWER, &txpower_data);
     ioctl(cc2520_file, CC2520_IO_RADIO_SET_LPL, &lpl_data);
 

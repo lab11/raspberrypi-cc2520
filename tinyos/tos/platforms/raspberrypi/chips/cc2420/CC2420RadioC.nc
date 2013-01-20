@@ -11,20 +11,16 @@ configuration CC2420RadioC {
   provides {
     interface SplitControl;
 
- //   interface Resource[uint8_t clientId];
     interface Send as BareSend;
     interface Receive as BareReceive;
     interface Packet as BarePacket;
 
- //   interface Send    as ActiveSend;
- //   interface Receive as ActiveReceive;
-
- //   interface CC2420Packet;
     interface PacketAcknowledgements;
- //   interface LinkPacketMetadata;
- //   interface LowPowerListening;
+    interface LowPowerListening;
     interface PacketLink;
 
+    interface CC2420Config;
+    interface ReadLqi;
   }
 }
 implementation {
@@ -33,7 +29,7 @@ implementation {
   components CC2520RpiRadioBareC;
 
   CC2420RadioP.PacketMetadata -> CC2520RpiRadioBareC.PacketMetadata;
- // CC2420RadioP.BareReceive -> CC2520RpiRadioC.BareReceive;
+  CC2420RadioP.RadioAddress -> CC2520RpiRadioBareC.RadioAddress;
 
   SplitControl = CC2520RpiRadioBareC.SplitControl;
   BareSend = CC2520RpiRadioBareC.Send;
@@ -42,5 +38,8 @@ implementation {
 
   PacketAcknowledgements = CC2420RadioP.PacketAcknowledgements;
   PacketLink = CC2420RadioP.PacketLink;
+  LowPowerListening = CC2520RpiRadioBareC.LowPowerListening;
 
+  CC2420Config = CC2420RadioP.CC2420Config;
+  ReadLqi = CC2420RadioP.ReadLqi;
 }
