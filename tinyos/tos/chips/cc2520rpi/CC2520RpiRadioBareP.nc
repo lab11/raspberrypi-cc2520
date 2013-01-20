@@ -9,6 +9,7 @@
 
 module CC2520RpiRadioBareP {
   provides {
+    interface SplitControl;
     interface Send;
     interface Receive;
     interface Packet;
@@ -24,14 +25,56 @@ module CC2520RpiRadioBareP {
 
 implementation {
 
+//----------- SplitControl ---
+  int cc2520_file = -1;
+  struct cc2520_set_channel_data chan_data = {CC2520_DEF_CHANNEL};
+  struct cc2520_set_address_data addr_data = {0, 0, DEFINED_TOS_AM_GROUP};
+  struct cc2520_set_txpower_data txpower_data = {CC2520_TXPOWER_0DBM};
+  struct cc2520_set_lpl_data lpl_data = {0, 0, FALSE};
+
+  command error_t SplitControl.start () {
+
+    printf("Testing cc2520 driver...\n");
+    cc2520_file = open("/dev/radio", O_RDWR);
+    if (cc2520_file < 0) {
+      printf("CC2520Rpi: Failed to open /dev/radio.\n");
+      printf("CC2520Rpi: Make sure the kernel module is loaded.\n");
+      exit(1);
+    }
+
+    addr_data.short_addr = TOS_NODE_ID;
+    addr_data.extended_addr = TOS_NODE_ID;
+
+    // set properties
+    ioctl(cc2520_file, CC2520_IO_RADIO_SET_CHANNEL, &chan_data);
+    ioctl(cc2520_file, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
+    ioctl(cc2520_file, CC2520_IO_RADIO_SET_TXPOWER, &txpower_data);
+    ioctl(cc2520_file, CC2520_IO_RADIO_SET_LPL, &lpl_data);
+
+    // turn on
+    ioctl(cc2520_file, CC2520_IO_RADIO_INIT, NULL);
+    ioctl(cc2520_file, CC2520_IO_RADIO_ON, NULL);
+
+    signal SplitControl.startDone(SUCCESS);
+    return SUCCESS;
+  }
+
+  command error_t SplitControl.stop () {
+    printf("Turning off the radio...\n");
+    ioctl(cc2520_file, CC2520_IO_RADIO_OFF, NULL);
+
+    signal SplitControl.stopDone(SUCCESS);
+    return SUCCESS;
+  }
+
 //----------- Send ---
   // msg: pointer to a message_t
   // len: length of the packet including the length field at the beginning
   command error_t Send.send (message_t* msg, uint8_t len) {
     // Need to add 1 to the length. This is because the length that
-    // CC2520RpiSend requires is the packet plus the crc bytes minus the length
+    // CC2520RpiSend requires is the packet plus the meta bytes minus the length
     // field.
-    ((uint8_t*) msg)[0] = len+1;
+    ((cc2520packet_header_t*) msg->header)->cc2520.length = len+1;
     return call SubSend.send(msg);
   }
 
@@ -83,38 +126,46 @@ implementation {
   }
 
 // ----------------- Low Power Listening ---
-  command void LowPowerListening.setLocalWakeupInterval (uint16_t interval) {
+  uint16_t LPL_interval = 0;
 
+  command void LowPowerListening.setLocalWakeupInterval (uint16_t interval) {
+    if (interval == 0) {
+      // turn off lpl
+      lpl_data.enabled = FALSE;
+      ioctl(cc2520_file, CC2520_IO_RADIO_OFF, NULL);
+      ioctl(cc2520_file, CC2520_IO_RADIO_SET_LPL, &lpl_data);
+      ioctl(cc2520_file, CC2520_IO_RADIO_ON, NULL);
+
+    } else if (interval != LPL_interval) {
+      // set the window and interval
+      lpl_data.window   = interval;
+      lpl_data.interval = interval;
+      lpl_data.enabled  = TRUE;
+      ioctl(cc2520_file, CC2520_IO_RADIO_OFF, NULL);
+      ioctl(cc2520_file, CC2520_IO_RADIO_SET_LPL, &lpl_data);
+      ioctl(cc2520_file, CC2520_IO_RADIO_ON, NULL);
+      LPL_interval = interval;
+    }
   }
 
   command uint16_t LowPowerListening.getLocalWakeupInterval () {
-    return 10;
+    return LPL_interval;
   }
 
   command void LowPowerListening.setRemoteWakeupInterval (message_t *msg,
                                                           uint16_t interval) {
-
   }
 
   command uint16_t LowPowerListening.getRemoteWakeupInterval (message_t *msg) {
-    return 10;
+    return LPL_interval;
   }
 
 // ----------------- RadioAddress------------------------
-  struct cc2520_set_address_data addr_data = {0x0001, 0x0000000000000001, 0x22};
   ieee_eui64_t ext_addr;
-  int cc2520_file = -1;
 
-  void openRadio () {
-    if (cc2520_file == -1) {
-      cc2520_file = open("/dev/radio", O_RDWR);
-    }
-  }
-
-  // fix me: convert uint64_t to ieee_eui_64
   command ieee_eui64_t RadioAddress.getExtAddr() {
-    memset(ext_addr.data, 0, sizeof(ieee_eui64_t));
-    ext_addr.data[7] = 1;
+    memcpy(&ext_addr.data, &addr_data.extended_addr, 8);
+    return ext_addr;
   }
 
   // Change the short address of the radio.
@@ -124,19 +175,20 @@ implementation {
 
   command void RadioAddress.setShortAddr(uint16_t address) {
     addr_data.short_addr = address;
-    openRadio();
+    ioctl(cc2520_file, CC2520_IO_RADIO_OFF, NULL);
     ioctl(cc2520_file, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
+    ioctl(cc2520_file, CC2520_IO_RADIO_ON, NULL);
   }
 
-  //Change the PAN address of the radio.
   async command uint16_t RadioAddress.getPanAddr() {
     return addr_data.pan_id;
   }
 
   command void RadioAddress.setPanAddr(uint16_t address) {
     addr_data.pan_id = address;
-    openRadio();
+    ioctl(cc2520_file, CC2520_IO_RADIO_OFF, NULL);
     ioctl(cc2520_file, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
+    ioctl(cc2520_file, CC2520_IO_RADIO_ON, NULL);
   }
 
 //----------- PacketMetadata ---

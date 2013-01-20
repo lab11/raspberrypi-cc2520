@@ -21,7 +21,6 @@ configuration CC2520RpiRadioBareC {
 
 implementation {
   components CC2520RpiRadioBareP;
-  components CC2520RpiSplitControlC;
   components CC2520RpiLinkC;
   components CC2520RpiReceiveC;
   components CC2520RpiSendC;
@@ -31,7 +30,7 @@ implementation {
 
   CC2520RpiLinkC.SubSend -> CC2520RpiSendC.BareSend;
 
-  SplitControl      = CC2520RpiSplitControlC.SplitControl;
+  SplitControl      = CC2520RpiRadioBareP.SplitControl;
   Send              = CC2520RpiRadioBareP.Send;
   Receive           = CC2520RpiRadioBareP.Receive;
   Packet            = CC2520RpiRadioBareP.Packet;
