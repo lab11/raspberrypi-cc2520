@@ -14,7 +14,7 @@
 
 // Handles all of the configuration settings for all of the layers.
 
-module CC2520RpiRadioP {
+module CC2520RpiAmRadioP {
   provides {
  //   interface CC2520DriverConfig;
  //   interface SoftwareAckConfig;
@@ -32,17 +32,23 @@ module CC2520RpiRadioP {
 
     // temporarily here...
     // just to get it to compile for now
-    interface SplitControl;
 
-    interface RadioAddress;
+
 
     interface PacketField<uint8_t> as PacketRSSI;
     interface PacketField<uint8_t> as PacketLinkQuality;
 
+    interface PacketAcknowledgements;
+
   }
 
   uses {
+    // dummy
+    interface Send;
+    interface Receive;
+
     interface Ieee154PacketLayer;
+    interface PacketMetadata;
  //   interface RadioAlarm;
  //   interface RadioPacket as CC2520Packet;
 
@@ -52,129 +58,59 @@ module CC2520RpiRadioP {
 
 implementation {
 
-  int file_desc;
-  struct cc2520_set_address_data addr_data;
-
-  ieee_eui64_t ext_addr;
-
-  // temporary
-  command error_t SplitControl.start() {
-
- //   int result = 0;
-
-    struct cc2520_set_channel_data chan_data;
-    struct cc2520_set_txpower_data txpower_data;
-
-    printf("Testing cc2520 driver...\n");
-    file_desc = open("/dev/radio", O_RDWR);
-
-    printf("Setting channel\n");
-
-    chan_data.channel = 25;
-    ioctl(file_desc, CC2520_IO_RADIO_SET_CHANNEL, &chan_data);
-
-    printf("Setting address\n");
-    addr_data.short_addr = 0x0001;
-    addr_data.extended_addr = 0x0000000000000001;
-    addr_data.pan_id = 0x22;
-    ioctl(file_desc, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
-
-    printf("Setting tx power\n");
-    txpower_data.txpower = CC2520_TXPOWER_0DBM;
-    ioctl(file_desc, CC2520_IO_RADIO_SET_TXPOWER, &txpower_data);
-
-    printf("Turning on the radio...\n");
-    ioctl(file_desc, CC2520_IO_RADIO_INIT, NULL);
-    ioctl(file_desc, CC2520_IO_RADIO_ON, NULL);
-
-
-
-
-    signal SplitControl.startDone(SUCCESS);
-    return SUCCESS;
-  }
-
-  // temporary
-  command error_t SplitControl.stop () {
-    signal SplitControl.stopDone(SUCCESS);
-    return SUCCESS;
-  }
-
-// ----------------- RadioAddress------------------------
-
-
-
-  // fix me: convert uint64_t to ieee_eui_64
-  command ieee_eui64_t RadioAddress.getExtAddr() {
-    memset(ext_addr.data, 0, sizeof(ieee_eui64_t));
-    ext_addr.data[7] = 1;
-  }
-
-  // Change the short address of the radio.
-  async command uint16_t RadioAddress.getShortAddr() {
-    return addr_data.short_addr;
-  }
-
-  command void RadioAddress.setShortAddr(uint16_t address) {
-    addr_data.short_addr = address;
-    ioctl(file_desc, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
-  }
-
-  //Change the PAN address of the radio.
-  async command uint16_t RadioAddress.getPanAddr() {
-    return addr_data.pan_id;
-  }
-
-  command void RadioAddress.setPanAddr(uint16_t address) {
-    addr_data.pan_id = address;
-    ioctl(file_desc, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
-  }
-
-  cc2520_metadata_t* getMeta(message_t* msg){
-    return ((void*)msg->metadata);
+  event void Send.sendDone (message_t* msg, error_t error) { }
+  event message_t* Receive.receive (message_t* msg, void* payload, uint8_t l) {
+    return msg;
   }
 
 
-  //----------------- PacketLinkQuality -----------------
-
+//----------------- PacketLinkQuality -----------------
   async command bool PacketLinkQuality.isSet(message_t* msg) {
     return TRUE;
   }
 
   async command uint8_t PacketLinkQuality.get(message_t* msg) {
-    return getMeta(msg)->lqi;
+    return call PacketMetadata.getLqi(msg);
   }
 
   async command void PacketLinkQuality.clear(message_t* msg) {
   }
 
   async command void PacketLinkQuality.set(message_t* msg, uint8_t value) {
-    getMeta(msg)->lqi = value;
+    call PacketMetadata.setLqi(msg, value);
   }
 
+
 //----------------- PacketRSSI -----------------
-
-
-
   async command bool PacketRSSI.isSet(message_t* msg) {
- //   return call RSSIFlag.get(msg);
     return TRUE;
   }
 
   async command uint8_t PacketRSSI.get(message_t* msg) {
-    return getMeta(msg)->rssi;
+    return call PacketMetadata.getRssi(msg);
   }
 
   async command void PacketRSSI.clear(message_t* msg) {
-//    call RSSIFlag.clear(msg);
   }
 
   async command void PacketRSSI.set(message_t* msg, uint8_t value) {
-    // just to be safe if the user fails to clear the packet
-  //  call TransmitPowerFlag.clear(msg);
+    call PacketMetadata.setRssi(msg, value);
+  }
 
-  //  call RSSIFlag.set(msg);
-    getMeta(msg)->rssi = value;
+
+
+//-------- PacketAck ---
+  async command error_t PacketAcknowledgements.requestAck(message_t* msg) {
+
+    return SUCCESS;
+  }
+
+  async command error_t PacketAcknowledgements.noAck(message_t* msg) {
+    return SUCCESS;
+  }
+
+  async command bool PacketAcknowledgements.wasAcked(message_t* msg) {
+    return TRUE;
   }
 
 

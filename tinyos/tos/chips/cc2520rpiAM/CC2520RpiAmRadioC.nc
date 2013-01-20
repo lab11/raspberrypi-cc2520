@@ -38,7 +38,7 @@
 
 #include <RadioConfig.h>
 
-configuration CC2520RpiRadioC {
+configuration CC2520RpiAmRadioC {
   provides {
     interface SplitControl;
 
@@ -106,38 +106,44 @@ implementation
 
 // -------- RadioP
 
-  components CC2520RpiRadioP as RadioP;
+  components CC2520RpiAmRadioP as AmRadioP;
+  components CC2520RpiRadioC as RadioC;
   components CC2520RpiReceiveC;
   components CC2520RpiSendC;
-  components CC2520RpiPacketC;
-  components CC2520RpiBarePacketC;
-  components CC2520RpiPacketAcknowledgementsC as PAckC;
+  components CC2520RpiAmPacketC;
+  components CC2520RpiAmBarePacketC;
+  components CC2520RpiAmPacketMetadataC;
 
-  PacketAcknowledgements = PAckC.PacketAcknowledgements;
+  // dummy wiring
+  AmRadioP.Send -> RadioC.Send;
+  AmRadioP.Receive -> RadioC.Receive;
 
-  // temporary
-  SplitControl = RadioP.SplitControl;
+  PacketAcknowledgements = AmRadioP.PacketAcknowledgements;
+
+  SplitControl = RadioC.SplitControl;
 
 //  BareSend = CC2520RpiSendC.BareSend;
 //  BareReceive = CC2520RpiReceiveC.BareReceive;
-  BarePacket = CC2520RpiBarePacketC.BarePacket;
-  CC2520RpiBarePacketC.RadioPacket -> TinyosNetworkLayerC.Ieee154Packet;
+  BarePacket = CC2520RpiAmBarePacketC.BarePacket;
+  CC2520RpiAmBarePacketC.RadioPacket -> TinyosNetworkLayerC.Ieee154Packet;
 
   BareSend = TinyosNetworkLayerC.Ieee154Send;
   BareReceive = TinyosNetworkLayerC.Ieee154Receive;
 //  BarePacket = TinyosNetworkLayerC.Ieee154Packet;
 
-  RadioAddress = RadioP.RadioAddress;
+  RadioAddress = RadioC.RadioAddress;
 
-  PacketLinkQuality = RadioP.PacketLinkQuality;
-  PacketRSSI = RadioP.PacketRSSI;
+  PacketLinkQuality = AmRadioP.PacketLinkQuality;
+  PacketRSSI = AmRadioP.PacketRSSI;
+
+  AmRadioP.PacketMetadata -> RadioC.PacketMetadata;
 
 
 //#ifdef RADIO_DEBUG
 //  components AssertC;
 //#endif
 
-  RadioP.Ieee154PacketLayer -> Ieee154PacketLayerC;
+  AmRadioP.Ieee154PacketLayer -> Ieee154PacketLayerC;
  // RadioP.RadioAlarm -> RadioAlarmC.RadioAlarm[unique(UQ_RADIO_ALARM)];
  // RadioP.PacketTimeStamp -> TimeStampingLayerC;
  // RadioP.CC2520Packet -> RadioDriverLayerC;
@@ -151,7 +157,7 @@ implementation
 
 #ifndef IEEE154FRAMES_ENABLED
   components new ActiveMessageLayerC();
-  ActiveMessageLayerC.Config -> RadioP;
+  ActiveMessageLayerC.Config -> AmRadioP;
       // ActiveMessageLayerC.SubSend -> CC2520RpiSendC.BareSend;
   ActiveMessageLayerC.SubSend -> TinyosNetworkLayerC.TinyosSend;
  // ActiveMessageLayerC.SubReceive -> CC2520RpiReceiveC.BareReceive;
@@ -238,8 +244,8 @@ implementation
 //#endif
   PacketLinkLayerC.SubSend -> CC2520RpiSendC.BareSend;
   PacketLinkLayerC.SubReceive -> CC2520RpiReceiveC.BareReceive;
-  PacketLinkLayerC.SubPacket -> CC2520RpiPacketC.RadioPacket;
-  PacketLinkLayerC.PacketAcknowledgements -> PAckC.PacketAcknowledgements;
+  PacketLinkLayerC.SubPacket -> CC2520RpiAmPacketC.RadioPacket;
+  PacketLinkLayerC.PacketAcknowledgements -> AmRadioP.PacketAcknowledgements;
  // PacketLinkLayerC -> LowPowerListeningLayerC.Send;
  // PacketLinkLayerC -> LowPowerListeningLayerC.Receive;
  // PacketLinkLayerC -> LowPowerListeningLayerC.RadioPacket;

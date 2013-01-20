@@ -1,5 +1,5 @@
 
-configuration CC2520RpiPacketC {
+configuration CC2520RpiAmPacketC {
   provides {
     interface RadioPacket;
   }
@@ -7,7 +7,7 @@ configuration CC2520RpiPacketC {
 
 implementation {
 
-  components CC2520RpiPacketP as PacketP;
+  components CC2520RpiAmPacketP as PacketP;
 
   RadioPacket = PacketP.RadioPacket;
 

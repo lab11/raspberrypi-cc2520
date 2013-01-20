@@ -5,7 +5,7 @@
 // length field and the two byte checksum at the end. The checksum
 // is verified by the lower driver.
 
-module CC2520RpiPacketP {
+module CC2520RpiAmPacketP {
   provides {
     interface RadioPacket;
   }
