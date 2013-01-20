@@ -7,7 +7,7 @@
 #include "CC2520RpiDriver.h"
 #include "CC2520RpiDriverLayer.h"
 
-module CC2520RpiRadioBareP {
+module CC2520RpiRadioP {
   provides {
     interface SplitControl;
     interface Send;

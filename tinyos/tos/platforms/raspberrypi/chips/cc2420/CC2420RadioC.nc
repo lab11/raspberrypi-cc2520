@@ -26,19 +26,19 @@ configuration CC2420RadioC {
 implementation {
 
   components CC2420RadioP;
-  components CC2520RpiRadioBareC;
+  components CC2520RpiRadioC;
 
-  CC2420RadioP.PacketMetadata -> CC2520RpiRadioBareC.PacketMetadata;
-  CC2420RadioP.RadioAddress -> CC2520RpiRadioBareC.RadioAddress;
+  CC2420RadioP.PacketMetadata -> CC2520RpiRadioC.PacketMetadata;
+  CC2420RadioP.RadioAddress -> CC2520RpiRadioC.RadioAddress;
 
-  SplitControl = CC2520RpiRadioBareC.SplitControl;
-  BareSend = CC2520RpiRadioBareC.Send;
-  BareReceive = CC2520RpiRadioBareC.Receive;
-  BarePacket = CC2520RpiRadioBareC.Packet;
+  SplitControl = CC2520RpiRadioC.SplitControl;
+  BareSend = CC2520RpiRadioC.Send;
+  BareReceive = CC2520RpiRadioC.Receive;
+  BarePacket = CC2520RpiRadioC.Packet;
 
   PacketAcknowledgements = CC2420RadioP.PacketAcknowledgements;
   PacketLink = CC2420RadioP.PacketLink;
-  LowPowerListening = CC2520RpiRadioBareC.LowPowerListening;
+  LowPowerListening = CC2520RpiRadioC.LowPowerListening;
 
   CC2420Config = CC2420RadioP.CC2420Config;
   ReadLqi = CC2420RadioP.ReadLqi;

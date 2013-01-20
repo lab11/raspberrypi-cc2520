@@ -8,12 +8,12 @@ configuration CC2520RpiReceiveC {
 implementation {
 
   components CC2520RpiReceiveP as ReceiveP;
-  components CC2520RpiRadioBareC as RadioBareC;
+  components CC2520RpiRadioC as RadioC;
   components MainC;
 
   MainC.SoftwareInit -> ReceiveP.SoftwareInit;
 
-  ReceiveP.PacketMetadata -> RadioBareC.PacketMetadata;
+  ReceiveP.PacketMetadata -> RadioC.PacketMetadata;
 
   BareReceive = ReceiveP.BareReceive;
 
