@@ -16,4 +16,10 @@ implementation {
 
   components IPStackC;
   BorderP.ForwardingTable -> IPStackC.ForwardingTable;
+
+#ifdef RPL_ROUTING
+  components RplBorderRouterP, IPPacketC;
+  RplBorderRouterP.ForwardingEvents -> IPStackC.ForwardingEvents[ROUTE_IFACE_BORDER];
+  RplBorderRouterP.IPPacket -> IPPacketC.IPPacket;
+#endif
 }

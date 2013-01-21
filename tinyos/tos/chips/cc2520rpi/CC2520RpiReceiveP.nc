@@ -41,10 +41,10 @@ implementation {
   message_t* rx_msg_ptr;
   message_t rx_msg_buf;
 
-  uint8_t tsfer_buf[128];
+  uint8_t tsfer_buf[256];
   uint8_t tsfer_buf_len;
 
-  task void receive_task () { 
+  task void receive_task () {
     cc2520_metadata_t* meta;
 
     // Copy the shared transfer buffer to the main thread only rxMsg buffer
@@ -54,7 +54,7 @@ implementation {
     meta = (cc2520_metadata_t*) tsfer_buf + tsfer_buf_len;
     call PacketMetadata.setLqi(rx_msg_ptr, meta->lqi);
     call PacketMetadata.setRssi(rx_msg_ptr, meta->rssi);
-    call PacketMetadata.setWasAcked(rx_msg_ptr, meta->ack);
+  //  call PacketMetadata.setWasAcked(rx_msg_ptr, meta->ack);
 
     // Signal the rest of the stack on the main thread
     rx_msg_ptr = signal BareReceive.receive(rx_msg_ptr);
@@ -80,7 +80,7 @@ implementation {
   }
 
   void* receive (void *arg) {
-    uint8_t buf[128];
+    uint8_t buf[256];
     int ret;
 
     printf("CC2520RpiReceiveP: Receive thread started.\n");
@@ -113,10 +113,14 @@ implementation {
 
   command error_t SoftwareInit.init () {
     // We pass a buffer back and forth between
-    // the upper layers. 
+    // the upper layers.
     rx_msg_ptr = &rx_msg_buf;
 
     cc2520_file = open("/dev/radio", O_RDWR);
+    if (cc2520_file < 0) {
+      printf("CC2520RpiReceiveP: Could not open radio.\n");
+      exit(1);
+    }
 
     // Lock on the transfer buffer that is shared between the main thread and
     // the receive thread

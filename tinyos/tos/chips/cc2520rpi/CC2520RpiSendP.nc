@@ -8,6 +8,9 @@ module CC2520RpiSendP {
     interface Init as SoftwareInit @exactlyonce();
     interface BareSend;
   }
+  uses {
+    interface PacketMetadata;
+  }
 }
 
 implementation {
@@ -25,6 +28,7 @@ implementation {
   pthread_cond_t  cond_send;
 
   task void sendDone_task() {
+    call PacketMetadata.setWasAcked(msg_pointer, TRUE);
     signal BareSend.sendDone(msg_pointer, SUCCESS);
   }
 
@@ -51,7 +55,7 @@ implementation {
       if (ret < 0) {
         printf("CC2520RpiSendP: failed write()\n");
         // TODO: Actually signal failures and other error conditions when the
-        // packet hasn't been sent correctly. See the driver manual for 
+        // packet hasn't been sent correctly. See the driver manual for
         // more information.
       }
 
