@@ -257,13 +257,10 @@ implementation {
   }
 
   async command bool PacketMetadata.wasAcked (message_t* msg) {
-    printf("GUESS WAS ACKED %p\n", msg);
-   // return TRUE;
     return getMetaCC2520(msg)->ack;
   }
 
   command void PacketMetadata.setWasAcked (message_t* msg, bool ack) {
-    printf("SET WAS ACKED %p\n", msg);
     getMetaCC2520(msg)->ack = ack;
   }
 
