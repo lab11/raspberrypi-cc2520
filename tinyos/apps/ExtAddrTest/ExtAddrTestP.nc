@@ -27,7 +27,7 @@ implementation {
     pkt[3] = 0x00; // seq
     pkt[4] = 0x22; // pan id
     pkt[5] = 0x00;
-    pkt[6] = 0x01; // dst ext addr
+    pkt[6] = 0x08; // dst ext addr
     pkt[7] = 0x00;
     pkt[8] = 0x00;
     pkt[9] = 0x00;
