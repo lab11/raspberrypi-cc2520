@@ -40,7 +40,6 @@
 #ifndef __CC2520RPIRADIO_H__
 #define __CC2520RPIRADIO_H__
 
-#include <RadioConfig.h>
 #include <TinyosNetworkLayer.h>
 #include <Ieee154PacketLayer.h>
 #include <ActiveMessageLayer.h>
@@ -65,9 +64,7 @@ typedef struct ack_metadata_t {
   uint8_t ack; // TRUE if the packet was acked, FALSE otherwise
 } ack_metadata_t;
 
-/**
- * CC2520 Security Header
- */
+// CC2520 Security Header
 typedef nx_struct security_header_t {
   nx_uint8_t secLevel:3;
   nx_uint8_t keyMode:2;
@@ -75,7 +72,6 @@ typedef nx_struct security_header_t {
   nx_uint32_t frameCounter;
   nx_uint8_t keyID[1]; // One byte for now
 } security_header_t;
-
 
 typedef nx_struct cc2520packet_header_t
 {

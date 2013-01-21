@@ -39,8 +39,6 @@ implementation {
   ieee_eui64_t ext_addr;
 
   command error_t SplitControl.start () {
-    uint8_t* addrbuf;
-
     printf("Testing cc2520 driver...\n");
     cc2520_file = open("/dev/radio", O_RDWR);
     if (cc2520_file < 0) {
@@ -97,6 +95,7 @@ implementation {
     signal Send.sendDone(msg, error);
   }
 
+  // This interface is very bare and provides access to the entire packet.
   command uint8_t Send.maxPayloadLength () {
     return 128;
   }
@@ -104,7 +103,6 @@ implementation {
   command void* Send.getPayload (message_t* msg, uint8_t len) {
     return msg;
   }
-
 
 //----------- Receive ---
   event message_t* SubReceive.receive (message_t* msg) {
@@ -114,8 +112,6 @@ implementation {
     uint8_t len = ((cc2520packet_header_t*) msg->header)->cc2520.length-1;
     return signal Receive.receive(msg, msg, len);
   }
-
-
 
 //----------- Packet ---
   command void Packet.clear (message_t* msg) {
@@ -131,7 +127,7 @@ implementation {
     ((cc2520packet_header_t*) msg->header)->cc2520.length = len;
   }
 
-  command uint8_t Packet.maxPayloadLength() {
+  command uint8_t Packet.maxPayloadLength () {
     return 128;
   }
 
@@ -140,7 +136,7 @@ implementation {
   }
 
 // ----------------- Low Power Listening ---
-  uint16_t LPL_interval = 0;
+  uint16_t lpl_interval = 0;
 
   command void LowPowerListening.setLocalWakeupInterval (uint16_t interval) {
     if (interval == 0) {
@@ -150,7 +146,7 @@ implementation {
       ioctl(cc2520_file, CC2520_IO_RADIO_SET_LPL, &lpl_data);
       ioctl(cc2520_file, CC2520_IO_RADIO_ON, NULL);
 
-    } else if (interval != LPL_interval) {
+    } else if (interval != lpl_interval) {
       // set the window and interval
       lpl_data.window   = LPL_WINDOW;
       lpl_data.interval = interval;
@@ -158,12 +154,12 @@ implementation {
       ioctl(cc2520_file, CC2520_IO_RADIO_OFF, NULL);
       ioctl(cc2520_file, CC2520_IO_RADIO_SET_LPL, &lpl_data);
       ioctl(cc2520_file, CC2520_IO_RADIO_ON, NULL);
-      LPL_interval = interval;
     }
+    lpl_interval = interval;
   }
 
   command uint16_t LowPowerListening.getLocalWakeupInterval () {
-    return LPL_interval;
+    return lpl_interval;
   }
 
   command void LowPowerListening.setRemoteWakeupInterval (message_t *msg,
@@ -171,32 +167,31 @@ implementation {
   }
 
   command uint16_t LowPowerListening.getRemoteWakeupInterval (message_t *msg) {
-    return LPL_interval;
+    return lpl_interval;
   }
 
 // ----------------- RadioAddress-----------------------
-  command ieee_eui64_t RadioAddress.getExtAddr() {
+  command ieee_eui64_t RadioAddress.getExtAddr () {
     memcpy(&ext_addr.data, &addr_data.extended_addr, 8);
     return ext_addr;
   }
 
-  // Change the short address of the radio.
-  async command uint16_t RadioAddress.getShortAddr() {
+  async command uint16_t RadioAddress.getShortAddr () {
     return addr_data.short_addr;
   }
 
-  command void RadioAddress.setShortAddr(uint16_t address) {
+  command void RadioAddress.setShortAddr (uint16_t address) {
     addr_data.short_addr = address;
     ioctl(cc2520_file, CC2520_IO_RADIO_OFF, NULL);
     ioctl(cc2520_file, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
     ioctl(cc2520_file, CC2520_IO_RADIO_ON, NULL);
   }
 
-  async command uint16_t RadioAddress.getPanAddr() {
+  async command uint16_t RadioAddress.getPanAddr () {
     return addr_data.pan_id;
   }
 
-  command void RadioAddress.setPanAddr(uint16_t address) {
+  command void RadioAddress.setPanAddr (uint16_t address) {
     addr_data.pan_id = address;
     ioctl(cc2520_file, CC2520_IO_RADIO_OFF, NULL);
     ioctl(cc2520_file, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
