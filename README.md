@@ -52,6 +52,36 @@ it:
 
 Run BorderRouter on the rpi, Node on mote and mcast.py on the rpi. Then watch the packets fly!
 
+#### Setup a Network
+
+Because the world is a very slow moving place, using IPv6 is not exactly trivial
+at this point.
+
+    sudo ip neigh add 2001:638:709:1236::1 lladdr 2c:41:38:89:09:a2 nud permanent dev eth0
+    sudo ip -6 route add 2001:638:709:1236::1/128 dev eth0
+
+    sudo ifconfig eth0 inet6 add 2001:638:709:1236::1/128
+
+
+Addresses
+---------
+
+    Subnet for wsn              : 2607:f018:800a:bcde:f012:3456:7890::/112
+    subnet for rest of computers: 2607:f018:800a:bcde:f012:3456:7891::/112
+
+    border router:              : 2607:f018:800a:bcde:f012:3456:7890:1/112%tun0
+    border router:              : 2607:f018:800a:bcde:f012:3456:7891:1/112%eth0
+    memristor                   : 2607:f018:800a:bcde:f012:3456:7891:2/112
+    nuclear                     : 2607:f018:800a:bcde:f012:3456:7891:3/112
+
+
+    rpi:
+    sudo ip -6 addr add 2607:f018:800a:bcde:f012:3456:7891:1/112 dev eth0
+
+    memristor:
+    sudo ip -6 addr add 2607:f018:800a:bcde:f012:3456:7891:2/112 dev eth0
+    sudo ip -6 route add 2607:f018:800a:bcde:f012:3456:7890::/112 dev eth0
+
 Hardware
 --------
 
