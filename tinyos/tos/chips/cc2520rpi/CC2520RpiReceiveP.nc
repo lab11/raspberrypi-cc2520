@@ -8,14 +8,6 @@
 
 /* This is the low level receive module that gets packets from the CC2520 kernel
  * module.
- * On init, a receive thread is created that blocks on the character driver.
- * After the receive thread receives a packet, it locks the transfer buffer,
- * copies the packet in and then signals the main thread. The main thread then
- * locks the transfer buffer, copies it into the message_t buffer and signals
- * the upper layers.
- * This seems clumsy to me, and I'm not sure if there is a better way, but it
- * keeps the data in the main thread and should handle packets that arrive
- * in rapid succession.
  */
 
 module CC2520RpiReceiveP {

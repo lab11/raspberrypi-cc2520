@@ -16,6 +16,3 @@ implementation {
 
   BareSend = SendP.BareSend;
 }
-
-
-

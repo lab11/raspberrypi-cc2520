@@ -8,34 +8,38 @@
 #define BASE 0xCC
 
 struct cc2520_set_channel_data {
-	uint8_t channel;
+  uint8_t channel;
 };
 
 struct cc2520_set_address_data {
-	uint16_t short_addr;
-	uint64_t extended_addr;
-	uint16_t pan_id;
+  uint16_t short_addr;
+  uint64_t extended_addr;
+  uint16_t pan_id;
 };
 
 struct cc2520_set_ack_data {
-	uint32_t timeout;
+  uint32_t timeout;
 };
 
 struct cc2520_set_lpl_data {
-	uint32_t window;
-	uint32_t interval;
-	bool enabled;
+  uint32_t window;
+  uint32_t interval;
+  bool enabled;
 };
 
 struct cc2520_set_csma_data {
-	uint32_t min_backoff;
-	uint32_t init_backoff;
-	uint32_t cong_backoff;
-	bool enabled;
+  uint32_t min_backoff;
+  uint32_t init_backoff;
+  uint32_t cong_backoff;
+  bool enabled;
 };
 
 struct cc2520_set_print_messages_data {
-	bool enabled;
+  bool enabled;
+};
+
+struct cc2520_set_txpower_data {
+  uint8_t txpower;
 };
 
 // Possible TX Powers:
@@ -48,10 +52,6 @@ struct cc2520_set_print_messages_data {
 #define CC2520_TXPOWER_N4DBM 0x88
 #define CC2520_TXPOWER_N7DBM 0x2C
 #define CC2520_TXPOWER_N18DBM 0x03
-
-struct cc2520_set_txpower_data {
-	uint8_t txpower;
-};
 
 #define CC2520_IO_RADIO_INIT _IO(BASE, 0)
 #define CC2520_IO_RADIO_ON _IO(BASE, 1)
