@@ -34,6 +34,7 @@ implementation {
   void* send (void* arg) {
     int ret;
     uint8_t *buf;
+    ieee154_simple_header_t* ieeehdr;
 
     printf("CC2520RpiSendP: send_thread starting.\n");
 
@@ -41,13 +42,11 @@ implementation {
       pthread_mutex_lock(&mutex_send);
       pthread_cond_wait(&cond_send, &mutex_send);
 
-      buf = (uint8_t*)msg_pointer;
+      buf = (uint8_t*) msg_pointer;
 
-      // TODO: Fix this up to examine the product metadata.
-      // buf[0] = len;
-     // buf[1] |= 0x20; // request ack
-      // buf[2] = 0x88;
-      buf[3] = seq++;
+      // Set the sequence number
+      ieeehdr = &(((cc2520packet_header_t*) msg_pointer->header)->ieee154);
+      ieeehdr->dsn = seq++;
 
       // call the driver to send the packet
       ret = write(cc2520_file, buf, len-1);
