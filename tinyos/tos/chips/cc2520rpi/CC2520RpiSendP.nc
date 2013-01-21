@@ -65,7 +65,12 @@ implementation {
           break;
         default:
           if (ret == len - 1) {
-            call PacketMetadata.setWasAcked(msg_pointer, TRUE);
+            // Check if it was a broadcast message
+            if (buf[6] == 0xFF && buf[7] == 0xFF) {
+              call PacketMetadata.setWasAcked(msg_pointer, FALSE);
+            } else {
+              call PacketMetadata.setWasAcked(msg_pointer, TRUE);
+            }
           } else {
             printf("CC2520RpiSendP: write() weird return code\n");
           }
