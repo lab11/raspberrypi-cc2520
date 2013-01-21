@@ -8,6 +8,7 @@ PLATFORM = raspberrypi
 PFLAGS += -I$(TOSROOTRPI)/tos/platforms/raspberrypi
 PFLAGS += -I$(TOSROOTRPI)/tos/platforms/raspberrypi/chips/cc2420
 PFLAGS += -I$(TOSROOTRPI)/tos/platforms/raspberrypi/chips/cc2520rpi
+PFLAGS += -I$(TOSROOTRPI)/tos/platforms/raspberrypi/chips/macaddress
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/cc2520rpi
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/cc2520rpiAM
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/rpi

@@ -24,6 +24,9 @@ implementation {
   components CC2520RpiLinkC;
   components CC2520RpiReceiveC;
   components CC2520RpiSendC;
+  components LocalIeeeEui64C;
+
+  CC2520RpiRadioP.LocalIeeeEui64 -> LocalIeeeEui64C.LocalIeeeEui64;
 
   CC2520RpiRadioP.SubSend -> CC2520RpiLinkC.Send;
   CC2520RpiRadioP.SubReceive -> CC2520RpiReceiveC.BareReceive;

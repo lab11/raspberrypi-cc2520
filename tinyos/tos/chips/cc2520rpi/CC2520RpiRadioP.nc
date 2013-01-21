@@ -20,6 +20,8 @@ module CC2520RpiRadioP {
   uses {
     interface BareSend as SubSend;
     interface BareReceive as SubReceive;
+
+    interface LocalIeeeEui64;
   }
 }
 
@@ -34,7 +36,10 @@ implementation {
   struct cc2520_set_lpl_data lpl_data = {0, 0, FALSE};
   struct cc2520_set_print_messages_data print_data = {TRUE};
 
+  ieee_eui64_t ext_addr;
+
   command error_t SplitControl.start () {
+    uint8_t* addrbuf;
 
     printf("Testing cc2520 driver...\n");
     cc2520_file = open("/dev/radio", O_RDWR);
@@ -44,8 +49,10 @@ implementation {
       exit(1);
     }
 
+    // set up the addresses for this node
     addr_data.short_addr = TOS_NODE_ID;
-    addr_data.extended_addr = TOS_NODE_ID;
+    ext_addr = call LocalIeeeEui64.getId();
+    memcpy(&addr_data.extended_addr, &ext_addr.data, 8);
 
     // set properties
     ioctl(cc2520_file, CC2520_IO_RADIO_SET_CHANNEL, &chan_data);
@@ -167,9 +174,7 @@ implementation {
     return LPL_interval;
   }
 
-// ----------------- RadioAddress------------------------
-  ieee_eui64_t ext_addr;
-
+// ----------------- RadioAddress-----------------------
   command ieee_eui64_t RadioAddress.getExtAddr() {
     memcpy(&ext_addr.data, &addr_data.extended_addr, 8);
     return ext_addr;
