@@ -49,22 +49,21 @@
 #include <LowPowerListeningLayer.h>
 #include <PacketLinkLayer.h>
 
-typedef nx_struct cc2520_header_t
-{
+typedef nx_struct cc2520_header_t {
   nxle_uint8_t length;
 } cc2520_header_t;
 
-
-typedef struct cc2520_metadata_t
-{
-  uint8_t lqi;
-  union
-  {
-    uint8_t power;
-    uint8_t ack;
-    uint8_t rssi;
+typedef struct cc2520_metadata_t {
+  union {
+    uint8_t crc:1;
+    uint8_t rssi:7;
   };
+  uint8_t lqi;
 } cc2520_metadata_t;
+
+typedef struct ack_metadata_t {
+  uint8_t ack; // TRUE if the packet was acked, FALSE otherwise
+} ack_metadata_t;
 
 /**
  * CC2520 Security Header
@@ -95,13 +94,11 @@ typedef nx_struct cc2520packet_header_t
 #endif
 } cc2520packet_header_t;
 
-typedef nx_struct cc2520packet_footer_t
-{
+typedef nx_struct cc2520packet_footer_t {
   // the time stamp is not recorded here, time stamped messaged cannot have max length
 } cc2520packet_footer_t;
 
-typedef struct cc2520packet_metadata_t
-{
+typedef struct cc2520packet_metadata_t {
 #ifdef LOW_POWER_LISTENING
   lpl_metadata_t lpl;
 #endif
@@ -111,9 +108,10 @@ typedef struct cc2520packet_metadata_t
   timestamp_metadata_t timestamp;
   flags_metadata_t flags;
   cc2520_metadata_t cc2520;
+  ack_metadata_t ack;
 } cc2520packet_metadata_t;
 
-enum cc2520_security_enums{
+enum cc2520_security_enums {
   NO_SEC = 0,
   CBC_MAC_4 = 1,
   CBC_MAC_8 = 2,

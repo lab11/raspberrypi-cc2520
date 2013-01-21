@@ -54,7 +54,6 @@ implementation {
     meta = (cc2520_metadata_t*) tsfer_buf + tsfer_buf_len;
     call PacketMetadata.setLqi(rx_msg_ptr, meta->lqi);
     call PacketMetadata.setRssi(rx_msg_ptr, meta->rssi);
-  //  call PacketMetadata.setWasAcked(rx_msg_ptr, meta->ack);
 
     // Signal the rest of the stack on the main thread
     rx_msg_ptr = signal BareReceive.receive(rx_msg_ptr);

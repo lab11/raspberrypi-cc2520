@@ -213,6 +213,10 @@ implementation {
     return &(((cc2520packet_metadata_t*) msg->metadata)->cc2520);
   }
 
+  ack_metadata_t* getMetaAck (message_t* msg) {
+    return &(((cc2520packet_metadata_t*) msg->metadata)->ack);
+  }
+
   ieee154_simple_header_t* getHeaderIeee (message_t* msg) {
     cc2520packet_header_t* hdr = (cc2520packet_header_t*) msg->header;
     return &(hdr->ieee154);
@@ -262,11 +266,11 @@ implementation {
   }
 
   async command bool PacketMetadata.wasAcked (message_t* msg) {
-    return getMetaCC2520(msg)->ack;
+    return getMetaAck(msg)->ack;
   }
 
   command void PacketMetadata.setWasAcked (message_t* msg, bool ack) {
-    getMetaCC2520(msg)->ack = ack;
+    getMetaAck(msg)->ack = ack;
   }
 
 }
