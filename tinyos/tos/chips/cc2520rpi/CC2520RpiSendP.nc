@@ -28,7 +28,6 @@ implementation {
   pthread_cond_t  cond_send;
 
   task void sendDone_task() {
-    call PacketMetadata.setWasAcked(msg_pointer, TRUE);
     signal BareSend.sendDone(msg_pointer, SUCCESS);
   }
 
@@ -46,17 +45,31 @@ implementation {
 
       // TODO: Fix this up to examine the product metadata.
       // buf[0] = len;
-      buf[1] |= 0x20; // request ack
+     // buf[1] |= 0x20; // request ack
       // buf[2] = 0x88;
       buf[3] = seq++;
 
       // call the driver to send the packet
       ret = write(cc2520_file, buf, len-1);
-      if (ret < 0) {
-        printf("CC2520RpiSendP: failed write()\n");
-        // TODO: Actually signal failures and other error conditions when the
-        // packet hasn't been sent correctly. See the driver manual for
-        // more information.
+      switch (ret) {
+        case CC2520_TX_BUSY:
+        case CC2520_TX_ACK_TIMEOUT:
+        case CC2520_TX_FAILED:
+          call PacketMetadata.setWasAcked(msg_pointer, FALSE);
+          break;
+        case CC2520_TX_LENGTH:
+          printf("CC2520RpiSendP: INCORRECT LENGTH\n");
+          break;
+        case CC2520_TX_SUCCESS:
+          call PacketMetadata.setWasAcked(msg_pointer, TRUE);
+          break;
+        default:
+          if (ret == len - 1) {
+            call PacketMetadata.setWasAcked(msg_pointer, TRUE);
+          } else {
+            printf("CC2520RpiSendP: write() weird return code\n");
+          }
+          break;
       }
 
       printf("CC2520RpiSendP: write DONE. return code: %d\n", ret);

@@ -64,4 +64,11 @@ struct cc2520_set_txpower_data {
 #define CC2520_IO_RADIO_SET_CSMA _IOW(BASE, 8, struct cc2520_set_csma_data)
 #define CC2520_IO_RADIO_SET_PRINT _IOW(BASE, 9, struct cc2520_set_print_messages_data)
 
+// Transmit error codes
+#define CC2520_TX_SUCCESS 0
+#define CC2520_TX_BUSY 1
+#define CC2520_TX_LENGTH 2
+#define CC2520_TX_ACK_TIMEOUT 3
+#define CC2520_TX_FAILED 4
+
 #endif
