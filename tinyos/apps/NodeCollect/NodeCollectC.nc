@@ -1,9 +1,9 @@
 
-// generic app for a node in a wsn
+// app for a data collection node in a wsn
 
-configuration NodeC {}
+configuration NodeCollectC {}
 implementation {
-  components MainC, NodeP as App, LedsC;
+  components MainC, NodeCollectP as App, LedsC;
   components new TimerMilliC();
 
   App.Boot -> MainC.Boot;
@@ -11,13 +11,16 @@ implementation {
   App.Leds -> LedsC;
   App.MilliTimer -> TimerMilliC;
 
-
   // Radio
   components IPStackC;
   components new UdpSocketC() as UDPService;
   App.RadioControl -> IPStackC.SplitControl;
   App.UDPService   -> UDPService.UDP;
-  App.ForwardingTable -> IPStackC.ForwardingTable;
+ // App.ForwardingTable -> IPStackC.ForwardingTable;
+
+#ifdef RPL_ROUTING
+  components RPLRoutingC;
+#endif
 
 }
 

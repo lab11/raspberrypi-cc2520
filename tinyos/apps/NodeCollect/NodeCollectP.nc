@@ -5,8 +5,10 @@
 #include <lib6lowpan/lib6lowpan.h>
 #include <lib6lowpan/ip.h>
 
+#define COLLECTION_SERVER "2607:f018:800a:bcde:f012:3456:7891:2"
+#define WSN_ROOT "2607:f018:800a:bcde:f012:3456:7890:1"
 
-module NodeP @safe() {
+module NodeCollectP @safe() {
   uses {
     interface Boot;
     interface Leds;
@@ -14,95 +16,52 @@ module NodeP @safe() {
 
     interface SplitControl as RadioControl;
     interface UDP as UDPService;
-
-    interface ForwardingTable;
   }
 }
 implementation {
 
- // message_t packet;
-
-  bool locked;
   uint16_t counter = 0;
 
-
-  struct in6_addr random_dest;
-  struct in6_addr llmc;
+  struct sockaddr_in6 server;
+  struct sockaddr_in6 root;
 
   event void Boot.booted() {
-    inet_pton6("2001:638:709:1235::1", &random_dest);
-    inet_pton6("ff02::1", &llmc);
+    inet_pton6(COLLECTION_SERVER, &server.sin6_addr);
+    server.sin6_port = htons(2001);
+    inet_pton6(WSN_ROOT, &root.sin6_addr);
+    server.sin6_port = htons(2001);
 
     call RadioControl.start();
   }
 
   event void RadioControl.startDone(error_t err) {
-
     if (err == SUCCESS) {
-      call ForwardingTable.addRoute(random_dest.s6_addr,
-                                    128,
-                                    llmc.s6_addr,
-                                    ROUTE_IFACE_154);
-
       call UDPService.bind(2001);
       call MilliTimer.startPeriodic(1000);
-    }
-    else {
+
+    } else {
       call RadioControl.start();
     }
   }
 
   event void MilliTimer.fired() {
-    error_t e;
-    struct sockaddr_in6 dest;
-    
     counter++;
-    dbg("RadioCountToLedsC", "RadioCountToLedsC: timer fired, counter is %hu.\n", counter);
-
-    // some other random address
-    // inet_pton6("2001::1", &dest.sin6_addr);
-
-    // This is the address of the RPi Border Router
-    inet_pton6("2001:638:709:1235::1", &dest.sin6_addr);
-    dest.sin6_port = htons(2001);
-    call UDPService.sendto(&dest, &counter, 2);
+    if (counter % 2) {
+      call Leds.led0Toggle();
+      call UDPService.sendto(&server, &counter, 2);
+    } else {
+      call Leds.led1Toggle();
+      call UDPService.sendto(&root, &counter, 2);
+    }
   }
 
   event void UDPService.recvfrom (struct sockaddr_in6 *from,
                                   void *payload,
                                   uint16_t len,
                                   struct ip6_metadata *meta) {
-    uint16_t* c;
-
-
-    c = (uint16_t*)payload;
-    if (*c & 0x1) {
-      call Leds.led0On();
-    }
-    else {
-      call Leds.led0Off();
-    }
-    if (*c & 0x2) {
-      call Leds.led1On();
-    }
-    else {
-      call Leds.led1Off();
-    }
-    if (*c & 0x4) {
-      call Leds.led2On();
-    }
-    else {
-      call Leds.led2Off();
-    }
-
+    call Leds.led2Toggle();
   }
-
-
 
   event void RadioControl.stopDone (error_t e) { }
 
 }
-
-
-
-
