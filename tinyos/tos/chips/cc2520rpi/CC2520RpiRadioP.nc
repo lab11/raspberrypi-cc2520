@@ -38,6 +38,8 @@ implementation {
 
   ieee_eui64_t ext_addr;
 
+  uint8_t sequence_number;
+
   command error_t SplitControl.start () {
     printf("Testing cc2520 driver...\n");
     cc2520_file = open("/dev/radio", O_RDWR);
@@ -46,6 +48,9 @@ implementation {
       printf("CC2520Rpi: Make sure the kernel module is loaded.\n");
       exit(1);
     }
+
+    // init the seq no
+    sequence_number = TOS_NODE_ID << 4;
 
     // set up the addresses for this node
     addr_data.short_addr = TOS_NODE_ID;
@@ -77,13 +82,29 @@ implementation {
   }
 
 //----------- Send ---
+
+  ieee154_simple_header_t* getHeaderIeee (message_t* msg) {
+    cc2520packet_header_t* hdr = (cc2520packet_header_t*) msg->header;
+    return &(hdr->ieee154);
+  }
+
   // msg: pointer to a message_t
   // len: length of the packet including the length field at the beginning
   command error_t Send.send (message_t* msg, uint8_t len) {
+    ieee154_simple_header_t* ieeehdr;
+
     // Need to add 1 to the length. This is because the length that
     // CC2520RpiSend requires is the packet plus the meta bytes minus the length
     // field.
     ((cc2520packet_header_t*) msg->header)->cc2520.length = len+1;
+
+    // Set the sequence number here. No real need to create a whole new layer
+    //  for it. We set the sequence number at this point so that it remains
+    //  constant for any retries in the LinkP layer. See:
+    //  http://docs.tinyos.net/tinywiki/index.php/CC2420_Data_Sequence_Numbers
+    ieeehdr = getHeaderIeee(msg);
+    ieeehdr->dsn = sequence_number++;
+
     return call SubSend.send(msg);
   }
 
@@ -210,11 +231,6 @@ implementation {
 
   ack_metadata_t* getMetaAck (message_t* msg) {
     return &(((cc2520packet_metadata_t*) msg->metadata)->ack);
-  }
-
-  ieee154_simple_header_t* getHeaderIeee (message_t* msg) {
-    cc2520packet_header_t* hdr = (cc2520packet_header_t*) msg->header;
-    return &(hdr->ieee154);
   }
 
   command uint8_t PacketMetadata.getLqi (message_t* msg) {

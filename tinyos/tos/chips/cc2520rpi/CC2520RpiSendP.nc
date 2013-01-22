@@ -17,11 +17,8 @@ implementation {
 
   int cc2520_file;
 
-
   uint8_t len;
   message_t* msg_pointer;
-
-  uint8_t seq = 0;
 
   pthread_t       thread_send;
   pthread_mutex_t mutex_send;
@@ -43,10 +40,6 @@ implementation {
       pthread_cond_wait(&cond_send, &mutex_send);
 
       buf = (uint8_t*) msg_pointer;
-
-      // Set the sequence number
-      ieeehdr = &(((cc2520packet_header_t*) msg_pointer->header)->ieee154);
-      ieeehdr->dsn = seq++;
 
       // call the driver to send the packet
       ret = write(cc2520_file, buf, len-1);
