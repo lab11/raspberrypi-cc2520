@@ -18,6 +18,8 @@ implementation {
   components RPLRoutingC;
   App.RootControl -> RPLRoutingC.RootControl;
 #endif
+
+  components UDPShellC;
 }
 
 
