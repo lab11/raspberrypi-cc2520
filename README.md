@@ -73,6 +73,9 @@ Addresses
     sudo ip -6 addr add 2607:f018:800a:bcde:f012:3456:7891:1/112 dev eth0
     sudo sysctl -w net.ipv6.conf.all.forwarding=1
 
+    sudo tcpdump -i eth0 udp and dst port 2001
+    sudo tcpdump -i tun0
+
     memristor:
     sudo ip -6 addr add 2607:f018:800a:bcde:f012:3456:7891:2/112 dev eth0
     sudo ip -6 route add 2607:f018:800a:bcde:f012:3456:7890::/112 dev eth0

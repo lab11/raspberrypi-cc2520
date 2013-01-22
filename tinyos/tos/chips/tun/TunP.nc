@@ -32,7 +32,8 @@ implementation {
     int ret;
 
     // skip the frame header
-    uint8_t* out_buf_start = out_buf + sizeof(struct tun_pi);
+ //   uint8_t* out_buf_start = out_buf + sizeof(struct tun_pi);
+    uint8_t* out_buf_start = out_buf;
 
     printf("TUNP: send\n");
 
@@ -78,7 +79,8 @@ implementation {
       printf("got p\n");
 
       // need to skip over the packet info header from the tun device
-      memcpy(in_buf, buf+sizeof(struct tun_pi), len);
+  //    memcpy(in_buf, buf+sizeof(struct tun_pi), len);
+      memcpy(in_buf, buf, len);
 
       // set up pointers and signal to the next layer
       iph = (struct ip6_hdr*) in_buf;
@@ -103,7 +105,7 @@ implementation {
     memset(&ifr, 0, sizeof(ifr));
 
     // Select a TUN device
-    ifr.ifr_flags = IFF_TUN;
+    ifr.ifr_flags = IFF_TUN | IFF_NO_PI;
 
     // Setup the interface
     err = ioctl(tun_file, TUNSETIFF, (void *) &ifr);
