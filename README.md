@@ -4,26 +4,39 @@ raspberrypi-cc2520
 Code, hardware, and instructions to use the TI CC2520 with the Raspberry Pi.
 
 
-Software
---------
+Installing the Software
+-----------------------
 
 ### Kernel
 
 You need the kernel module from https://github.com/ab500/linux-cc2520-driver.
 
-You also need to enable IPV6. Edit `/etc/modules` and add `ipv6` to the end
-of the file.
+You need to enable IPV6 on the RPI:
+
+    sudo vim /etc/modules
+    add ipv6 on a newline
+
+If you want to run the border router application you need to enable interface forwarding:
+
+    sudo vim /etc/sysctl.conf
+    uncomment the line: net.ipv6.conf.all.forwarding=1
 
 ### TinyOS
 
-You need a copy of the main TinyOS repository and the tinyos folder from this repo.
+You need a copy of the main TinyOS repository and the tinyos folder from this
+repo. You also need to install the dependencies for TinyOS. There are
+instructions here:
+[http://docs.tinyos.net/tinywiki/index.php/Installing_TinyOS_2.1.1]. If you want
+the simple Linux install I use, look here:
+[http://energy.eecs.umich.edu/wiki/doku.php?id=tinyos_install].
 
 #### Installation
 
 The TinyOS code requires a library for the low level BCM2835 GPIO from
-http://www.open.com.au/mikem/bcm2835/. Download and compile it on the RPI as shown.
-In order to cross compile the tinyos code on your machine you need also need the
-library and headers on your local machine.
+http://www.open.com.au/mikem/bcm2835/. Download and compile it on the RPI as
+instructed on the website. In order to cross compile tinyos code on your machine
+you also need the library and headers on your local machine. To build this on
+your local machine:
 
     -insert code for that here-
     mv libbcm2835.a /usr/arm-linux-gnueabi/lib
@@ -37,31 +50,67 @@ need to help it along a bit. Add the following to your `.bashrc` file:
 
 #### Usage
 
-Assuming you have the correct compilers, you should be able to run the following in
-`tinyos-main/apps/Blink` and have it compile successfully:
+Assuming you have the correct compilers, you should be able to run the following
+and have it compile successfully:
 
+    cd tinyos-main/apps/Blink
     make raspberrypi
 
 Then copy `build/raspberrypi/main.exe` to the RPI and you should be able to run
 it:
 
-    ./main.exe
+    scp build/raspberrypi/main.exe <raspberrypi>:~/blink
+    on the rpi:
+    ./blink
 
 
-#### Testing
-
-Run BorderRouter on the rpi, Node on mote and mcast.py on the rpi. Then watch the packets fly!
-
-#### Setup a Network
-
-Because the world is a very slow moving place, using IPv6 is not exactly trivial
-at this point.
 
 
-Addresses
----------
+Setting Up an Actual Border Router
+----------------------------------
 
-    Subnet for wsn              : 2607:f018:800a:bcde:f012:3456:7890::/112
+These are the instructions for how I'm testing the RPI as a border router.
+Because IPv6 support is anything but universal, this requires more manual setup
+than desired.
+
+My setup consists of the RPI and a computer on a wired network using the same
+Ethernet switch. Ethernet switches do not need to look into IPv6 packets so they
+can handle switching IPv6 packets. However, some (most?) routers do not yet
+understand IPv6, so it's best if the RPI and computer are not attached directly
+through a router.
+
+### Setting Up the RPI
+
+The RPI acts as a router for a range of IP addresses for the connected wireless
+motes. I have assigned these a prefix:
+`2607:f018:800a:bcde:f012:3456:7890::/112`. This is currently setup in TunP.
+
+We also need to setup an IPv6 address for the RPI. This will be the address for
+the RPI for packets coming in from the wsn side or from the Internet.
+
+    sudo ip -6 addr add 2607:f018:800a:bcde:f012:3456:7891:1/112 dev eth0
+
+### Setting Up the Computer
+
+The computer can act as a source of packets or a receiver of packets. It also
+needs an IP address and a prefix for the range of IP address that are on the
+same subnet. Then in order for the computer to know how to route packets to the
+wsn we need to explicitly tell it.
+
+    sudo ip -6 addr add 2607:f018:800a:bcde:f012:3456:7891:2/112 dev eth0
+    sudo ip -6 route add 2607:f018:800a:bcde:f012:3456:7890::/112 dev eth0
+
+### Making a Network
+
+With that running infrastructure running we need wireless nodes. These are
+configured with the prefix `2607:f018:800a:bcde:f012:3456:7890::/112`.
+
+### Testing
+
+
+### Notes
+
+    subnet for wsn              : 2607:f018:800a:bcde:f012:3456:7890::/112
     subnet for rest of computers: 2607:f018:800a:bcde:f012:3456:7891::/112
 
     border router:              : 2607:f018:800a:bcde:f012:3456:7891:1/112%eth0
