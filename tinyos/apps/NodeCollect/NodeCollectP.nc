@@ -6,7 +6,7 @@
 #include <lib6lowpan/ip.h>
 
 #define COLLECTION_SERVER "2607:f018:800a:bcde:f012:3456:7891:2"
-#define WSN_ROOT "2607:f018:800a:bcde:f012:3456:7890:1"
+#define WSN_ROOT "2607:f018:800a:bcde:f012:3456:7891:1"
 
 module NodeCollectP @safe() {
   uses {
@@ -29,7 +29,7 @@ implementation {
     inet_pton6(COLLECTION_SERVER, &server.sin6_addr);
     server.sin6_port = htons(2001);
     inet_pton6(WSN_ROOT, &root.sin6_addr);
-    server.sin6_port = htons(2001);
+    root.sin6_port = htons(2001);
 
     call RadioControl.start();
   }
@@ -47,8 +47,8 @@ implementation {
   event void MilliTimer.fired() {
     counter++;
     if (counter % 2) {
-      call Leds.led0Toggle();
-      call UDPService.sendto(&server, &counter, 2);
+   //   call Leds.led0Toggle();
+   //   call UDPService.sendto(&server, &counter, 2);
     } else {
       call Leds.led1Toggle();
       call UDPService.sendto(&root, &counter, 2);
