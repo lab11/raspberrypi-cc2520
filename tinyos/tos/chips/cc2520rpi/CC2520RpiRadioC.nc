@@ -1,10 +1,23 @@
 
-// Top level for a very stripped radio interface.
-//
-// Designed for BLIP.
-//
-// Provides low level interfaces for the CC2520 on the RPI. The send interface
-//  expects a fully formed 802.15.4 packet except for the sequence number.
+/* Top level radio driver module for a very bare radio interface for the CC2520
+ * radio running on Linux. This driver expects nearly fully formed 802.15.4
+ * packets including the physical layer length byte. This driver will set the
+ * sequence number and handle packet retries on the send side, and add metadata
+ * on the receive side.
+ *
+ * This driver provides interfaces compatible with the BLIP IPv6/6LoWPAN stack.
+ * See http://docs.tinyos.net/tinywiki/index.php/BLIP_2.0_Platform_Support_Guide
+ * for a little more information on how these interfaces act.
+ *
+ * CC2520RpiRadioC stack:
+ *          RadioP
+ *        /     \
+ *      V        \
+ *    LinkP       \
+ *      |          \
+ *      V          V
+ *    SendP      ReceiveP
+ */
 
 configuration CC2520RpiRadioC {
   provides {
