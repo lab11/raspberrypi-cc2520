@@ -76,7 +76,7 @@ implementation {
 
     while (1) {
       len = read(tun_file, buf, 2048);
-      printf("got p\n");
+      printf("TunP: got packet\n");
 
       // need to skip over the packet info header from the tun device
   //    memcpy(in_buf, buf+sizeof(struct tun_pi), len);
