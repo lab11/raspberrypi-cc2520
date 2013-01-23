@@ -1,5 +1,0 @@
-# -*- makefile -*-
-
-
-PFLAGS+=-I$(TOSROOTRPI)/tos/lib/net/blip
-

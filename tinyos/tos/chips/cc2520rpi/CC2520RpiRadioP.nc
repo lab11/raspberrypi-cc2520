@@ -82,10 +82,8 @@ implementation {
   }
 
 //----------- Send ---
-
   ieee154_simple_header_t* getHeaderIeee (message_t* msg) {
-    cc2520packet_header_t* hdr = (cc2520packet_header_t*) msg->header;
-    return &(hdr->ieee154);
+    return &(((cc2520packet_header_t*) msg->header)->ieee154);
   }
 
   // msg: pointer to a message_t
