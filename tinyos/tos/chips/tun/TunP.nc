@@ -18,21 +18,31 @@ module TunP {
 }
 
 implementation {
+  int ssystem(const char *fmt, ...);
 
   int tun_file;
   pthread_t receive_thread;
   uint8_t in_buf[2048];
   uint8_t out_buf[2048];
 
+  struct ip6_hdr *iph;
+  void *payload;
+
+  task void sendDone_task() {
+    // [TODO]: Acutally signal being done...
+    //signal IPForward.sendDone(SUCCESS);
+  }
+
   // todo: add timer and sendDone
-  command error_t IPForward.send(struct in6_addr *next_hop,
-                                 struct ip6_packet *msg,
-                                 void *data) {
+  command error_t IPForward.send(
+    struct in6_addr *next_hop,
+    struct ip6_packet *msg,
+    void *data) 
+  {
     size_t len;
     int ret;
 
     // skip the frame header
- //   uint8_t* out_buf_start = out_buf + sizeof(struct tun_pi);
     uint8_t* out_buf_start = out_buf;
 
     printf("TUNP: send\n");
@@ -48,29 +58,17 @@ implementation {
       printf("TUNP: send failed\n");
     }
 
-
+    post sendDone_task();
     return SUCCESS;
   }
 
-  // Runs a command on the local system using
-  // the kernel command interpreter.
-  int ssystem(const char *fmt, ...) {
-    char cmd[128];
-    va_list ap;
-    va_start(ap, fmt);
-    vsnprintf(cmd, sizeof(cmd), fmt, ap);
-    va_end(ap);
-    printf("%s\n", cmd);
-    fflush(stdout);
-    return system(cmd);
+  task void receive_task() {
+    signal IPForward.recv(iph, payload, NULL);
   }
 
-  void* receive (void* arg) {
+  void* receive(void* arg) {
     int len;
     uint8_t buf[2048];
-
-    struct ip6_hdr *iph;
-    void *payload;
 
     printf("receive thread tun\n");
 
@@ -78,14 +76,15 @@ implementation {
       len = read(tun_file, buf, 2048);
       printf("TunP: got packet\n");
 
-      // need to skip over the packet info header from the tun device
-  //    memcpy(in_buf, buf+sizeof(struct tun_pi), len);
+      // [NOTE]: At this point in_buf is a litte
+      // redundant, but we'll keep it around or now.
       memcpy(in_buf, buf, len);
 
       // set up pointers and signal to the next layer
       iph = (struct ip6_hdr*) in_buf;
       payload = (iph + 1);
-      signal IPForward.recv(iph, payload, NULL);
+
+      post receive_task();
     }
 
     return NULL;
@@ -124,15 +123,21 @@ implementation {
  //   ssystem("ifconfig tun0 inet6 add fe80::fffe:12/64");
     printf("\n");
 
-    err = pthread_create(&receive_thread, NULL, &receive, NULL);
-    if (err) {
-      //error
-    }
-
-
+    pthread_create(&receive_thread, NULL, &receive, NULL);
     return SUCCESS;
-
   }
 
+  // Runs a command on the local system using
+  // the kernel command interpreter.
+  int ssystem(const char *fmt, ...) {
+    char cmd[128];
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(cmd, sizeof(cmd), fmt, ap);
+    va_end(ap);
+    printf("%s\n", cmd);
+    fflush(stdout);
+    return system(cmd);
+  }
 }
 
