@@ -28,9 +28,11 @@ implementation {
   struct ip6_hdr *iph;
   void *payload;
 
+  // Send related state variables
+  struct send_info send_info_struct;
+
   task void sendDone_task() {
-    // [TODO]: Acutally signal being done...
-    //signal IPForward.sendDone(SUCCESS);
+    signal IPForward.sendDone(&send_info_struct);
   }
 
   // todo: add timer and sendDone
@@ -53,8 +55,14 @@ implementation {
     memcpy(out_buf_start, &msg->ip6_hdr, sizeof(struct ip6_hdr));
     iov_read(msg->ip6_data, 0, len, out_buf_start + sizeof(struct ip6_hdr));
 
+    send_info_struct.upper_data = data;
+    send_info_struct.link_fragments = 1;
+    send_info_struct.link_transmissions = 1;
+    send_info_struct.failed = FALSE;
+    
     ret = write(tun_file, out_buf, len + sizeof(struct tun_pi));
     if (ret < 0) {
+      send_info_struct.failed = TRUE;
       printf("TUNP: send failed\n");
     }
 
