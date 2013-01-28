@@ -36,18 +36,18 @@ implementation {
   }
 
   // todo: add timer and sendDone
-  command error_t IPForward.send(
-    struct in6_addr *next_hop,
-    struct ip6_packet *msg,
-    void *data)
-  {
+  command error_t IPForward.send (struct in6_addr *next_hop,
+                                  struct ip6_packet *msg,
+                                  void *data) {
     size_t len;
     int ret;
 
     // skip the frame header
     uint8_t* out_buf_start = out_buf;
 
-    printf("TUNP: send\n");
+#ifdef TUN_DEBUG
+    printf("TUNP: send to interface\n");
+#endif
 
     len = iov_len(msg->ip6_data) + sizeof(struct ip6_hdr);
 
@@ -63,7 +63,9 @@ implementation {
     ret = write(tun_file, out_buf, len + sizeof(struct tun_pi));
     if (ret < 0) {
       send_info_struct.failed = TRUE;
+#ifdef TUN_DEBUG
       printf("TUNP: send failed\n");
+#endif
     }
 
     post sendDone_task();
@@ -78,11 +80,15 @@ implementation {
     int len;
     uint8_t buf[2048];
 
+#ifdef TUN_DEBUG
     printf("receive thread tun\n");
+#endif
 
     while (1) {
       len = read(tun_file, buf, 2048);
+#ifdef TUN_DEBUG
       printf("TunP: got packet\n");
+#endif
 
       // [NOTE]: At this point in_buf is a litte
       // redundant, but we'll keep it around or now.
@@ -105,7 +111,8 @@ implementation {
     tun_file = open("/dev/net/tun", O_RDWR);
     if (tun_file < 0) {
       // error
-      printf("no net/tun\n");
+      fprintf(stderr, "TunP: Could not create a tun interface.\n");
+      exit(1);
     }
 
     // Clear the ifr struct
@@ -117,13 +124,12 @@ implementation {
     // Setup the interface
     err = ioctl(tun_file, TUNSETIFF, (void *) &ifr);
     if (err < 0) {
-      printf("bad ioctl\n");
+      fprintf(stderr, "TunP: ioctl could not set up tun interface\n");
       close(tun_file);
     }
 
     // Setup the IP Addresses
     // Todo: this should be made nicer somehow (not use ifconfig, be flexible)
-    printf("\n");
     ssystem("ifconfig tun0 up");
     ssystem("ifconfig tun0 mtu 1280");
  //   ssystem("ip -6 addr add 2607:f018:800a:bcde:f012:3456:7890:1/112 dev tun0");
@@ -131,7 +137,6 @@ implementation {
  //   ssystem("ifconfig tun0 inet6 add fe80::212:6d52:5000:1/64");
     // Dummy link local addr to make the dhcp server work
     ssystem("ifconfig tun0 inet6 add fe80::212:aaaa:bbbb:f/64");
-    printf("\n");
 
     pthread_create(&receive_thread, NULL, &receive, NULL);
     return SUCCESS;
@@ -145,8 +150,10 @@ implementation {
     va_start(ap, fmt);
     vsnprintf(cmd, sizeof(cmd), fmt, ap);
     va_end(ap);
+#ifdef TUN_DEBUG
     printf("%s\n", cmd);
     fflush(stdout);
+#endif
     return system(cmd);
   }
 }
