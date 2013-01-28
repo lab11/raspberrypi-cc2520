@@ -11,7 +11,7 @@ PFLAGS += -DPPP_HDLC_RX_FRAME_LIMIT=1 -DPPP_HDLC_TX_FRAME_LIMIT=8
 
 # if you set this, the stack won't use dhcp to assign addresses -- it
 # will use this prefix combined with TOS_NODE_ID
-PFLAGS += -DIN6_PREFIX=\"2607:f018:800a:bcde:f012:3456:7891::\"
+#PFLAGS += -DIN6_PREFIX=\"2607:f018:800a:bcde:f012:3456:7890::\"
 
 # derive short address from the dhcp address assignment, if possible
 #PFLAGS += -DBLIP_DERIVE_SHORTADDRS
