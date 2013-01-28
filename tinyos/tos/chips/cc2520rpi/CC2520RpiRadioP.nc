@@ -41,6 +41,9 @@ implementation {
   uint8_t sequence_number;
 
   command error_t SplitControl.start () {
+    uint8_t* ext_addr_ptr;
+    int i;
+
     printf("Testing cc2520 driver...\n");
     cc2520_file = open("/dev/radio", O_RDWR);
     if (cc2520_file < 0) {
@@ -55,7 +58,11 @@ implementation {
     // set up the addresses for this node
     addr_data.short_addr = TOS_NODE_ID;
     ext_addr = call LocalIeeeEui64.getId();
-    memcpy(&addr_data.extended_addr, &ext_addr.data, 8);
+    ext_addr_ptr = (uint8_t*) &addr_data.extended_addr;
+    for (i=0; i<8; i++) {
+      ext_addr_ptr[i] = ext_addr.data[7-i];
+    }
+    //memcpy(&addr_data.extended_addr, &ext_addr.data, 8);
 
     // set properties
     ioctl(cc2520_file, CC2520_IO_RADIO_SET_CHANNEL, &chan_data);
