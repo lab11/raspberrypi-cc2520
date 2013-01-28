@@ -1,4 +1,4 @@
-
+#include <pthread.h>
 #include "rpihardware.h"
 
 module McuSleepC @safe() {

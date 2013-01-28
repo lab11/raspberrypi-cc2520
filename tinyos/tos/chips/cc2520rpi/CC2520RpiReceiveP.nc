@@ -56,7 +56,8 @@ implementation {
     pthread_mutex_unlock(&mutex_receive);
   }
 
-  void print_message (uint8_t *buf, uint8_t len) {
+#if CC2520RPI_DEBUG
+  void print_message (uint8_t* buf, uint8_t len) {
     char pbuf[2048];
     char *buf_ptr = NULL;
     int i;
@@ -69,19 +70,26 @@ implementation {
     *(buf_ptr) = '\0';
     printf("read %i %s\n", len, pbuf);
   }
+#endif
 
   void* receive (void *arg) {
     uint8_t buf[256];
     int ret;
 
+#if CC2520RPI_DEBUG
     printf("CC2520RpiReceiveP: Receive thread started.\n");
+#endif
 
     while (1) {
-      printf("Receiving a test message...\n");
+#if CC2520RPI_DEBUG
+    printf("Receiving a test message...\n");
+#endif
       ret = read(cc2520_file, buf, 128);
 
       if (ret > 0) {
+#if CC2520RPI_DEBUG
         print_message(buf, ret);
+#endif
 
         pthread_mutex_lock(&mutex_receive);
         while (pending) {
@@ -109,7 +117,7 @@ implementation {
 
     cc2520_file = open("/dev/radio", O_RDWR);
     if (cc2520_file < 0) {
-      printf("CC2520RpiReceiveP: Could not open radio.\n");
+      fprintf(stderr, "CC2520RpiReceiveP: Could not open radio.\n");
       exit(1);
     }
 

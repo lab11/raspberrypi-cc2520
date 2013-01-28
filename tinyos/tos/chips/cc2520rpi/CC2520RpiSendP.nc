@@ -33,7 +33,9 @@ implementation {
     uint8_t *buf;
     ieee154_simple_header_t* ieeehdr;
 
+#ifdef CC2520RPI_DEBUG
     printf("CC2520RpiSendP: send_thread starting.\n");
+#endif
 
     while (1) {
       pthread_mutex_lock(&mutex_send);
@@ -50,7 +52,9 @@ implementation {
           call PacketMetadata.setWasAcked(msg_pointer, FALSE);
           break;
         case CC2520_TX_LENGTH:
+#ifdef CC2520RPI_DEBUG
           printf("CC2520RpiSendP: INCORRECT LENGTH\n");
+#endif
           break;
         case CC2520_TX_SUCCESS:
           call PacketMetadata.setWasAcked(msg_pointer, TRUE);
@@ -63,8 +67,9 @@ implementation {
           }
           break;
       }
-
+#ifdef CC2520RPI_DEBUG
       printf("CC2520RpiSendP: write DONE. return code: %d\n", ret);
+#endif
       pthread_mutex_unlock(&mutex_send);
 
       post sendDone_task();
@@ -76,21 +81,24 @@ implementation {
   command error_t SoftwareInit.init() {
     // Open the character device for the CC2520
     cc2520_file = open("/dev/radio", O_RDWR);
-    printf("cc2520file: %i\n", cc2520_file);
+    if (cc2520_file < 0) {
+      fprintf(stderr, "CC2520RpiSendP: Could not open radio.\n");
+      exit(1);
+    }
 
     pthread_mutex_init(&mutex_send, NULL);
     pthread_cond_init(&cond_send, NULL);
 
     pthread_create(&thread_send, NULL, &send, NULL);
 
-    printf("CC2520RpiSendP: sizeof header: %i\n", sizeof(cc2520packet_header_t));
-
     return SUCCESS;
   }
 
   command error_t BareSend.send (message_t* msg) {
     pthread_mutex_lock(&mutex_send);
+#ifdef CC2520RPI_DEBUG
     printf("CC2520RpiSendP: sending packet\n");
+#endif
 
     // Store the pointer and length of this message.
     msg_pointer = msg;
