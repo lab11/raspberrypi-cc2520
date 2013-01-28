@@ -1,7 +1,6 @@
-#include <pthread.h>
 #include "rpihardware.h"
 
-module McuSleepC @safe() {
+configuration McuSleepC @safe() {
   provides {
     interface McuSleep;
     interface McuPowerState;
@@ -10,27 +9,15 @@ module McuSleepC @safe() {
     interface McuPowerOverride;
   }
 }
+
 implementation {
+  components McuSleepP;
+  components ThreadWaitC;
 
+  McuSleepP.ThreadWait -> ThreadWaitC.ThreadWait;
 
-
-
-  mcu_power_t getPowerState() {
-
-    return 0;
-  }
-
-
-
-  async command void McuSleep.sleep() {
-
-  }
-
-  async command void McuPowerState.update() {
-  }
-
- default async command mcu_power_t McuPowerOverride.lowestState() {
-   return 1;
- }
+  McuSleep = McuSleepP.McuSleep;
+  McuPowerState = McuSleepP.McuPowerState;
+  McuPowerOverride = McuSleepP.McuPowerOverride;
 
 }

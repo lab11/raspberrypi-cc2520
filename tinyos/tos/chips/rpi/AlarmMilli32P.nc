@@ -1,67 +1,44 @@
-/**
- * AlarmMilliC is the alarm for async millisecond alarms
- *
- * @author Cory Sharp <cssharp@eecs.berkeley.edu>
- * @see  Please refer to TEP 102 for more information about this component and its
- *          intended use.
- */
-
 #include <signal.h>
 #include <time.h>
 
-//#define SIGALRM 14
-
 extern void signal_wrapper(int, void*);
 
-generic module AlarmMilli32P()
-{
-  provides interface Init;
-  provides interface Alarm<TMilli, uint32_t> as Alarm;
+generic module AlarmMilli32P() {
+  provides {
+    interface Init;
+    interface Alarm<TMilli, uint32_t> as Alarm;
+  }
+  uses {
+    interface ThreadWait;
+  }
 }
-implementation
-{
-  timer_t  timerid;
 
-  // whether or not to signal alarm events
-  // the timer keeps on clickin' even when you stop it, but when trigger_alarm
-  // is false it won't do any interrupts or what not
-//  bool     trigger_alarm;
+implementation {
+  timer_t  timerid;
 
   // Keep track of the absolute time the most recent alarm was set at.
   // This is for the getAlarm() function.
   uint32_t last_alarm;
 
-
-  // Callback for the alarm
-  void AlarmMilli32Fired (int sig) {
+  task void timerFired_task () {
     signal Alarm.fired();
   }
 
-  command error_t Init.init()
-  {
+  // Callback for the alarm
+  void AlarmMilli32Fired (int sig) {
+    post timerFired_task();
+    call ThreadWait.signalThread();
+  }
 
-    int              t_ret;
-  //  struct sigevent  sev;
-  //  struct sigaction sa;
+  command error_t Init.init () {
+    int t_ret;
 
-    // Setup the signal handler for the timer trigger
-  /*  sa.sa_flags = SA_SIGINFO;
-    sa.sa_sigaction = AlarmMilli32Fired;
-    sigemptyset(&sa.sa_mask);
-    sigaction(SIGRTMIN, &sa, NULL);
-
-    // Setup the signal that the timer calls when it fires
-    sev.sigev_notify = SIGEV_SIGNAL;
-    sev.sigev_signo  = SIGRTMIN;
-    sev.sigev_value.sival_ptr = &timerid;
-*/
     // Create a timer that just keeps counting
     // http://www.kernel.org/doc/man-pages/online/pages/man2/timer_create.2.html
     t_ret = timer_create(CLOCK_MONOTONIC, NULL, &timerid);
 
-   //sighandler_t brad_signal(int, sighandler_t);
-   signal_wrapper(SIGALRM, AlarmMilli32Fired);
-
+    //sighandler_t brad_signal(int, sighandler_t);
+    signal_wrapper(SIGALRM, AlarmMilli32Fired);
 
     last_alarm = 0;
 
@@ -72,29 +49,16 @@ implementation
     }
   }
 
-  async command void Alarm.start(uint32_t dt)
-  {
+  async command void Alarm.start (uint32_t dt) {
     call Alarm.startAt(call Alarm.getNow(), dt);
   }
 
-  async command void Alarm.stop()
-  {
+  async command void Alarm.stop () {
     struct itimerspec new_timer = {{0, 0}, {0, 0}};
     timer_settime(timerid, TIMER_ABSTIME, &new_timer, NULL);
   }
 
-/*  async event void Msp430Compare.fired()
-  {
-
-    trigger_alarm = FALSE;
-
-
-    call Msp430TimerControl.disableEvents();
-    signal Alarm.fired();
-  }
-*/
-  async command bool Alarm.isRunning()
-  {
+  async command bool Alarm.isRunning () {
     struct itimerspec timer_val;
     int               t_ret;
     // if timer_val.it_value is 0, then the timer is disarmed
@@ -108,15 +72,13 @@ implementation
     return FALSE;
   }
 
-  async command void Alarm.startAt(uint32_t t0, uint32_t dt)
-  {
+  async command void Alarm.startAt(uint32_t t0, uint32_t dt) {
     struct timespec timer_val;
     int             t_ret;
     uint32_t        time_now;
     uint32_t        elapsed;
 
-    atomic
-    {
+    atomic {
       t_ret = clock_gettime(CLOCK_MONOTONIC, &timer_val);
 
       if (t_ret == 0) {
@@ -172,8 +134,7 @@ implementation
     }
   }
 
-  async command uint32_t Alarm.getNow()
-  {
+  async command uint32_t Alarm.getNow () {
     struct timespec timer_val;
     int             t_ret;
     uint32_t        time_now = 0;
@@ -188,10 +149,8 @@ implementation
     return time_now;
   }
 
-  async command uint32_t Alarm.getAlarm()
-  {
+  async command uint32_t Alarm.getAlarm () {
     return last_alarm;
   }
 
 }
-

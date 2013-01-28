@@ -15,6 +15,7 @@ PFLAGS += -I$(TOSROOTRPI)/tos/chips/rpi
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/tun
 PFLAGS += -I$(TOSROOTRPI)/tos/interfaces
 PFLAGS += -I$(TOSROOTRPI)/tos/lib/net/blip
+PFLAGS += -I$(TOSROOTRPI)/tos/system
 
 
 PFLAGS += -DPRINTFUART_ENABLED=1
