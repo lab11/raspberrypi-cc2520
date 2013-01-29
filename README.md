@@ -101,32 +101,26 @@ I'm using Dibbler[http://klub.com.pl/dhcpv6/]. I couldn't figure out how to cros
 compile it so I downloaded it to the RPI and built it on there (yeah it took a little while).
 
 Running Dibbler is pretty straightforward. The last key is the configuration file
-located at `/etc/dibbler/
+located at `/etc/dibbler/server.conf`. Here is mine:
 
-    bradjc@raspberrypi ~ $ top
-top - 00:03:38 up 17:59,  5 users,  load average: 0.41, 0.33, 0.27
-Tasks:  77 total,   1 running,  76 sleeping,   0 stopped,   0 zombie
-iface relay1 {
+    iface relay1 {
+     relay tun0
 
- relay tun0
+     class {
+      pool 2607:f018:800a:bcde:f012:3456:7890::/112
+     }
+    }
 
- class {
-  pool 2607:f018:800a:bcde:f012:3456:7890::/112
- }
-}
+    iface "tun0" {
+     class {
+      pool 2607:f018:800a:bcde:f012:3456:7890::/112
+     }
 
-iface "tun0" {
-
- class {
-  pool 2607:f018:800a:bcde:f012:3456:7890::/112
- }
-
- client link-local fe80::212:6d52:5000:1 {
-  address 2607:f018:800a:bcde:f012:3456:7890:1
-  prefix 2607:f018:800a:bcde:f012:3456:7890::/112
- }
-
-}
+     client link-local fe80::212:6d52:5000:1 {
+      address 2607:f018:800a:bcde:f012:3456:7890:1
+      prefix 2607:f018:800a:bcde:f012:3456:7890::/112
+     }
+    }
 
 ### Setting Up the Computer
 
