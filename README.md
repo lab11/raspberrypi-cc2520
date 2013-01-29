@@ -89,6 +89,44 @@ We also need to setup an IPv6 address for the RPI. This will be the address for
 the RPI for packets coming in from the wsn side or from the Internet.
 
     sudo ip -6 addr add 2607:f018:800a:bcde:f012:3456:7891:1/112 dev eth0
+    
+#### DHCP
+
+Blip supports both static and dynamic IP addresses. If you wish to reduce your
+burden when flashing nodes and use dynamic addresses, you need to be
+running a DHCP server. Ideally you could use any router's DHCP server, but in 
+the likely case that isn't available, you can run a DHCP server on the RPI.
+
+I'm using Dibbler[http://klub.com.pl/dhcpv6/]. I couldn't figure out how to cross
+compile it so I downloaded it to the RPI and built it on there (yeah it took a little while).
+
+Running Dibbler is pretty straightforward. The last key is the configuration file
+located at `/etc/dibbler/
+
+    bradjc@raspberrypi ~ $ top
+top - 00:03:38 up 17:59,  5 users,  load average: 0.41, 0.33, 0.27
+Tasks:  77 total,   1 running,  76 sleeping,   0 stopped,   0 zombie
+iface relay1 {
+
+ relay tun0
+
+ class {
+  pool 2607:f018:800a:bcde:f012:3456:7890::/112
+ }
+}
+
+iface "tun0" {
+
+ class {
+  pool 2607:f018:800a:bcde:f012:3456:7890::/112
+ }
+
+ client link-local fe80::212:6d52:5000:1 {
+  address 2607:f018:800a:bcde:f012:3456:7890:1
+  prefix 2607:f018:800a:bcde:f012:3456:7890::/112
+ }
+
+}
 
 ### Setting Up the Computer
 
