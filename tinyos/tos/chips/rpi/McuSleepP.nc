@@ -17,6 +17,7 @@ implementation {
   }
 
   async command void McuSleep.sleep() {
+    __nesc_enable_interrupt();
     call ThreadWait.wait();
   }
 

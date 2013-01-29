@@ -19,15 +19,15 @@ implementation {
   }
 
   command void ThreadWait.wait () {
-    pthread_mutex_lock(&mutex_threadwait);
+   // pthread_mutex_lock(&mutex_threadwait);
     pthread_cond_wait(&cond_threadwait, &mutex_threadwait);
-    pthread_mutex_unlock(&mutex_threadwait);
+   // pthread_mutex_unlock(&mutex_threadwait);
   }
 
   command void ThreadWait.signalThread () {
-    pthread_mutex_lock(&mutex_threadwait);
+   // pthread_mutex_lock(&mutex_threadwait);
     pthread_cond_signal(&cond_threadwait);
-    pthread_mutex_unlock(&mutex_threadwait);
+   // pthread_mutex_unlock(&mutex_threadwait);
   }
 
 }
