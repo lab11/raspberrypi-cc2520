@@ -90,7 +90,7 @@ implementation {
           struct itimerspec new_timer = {{0, 0}, {0, 0}};
 
           new_timer.it_value.tv_sec  = timer_val.tv_sec;
-          new_timer.it_value.tv_nsec = timer_val.tv_nsec + 500;
+          new_timer.it_value.tv_nsec = timer_val.tv_nsec + 500000;
 
           t_ret = timer_settime(timerid, TIMER_ABSTIME, &new_timer, NULL);
 
@@ -111,12 +111,11 @@ implementation {
           if (new_timer.it_value.tv_nsec > 999999999) {
             // the number of nanoseconds add up to more than a second.
             new_timer.it_value.tv_nsec -= 999999999;
-            new_timer.it_value.tv_nsec++;
+            new_timer.it_value.tv_sec++;
           }
 
           t_ret = timer_settime(timerid, TIMER_ABSTIME, &new_timer, NULL);
         }
-
         if (t_ret != 0) {
         //  printf("set timer failed\n");
         }
