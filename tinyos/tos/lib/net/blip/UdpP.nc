@@ -87,7 +87,7 @@ module UdpP {
     if (i == N_CLIENTS) {
       // Packet is to a port not used by this TinyOS application
       // Dump the packet to linux to let it see if anything is bound to the port
-      struct ip6_packet pkt;
+/*      struct ip6_packet pkt;
       v.iov_next = NULL;
       v.iov_base = packet;
       v.iov_len  = ntohs(iph->ip6_plen);
@@ -97,7 +97,7 @@ module UdpP {
       // send this to the Tun module. Can cheat and use NULLs in fields that
       //  aren't referenced. Maybe should fill these in at some point...
       printf("UDP: to me, but not bound port\n");
-      call IPForward.send(NULL, &pkt, NULL);
+      call IPForward.send(NULL, &pkt, NULL);*/
       return;
     }
     memcpy(&addr.sin6_addr, &iph->ip6_src, 16);

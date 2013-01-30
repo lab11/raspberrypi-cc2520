@@ -1,5 +1,6 @@
 
 #include <pthread.h>
+#include <stdio.h>
 
 module ThreadWaitP {
   provides {
@@ -19,14 +20,26 @@ implementation {
   }
 
   command void ThreadWait.wait () {
-   // pthread_mutex_lock(&mutex_threadwait);
-    pthread_cond_wait(&cond_threadwait, &mutex_threadwait);
-   // pthread_mutex_unlock(&mutex_threadwait);
+
+    struct timespec ts;
+
+    pthread_mutex_lock(&mutex_threadwait);
+
+    clock_gettime(CLOCK_REALTIME, &ts);
+    ts.tv_sec += 5;
+    pthread_cond_timedwait(&cond_threadwait, &mutex_threadwait, &ts);
+
+    printf("WAIT WAKEUP\n");
+
+
+
+   // pthread_cond_wait(&cond_threadwait, &mutex_threadwait);
+    pthread_mutex_unlock(&mutex_threadwait);
   }
 
   command void ThreadWait.signalThread () {
    // pthread_mutex_lock(&mutex_threadwait);
-    pthread_cond_broadcast(&cond_threadwait);
+    pthread_cond_signal(&cond_threadwait);
    // pthread_mutex_unlock(&mutex_threadwait);
   }
 

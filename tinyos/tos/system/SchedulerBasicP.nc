@@ -50,6 +50,7 @@
  */
 
 #include "hardware.h"
+ #include <stdio.h>
 
 module SchedulerBasicP @safe() {
   provides interface Scheduler;
@@ -174,6 +175,7 @@ implementation
     atomic {
       ret = pushTask(id);
     }
+   // printf("task posted %i.\n", id);
     call ThreadWait.signalThread();
     return (ret) ? SUCCESS : EBUSY;
   }

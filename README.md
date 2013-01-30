@@ -89,12 +89,13 @@ We also need to setup an IPv6 address for the RPI. This will be the address for
 the RPI for packets coming in from the wsn side or from the Internet.
 
     sudo ip -6 addr add 2607:f018:800a:bcde:f012:3456:7891:1/112 dev eth0
-    
+    sudo ip -6 route add 2001:470:1f11:131a::/64 dev tun0
+
 #### DHCP
 
 Blip supports both static and dynamic IP addresses. If you wish to reduce your
 burden when flashing nodes and use dynamic addresses, you need to be
-running a DHCP server. Ideally you could use any router's DHCP server, but in 
+running a DHCP server. Ideally you could use any router's DHCP server, but in
 the likely case that isn't available, you can run a DHCP server on the RPI.
 
 I'm using Dibbler[http://klub.com.pl/dhcpv6/]. I couldn't figure out how to cross

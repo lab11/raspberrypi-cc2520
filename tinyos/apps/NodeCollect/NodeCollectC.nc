@@ -22,6 +22,11 @@ implementation {
   components RPLRoutingC;
 #endif
 
+#ifdef PRINTFUART_ENABLED
+  components PrintfC;
+  components SerialStartC;
+#endif
+
 }
 
 

@@ -5,7 +5,7 @@
 #include <lib6lowpan/lib6lowpan.h>
 #include <lib6lowpan/ip.h>
 
-#define COLLECTION_SERVER "2607:f018:800a:bcde:f012:3456:7891:2"
+#define COLLECTION_SERVER "2001:470:1f10:131c::2"
 #define WSN_ROOT "2607:f018:800a:bcde:f012:3456:7891:1"
 
 module NodeCollectP @safe() {
@@ -47,11 +47,11 @@ implementation {
   event void MilliTimer.fired() {
     counter++;
     if (counter % 2) {
-   //   call Leds.led0Toggle();
-   //   call UDPService.sendto(&server, &counter, 2);
+      call Leds.led0Toggle();
+      call UDPService.sendto(&server, &counter, 2);
     } else {
-      call Leds.led1Toggle();
-      call UDPService.sendto(&root, &counter, 2);
+   //   call Leds.led1Toggle();
+   //   call UDPService.sendto(&root, &counter, 2);
     }
   }
 

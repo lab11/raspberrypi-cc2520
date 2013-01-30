@@ -50,6 +50,8 @@ implementation {
     // Signal the rest of the stack on the main thread
     rx_msg_ptr = signal BareReceive.receive(rx_msg_ptr);
 
+    printf("receive_task\n");
+
     pthread_mutex_lock(&mutex_receive);
     pending = FALSE;
     pthread_cond_signal(&cond_pending);
@@ -101,9 +103,12 @@ implementation {
         tsfer_buf_len = ret;
 
         pending = TRUE;
+        printf("PENDING TRUE\n");
         pthread_mutex_unlock(&mutex_receive);
 
         post receive_task();
+
+        printf("POSTED RECEIVE TASK\n");
       }
     }
 
