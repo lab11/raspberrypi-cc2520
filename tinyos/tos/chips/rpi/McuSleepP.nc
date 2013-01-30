@@ -17,8 +17,8 @@ implementation {
   }
 
   async command void McuSleep.sleep() {
-  //  __nesc_enable_interrupt();
-  //  call ThreadWait.wait();
+    __nesc_enable_interrupt();
+    call ThreadWait.wait();
   }
 
   async command void McuPowerState.update() {
