@@ -22,7 +22,6 @@ implementation
   components new VirtualizeTimerC(TMilli,uniqueCount(UQ_TIMER_MILLI));
   components new CounterToLocalTimeC(TMilli);
   components LocalTimeMilli32P;
-  components ThreadWaitC;
 
   Init = AlarmMilli32P;
   TimerMilli = VirtualizeTimerC;
@@ -31,7 +30,6 @@ implementation
   VirtualizeTimerC.TimerFrom -> AlarmToTimerC;
   AlarmToTimerC.Alarm -> AlarmMilli32P;
 
-  AlarmMilli32P.ThreadWait -> ThreadWaitC.ThreadWait;
 //  CounterToLocalTimeC.Counter -> CounterMilli32C;
 
 /*

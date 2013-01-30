@@ -26,7 +26,7 @@ implementation {
 
   command void ThreadWait.signalThread () {
    // pthread_mutex_lock(&mutex_threadwait);
-    pthread_cond_signal(&cond_threadwait);
+    pthread_cond_broadcast(&cond_threadwait);
    // pthread_mutex_unlock(&mutex_threadwait);
   }
 

@@ -15,9 +15,6 @@ module TunP {
     interface Init as SoftwareInit @exactlyonce();
     interface IPForward;
   }
-  uses {
-    interface ThreadWait;
-  }
 }
 
 implementation {
@@ -72,7 +69,6 @@ implementation {
     }
 
     post sendDone_task();
-    call ThreadWait.signalThread();
     return SUCCESS;
   }
 
@@ -103,7 +99,6 @@ implementation {
       payload = (iph + 1);
 
       post receive_task();
-      call ThreadWait.signalThread();
     }
 
     return NULL;

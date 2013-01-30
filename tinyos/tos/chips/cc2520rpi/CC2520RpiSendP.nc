@@ -10,7 +10,6 @@ module CC2520RpiSendP {
   }
   uses {
     interface PacketMetadata;
-    interface ThreadWait;
   }
 }
 
@@ -74,7 +73,6 @@ implementation {
       pthread_mutex_unlock(&mutex_send);
 
       post sendDone_task();
-      call ThreadWait.signalThread();
     }
 
     return NULL;

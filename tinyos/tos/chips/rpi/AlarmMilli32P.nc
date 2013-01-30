@@ -8,9 +8,6 @@ generic module AlarmMilli32P() {
     interface Init;
     interface Alarm<TMilli, uint32_t> as Alarm;
   }
-  uses {
-    interface ThreadWait;
-  }
 }
 
 implementation {
@@ -20,14 +17,9 @@ implementation {
   // This is for the getAlarm() function.
   uint32_t last_alarm;
 
-  task void timerFired_task () {
-    signal Alarm.fired();
-  }
-
   // Callback for the alarm
   void AlarmMilli32Fired (int sig) {
-    post timerFired_task();
-    call ThreadWait.signalThread();
+    signal Alarm.fired();
   }
 
   command error_t Init.init () {

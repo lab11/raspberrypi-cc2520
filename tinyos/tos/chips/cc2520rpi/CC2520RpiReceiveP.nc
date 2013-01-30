@@ -17,7 +17,6 @@ module CC2520RpiReceiveP {
   }
   uses {
     interface PacketMetadata;
-    interface ThreadWait;
   }
 }
 
@@ -105,7 +104,6 @@ implementation {
         pthread_mutex_unlock(&mutex_receive);
 
         post receive_task();
-        call ThreadWait.signalThread();
       }
     }
 
