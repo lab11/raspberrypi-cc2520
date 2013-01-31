@@ -28,12 +28,8 @@ implementation {
     clock_gettime(CLOCK_REALTIME, &ts);
     ts.tv_sec += 5;
     pthread_cond_timedwait(&cond_threadwait, &mutex_threadwait, &ts);
-
-    printf("WAIT WAKEUP\n");
-
-
-
    // pthread_cond_wait(&cond_threadwait, &mutex_threadwait);
+
     pthread_mutex_unlock(&mutex_threadwait);
   }
 
