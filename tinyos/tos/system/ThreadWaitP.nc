@@ -20,7 +20,7 @@ implementation {
     return SUCCESS;
   }
 
-  command void ThreadWait.wait () {
+  async command void ThreadWait.wait () {
 
     struct timespec ts;
 
@@ -34,7 +34,7 @@ implementation {
     pthread_mutex_unlock(&mutex_threadwait);
   }
 
-  command void ThreadWait.signalThread () {
+  async command void ThreadWait.signalThread () {
    // pthread_mutex_lock(&mutex_threadwait);
     pthread_cond_signal(&cond_threadwait);
    // pthread_mutex_unlock(&mutex_threadwait);
