@@ -17,6 +17,7 @@ implementation {
   command error_t Init.init () {
     pthread_mutex_init(&mutex_threadwait, NULL);
     pthread_cond_init(&cond_threadwait, NULL);
+    return SUCCESS;
   }
 
   command void ThreadWait.wait () {

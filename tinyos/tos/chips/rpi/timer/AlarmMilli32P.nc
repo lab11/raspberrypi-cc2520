@@ -141,7 +141,7 @@ implementation {
   }
 
   async command uint32_t Alarm.getAlarm () {
-    return last_alarm;
+    atomic return last_alarm;
   }
 
 }
