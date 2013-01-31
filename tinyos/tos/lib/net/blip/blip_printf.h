@@ -86,6 +86,7 @@ int printf_ieee154addr(ieee154_addr_t *in) {
 #define printf_in6addr(a) ;
 #define printf_buf(buf, len) ;
 #define iov_print(iov) ;
+#define printf_ieee154addr(in) ;
 
 #endif /* PRINTFUART_ENABLED */
 
