@@ -1,11 +1,10 @@
 #include <bcm2835.h>
 
-generic module HplRpiGeneralIOP(uint8_t pin) @safe()
-{
+generic module HplRpiGeneralIOP(uint8_t pin) @safe() {
   provides interface HplRpiGeneralIO as IO;
 }
-implementation
-{
+implementation {
+
   // Variables to keep track of the pin state. These are necessary because the
   // bcm2835 library does not have functions that correspond to all of the
   // functions in this module.
@@ -14,21 +13,23 @@ implementation
 
   async command void IO.set() {
     bcm2835_gpio_set(pin);
-    pin_high = TRUE;
+    atomic pin_high = TRUE;
   }
 
   async command void IO.clr() {
     bcm2835_gpio_clr(pin);
-    pin_high = FALSE;
+    atomic pin_high = FALSE;
   }
 
   async command void IO.toggle() {
-    if (pin_high) {
-      bcm2835_gpio_clr(pin);
-      pin_high = FALSE;
-    } else {
-      bcm2835_gpio_set(pin);
-      pin_high = TRUE;
+    atomic {
+      if (pin_high) {
+        bcm2835_gpio_clr(pin);
+        pin_high = FALSE;
+      } else {
+        bcm2835_gpio_set(pin);
+        pin_high = TRUE;
+      }
     }
   }
 
@@ -42,19 +43,19 @@ implementation
 
   async command void IO.makeInput() {
     bcm2835_gpio_fsel(pin, BCM2835_GPIO_FSEL_INPT);
-    pin_input = TRUE;
+    atomic pin_input = TRUE;
   }
 
   async command bool IO.isInput() {
-    return pin_input;
+    atomic return pin_input;
   }
 
   async command void IO.makeOutput() {
     bcm2835_gpio_fsel(pin, BCM2835_GPIO_FSEL_OUTP);
-    pin_input = FALSE;
+    atomic pin_input = FALSE;
   }
 
   async command bool IO.isOutput() {
-    return pin_input == FALSE;
+    atomic return pin_input == FALSE;
   }
 }
