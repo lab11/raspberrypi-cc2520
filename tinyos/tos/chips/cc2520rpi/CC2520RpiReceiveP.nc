@@ -66,7 +66,7 @@ implementation {
 #ifdef CC2520RPI_DEBUG
     {
       uint8_t sam, dam;
-      uint8_t* buf = tsfer_buf+5;
+      uint8_t* buf = tsfer_buf+6;
       sam = (tsfer_buf[2] >> 6) & 0x3;
       dam = (tsfer_buf[2] >> 2) & 0x3;
       printf("CC2520RpiReceiveP: Received a packet. len: %i\n", tsfer_buf_len);
