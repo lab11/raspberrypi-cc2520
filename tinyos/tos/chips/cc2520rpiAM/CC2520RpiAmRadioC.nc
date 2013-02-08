@@ -38,11 +38,12 @@
 
 #include <RadioConfig.h>
 
+#define TFRAMES_ENABLED 1
+
 configuration CC2520RpiAmRadioC {
   provides {
     interface SplitControl;
 
-#ifndef IEEE154FRAMES_ENABLED
     interface AMSend[am_id_t id];
     interface Receive[am_id_t id];
 //    interface Receive as Snoop[am_id_t id];
@@ -54,18 +55,7 @@ configuration CC2520RpiAmRadioC {
 
     interface AMPacket;
     interface Packet as PacketForActiveMessage;
-#endif
 
-#ifndef TFRAMES_ENABLED
-    interface Ieee154Send;
-    interface Receive as Ieee154Receive;
- //   interface SendNotifier as Ieee154Notifier;
-
- //   interface Resource as SendResource[uint8_t clint];
-
- //   interface Ieee154Packet;
-    interface Packet as PacketForIeee154Message;
-#endif
 
 
     interface PacketAcknowledgements;
@@ -86,15 +76,6 @@ configuration CC2520RpiAmRadioC {
  //   interface PacketTimeStamp<TRadio, uint32_t> as PacketTimeStampRadio;
  //   interface PacketTimeStamp<TMilli, uint32_t> as PacketTimeStampMilli;
 
-
-    // Completely raw interfaces.
-    // BareSend needs all of the bytes of the packet except for the CRC at the
-    //  end.
-    interface BareSend;
-    // BareReceive returns the entire packet.
-    interface BareReceive;
-    interface Packet as BarePacket;
-
     interface RadioAddress;
   }
 }
@@ -104,6 +85,7 @@ implementation
 #define UQ_METADATA_FLAGS "UQ_CC2520_METADATA_FLAGS"
 #define UQ_RADIO_ALARM    "UQ_CC2520_RADIO_ALARM"
 
+
 // -------- RadioP
 
   components CC2520RpiAmRadioP as AmRadioP;
@@ -111,25 +93,18 @@ implementation
   components CC2520RpiReceiveC;
   components CC2520RpiSendC;
   components CC2520RpiAmPacketC;
-  components CC2520RpiAmBarePacketC;
   components CC2520RpiAmPacketMetadataC;
 
   // dummy wiring
   AmRadioP.Send -> RadioP.Send;
   AmRadioP.Receive -> RadioP.Receive;
 
+  components LocalIeeeEui64C;
+  RadioP.LocalIeeeEui64 -> LocalIeeeEui64C.LocalIeeeEui64;
+
   PacketAcknowledgements = AmRadioP.PacketAcknowledgements;
 
   SplitControl = RadioP.SplitControl;
-
-//  BareSend = CC2520RpiSendC.BareSend;
-//  BareReceive = CC2520RpiReceiveC.BareReceive;
-  BarePacket = CC2520RpiAmBarePacketC.BarePacket;
-  CC2520RpiAmBarePacketC.RadioPacket -> TinyosNetworkLayerC.Ieee154Packet;
-
-  BareSend = TinyosNetworkLayerC.Ieee154Send;
-  BareReceive = TinyosNetworkLayerC.Ieee154Receive;
-//  BarePacket = TinyosNetworkLayerC.Ieee154Packet;
 
   RadioAddress = RadioP.RadioAddress;
 
@@ -155,7 +130,6 @@ implementation
 
 // -------- Active Message
 
-#ifndef IEEE154FRAMES_ENABLED
   components new ActiveMessageLayerC();
   ActiveMessageLayerC.Config -> AmRadioP;
       // ActiveMessageLayerC.SubSend -> CC2520RpiSendC.BareSend;
@@ -175,7 +149,6 @@ implementation
 
  // ReceiveDefault = ActiveMessageLayerC.ReceiveDefault;
  // SnoopDefault = ActiveMessageLayerC.SnoopDefault;
-#endif
 /*
 // -------- Automatic RadioSend Resource
 
@@ -191,24 +164,7 @@ implementation
 
 // -------- RadioSend Resource
 */
-#ifndef TFRAMES_ENABLED
- // components new SimpleFcfsArbiterC(RADIO_SEND_RESOURCE) as SendResourceC;
- // SendResource = SendResourceC;
 
-// -------- Ieee154 Message
-
-  components new Ieee154MessageLayerC();
-  Ieee154MessageLayerC.Ieee154PacketLayer -> Ieee154PacketLayerC;
-  Ieee154MessageLayerC.SubSend -> TinyosNetworkLayerC.Ieee154Send;
-  Ieee154MessageLayerC.SubReceive -> TinyosNetworkLayerC.Ieee154Receive;
-  Ieee154MessageLayerC.RadioPacket -> TinyosNetworkLayerC.Ieee154Packet;
-
-  Ieee154Send = Ieee154MessageLayerC;
-  Ieee154Receive = Ieee154MessageLayerC;
-//  Ieee154Notifier = Ieee154MessageLayerC;
- // Ieee154Packet = Ieee154PacketLayerC;
-  PacketForIeee154Message = Ieee154MessageLayerC.Packet;
-#endif
 
 // -------- Tinyos Network
 

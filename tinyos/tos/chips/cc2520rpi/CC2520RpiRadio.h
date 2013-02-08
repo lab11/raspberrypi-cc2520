@@ -101,9 +101,7 @@ typedef struct cc2520packet_metadata_t {
 #ifdef LOW_POWER_LISTENING
   lpl_metadata_t lpl;
 #endif
-#ifdef PACKET_LINK
   link_metadata_t link;
-#endif
   timestamp_metadata_t timestamp;
   flags_metadata_t flags;
   cc2520_metadata_t cc2520;
