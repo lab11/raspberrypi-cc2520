@@ -60,6 +60,10 @@ need to help it along a bit. Add the following to your `.bashrc` file:
     export TOSROOTRPI=<path to git repo>/tinyos
     export TOSMAKE_PATH="$TOSROOTRPI/support/make $TOSMAKE_PATH"
 
+Until TinyOS pulls my changes you need to merge in my blip_interface branch
+to the tinyos-main repository.
+
+
 
 Usage
 -----
