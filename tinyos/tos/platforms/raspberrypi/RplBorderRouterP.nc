@@ -43,7 +43,8 @@ implementation {
     return TRUE;
   }
 
-  event void ForwardingEvents.linkResult(struct in6_addr *dest, struct send_info *info) {
+  event void ForwardingEvents.linkResult(struct in6_addr *dest,
+                                         struct send_info *info) {
 
   }
 }

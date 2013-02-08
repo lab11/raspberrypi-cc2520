@@ -34,7 +34,11 @@ implementation {
   struct cc2520_set_ack_data ack_data = {SOFTWAREACK_TIMEOUT};
   struct cc2520_set_txpower_data txpower_data = {CC2520_DEF_RFPOWER};
   struct cc2520_set_lpl_data lpl_data = {0, 0, FALSE};
+#ifdef CC2520RPI_DEBUG
   struct cc2520_set_print_messages_data print_data = {TRUE};
+#else
+  struct cc2520_set_print_messages_data print_data = {FALSE};
+#endif
 
   ieee_eui64_t ext_addr;
 

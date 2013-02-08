@@ -5,7 +5,6 @@ configuration PlatformLedsC {
     interface GeneralIO as Led0;
     interface GeneralIO as Led1;
     interface GeneralIO as Led2;
-
   }
   uses {
     interface Init;
@@ -21,12 +20,6 @@ implementation {
   components new RpiGpioC() as Led1Impl;
   components new RpiGpioC() as Led2Impl;
 
-  // Means that this configuration's Init is
-  // equivilent to PlatformP.LedsInit. In practice
-  // this means that when you assign an Init
-  // function to PlatformLedsC, it's passed through
-  // and used by the PlatformInit stuff.
-  // (this is rediculously confusing for blinking LEDs =( )
   Init = PlatformP.LedsInit;
 
   Led0Impl.HplGeneralIO -> GeneralIOC.Port1_07;
