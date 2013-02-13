@@ -6207,7 +6207,7 @@ Source: http://www.murata.com .. GRM43DR72E224KW01.pdf</description>
 <label x="83.82" y="53.34" size="1.27" layer="95" xref="yes"/>
 </segment>
 </net>
-<net name="GPIO17" class="0">
+<net name="!RESET" class="0">
 <segment>
 <pinref part="J1" gate="G$1" pin="12"/>
 <wire x1="50.8" y1="157.48" x2="55.88" y2="157.48" width="0.1524" layer="91"/>

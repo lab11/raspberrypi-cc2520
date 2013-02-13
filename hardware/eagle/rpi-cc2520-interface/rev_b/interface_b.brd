@@ -135,14 +135,14 @@
 CC2520
 Interface</text>
 <text x="18.669" y="37.846" size="1.016" layer="21" font="vector" ratio="12" align="bottom-center">Brad Campbell</text>
-<text x="22.098" y="19.812" size="1.016" layer="21" font="vector" ratio="12" align="bottom-center">2013/02/07</text>
+<text x="22.098" y="19.812" size="1.016" layer="21" font="vector" ratio="12" align="bottom-center">2013/02/11</text>
 <text x="7.747" y="3.048" size="0.762" layer="21" font="vector" ratio="10" align="center-left">3.3V</text>
 <text x="2.667" y="3.048" size="0.762" layer="21" font="vector" ratio="10" align="center-right">5V</text>
 <text x="7.747" y="5.588" size="0.762" layer="21" font="vector" ratio="10" align="center-left">SDA</text>
 <text x="7.747" y="8.128" size="0.762" layer="21" font="vector" ratio="10" align="center-left">SCL</text>
 <text x="7.747" y="10.668" size="0.762" layer="21" font="vector" ratio="10" align="center-left">LED0</text>
 <text x="7.747" y="13.208" size="0.762" layer="21" font="vector" ratio="10" align="center-left">GND</text>
-<text x="7.747" y="15.748" size="0.762" layer="21" font="vector" ratio="10" align="center-left">G17</text>
+<text x="7.747" y="15.748" size="0.762" layer="21" font="vector" ratio="10" align="center-left">!RST</text>
 <text x="7.747" y="18.288" size="0.762" layer="21" font="vector" ratio="10" align="center-left">LED2</text>
 <text x="7.747" y="20.828" size="0.762" layer="21" font="vector" ratio="10" align="center-left">CCA</text>
 <text x="2.667" y="5.588" size="0.762" layer="21" font="vector" ratio="10" align="center-right">5V</text>
@@ -1803,7 +1803,7 @@ This Sunstone Circuits 2 Layer .DRU has been set to cover our minimum requiremen
 <via x="3.81" y="24.638" extent="1-16" drill="0.635"/>
 <wire x1="3.81" y1="24.638" x2="1.524" y2="24.638" width="0.8128" layer="16"/>
 </signal>
-<signal name="GPIO17">
+<signal name="!RESET">
 <contactref element="J1" pad="12"/>
 <contactref element="J2" pad="11"/>
 <contactref element="EVM1" pad="P2_15"/>
