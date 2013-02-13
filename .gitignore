@@ -17,3 +17,20 @@
 *.app
 
 build
+
+*.b#*
+*.s#*
+*.top
+*.bot
+*.bsk
+*.bsp
+*.drd
+*.dri
+*.gpi
+*.oln
+*.slk
+*.smb
+*.smt
+*.tsp
+
+
