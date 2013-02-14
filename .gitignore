@@ -32,5 +32,8 @@ build
 *.smb
 *.smt
 *.tsp
-
+*.fab
+*.sco
+merged.placement.txt
+merged.toollist.drl
 
