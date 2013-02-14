@@ -51,7 +51,7 @@ implementation {
     uint8_t* out_buf_start = out_buf;
 
 #ifdef TUN_DEBUG
-    printf("TUNP: send to interface\n");
+    printf("TunP: send to interface\n");
 #endif
 
     len = iov_len(msg->ip6_data) + sizeof(struct ip6_hdr);
@@ -69,7 +69,7 @@ implementation {
     if (ret < 0) {
       send_info_struct.failed = TRUE;
 #ifdef TUN_DEBUG
-      printf("TUNP: send failed\n");
+      printf("TunP: send failed\n");
 #endif
     }
 

@@ -52,7 +52,6 @@ implementation {
     if (ret < 0) {
       if (errno == EINTR) {
         // suppress
-        printf("select intre\n");
       } else {
         // error
         fprintf(stderr, "IOManagerP: select return error: %i\n", ret);
@@ -65,7 +64,6 @@ implementation {
     } else {
       // some file is ready
       int j;
-      printf("file ready\n");
       for (j=0; j<N_FDS; j++) {
         if (FD_ISSET(map[j], &rfds)) {
           signal IO.receiveReady[j]();

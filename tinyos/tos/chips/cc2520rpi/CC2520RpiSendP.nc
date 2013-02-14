@@ -143,8 +143,6 @@ implementation {
         ret_val = write(read_pipe[1], &rhdr, sizeof(read_fifo_header_t));
         if (ret_val == -1) {
           fprintf(stderr, "CC2520RpiSendP: Error writing to read pipe.\n");
-        } else {
-          printf("wrote %i %i\n", ret_val, read_pipe[1]);
         }
       }
     }
@@ -170,8 +168,6 @@ implementation {
   // Read from read_fifo to get send metadata for the last sent packet
   async event void IO.receiveReady () {
     ssize_t ret;
-
-    printf("recevei readuy\n");
 
     ret = read(cc2520_read, &send_hdr, sizeof(read_fifo_header_t));
     if (ret <= 0) {
