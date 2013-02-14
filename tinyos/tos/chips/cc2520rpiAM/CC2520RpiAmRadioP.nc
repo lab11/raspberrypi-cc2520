@@ -11,7 +11,6 @@
 #include <Tasklet.h>
 
 #include "CC2520RpiDriver.h"
-#include "signalWrapper.h"
 
 
 // Handles all of the configuration settings for all of the layers.
