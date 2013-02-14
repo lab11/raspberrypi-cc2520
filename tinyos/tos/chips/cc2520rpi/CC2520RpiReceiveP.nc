@@ -135,6 +135,11 @@ implementation {
       uint8_t pkt_buf[MAX_PACKET_LEN];
       close(read_pipe[0]);
 
+#if CC2520RPI_DEBUG
+      printf("CC2520RpiReceiveP: Spawned RX Process (%d). TOS Process (%d)\n",
+          getpid(), getppid());
+#endif
+
       while(1) {
         ssize_t len;
         len = read(cc2520_file, pkt_buf, MAX_PACKET_LEN);
