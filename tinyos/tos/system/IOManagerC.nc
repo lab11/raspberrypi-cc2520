@@ -3,17 +3,14 @@
 
 configuration IOManagerC {
   provides {
-    interface IO[uint8_t io_id];
+    interface IO[uint8_t id];
     interface BlockingIO;
   }
 }
 
 implementation {
   components IOManagerP;
-  components TimerQueryC;
 
-  IOManagerP.TimerQuery -> TimerQueryC.TimerQuery;
-
-  IO = IOManagerP[uint8_t io_id];
+  IO = IOManagerP.IO;
   BlockingIO = IOManagerP.BlockingIO;
 }
