@@ -38,7 +38,7 @@
 
 #include <RadioConfig.h>
 
-#define TFRAMES_ENABLED 1
+//#define TFRAMES_ENABLED 1
 
 configuration CC2520RpiAmRadioC {
   provides {
@@ -169,13 +169,20 @@ implementation
 // -------- Tinyos Network
 
   components new TinyosNetworkLayerC();
+  components CC2520RpiAmUniqueC;
+  components CC2520RpiAm154DummyP;
 
  // TinyosNetworkLayerC.SubSend -> UniqueLayerC;
  // TinyosNetworkLayerC.SubSend -> CC2520RpiSendC.BareSend;
-  TinyosNetworkLayerC.SubSend -> PacketLinkLayerC.Send;
+  TinyosNetworkLayerC.SubSend -> CC2520RpiAmUniqueC.Send;
+  CC2520RpiAmUniqueC.SubSend -> PacketLinkLayerC.Send;
+//  TinyosNetworkLayerC.SubSend -> PacketLinkLayerC.Send;
   TinyosNetworkLayerC.SubReceive -> PacketLinkLayerC;
  // TinyosNetworkLayerC.SubReceive -> CC2520RpiReceiveC;
   TinyosNetworkLayerC.SubPacket -> Ieee154PacketLayerC.RadioPacket;
+
+  CC2520RpiAm154DummyP.Ieee154Send -> TinyosNetworkLayerC.Ieee154Send;
+  CC2520RpiAm154DummyP.Ieee154Receive -> TinyosNetworkLayerC.Ieee154Receive;
 
 // -------- IEEE 802.15.4 Packet
 
