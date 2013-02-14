@@ -2,9 +2,11 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include <pthread.h>
 #include <stdio.h>
-//#include <signal.h>
+#include <errno.h>
+#include <sys/types.h>
+
+#define MAX_PACKET_LEN 128
 
 /* This is the low level receive module that gets packets from the CC2520 kernel
  * module.
@@ -17,24 +19,18 @@ module CC2520RpiReceiveP {
   }
   uses {
     interface PacketMetadata;
+    interface IO;
   }
 }
 
 implementation {
 
-  int cc2520_file;
+  int cc2520_pipe;
 
-  pthread_t receive_thread;
-
-  bool pending = FALSE;
-  pthread_mutex_t mutex_receive;
-  pthread_cond_t cond_pending;
-
-  message_t* rx_msg_ptr;
+  uint8_t* rx_msg_ptr;
   message_t rx_msg_buf;
 
-  uint8_t tsfer_buf[256];
-  uint8_t tsfer_buf_len;
+  int read_pipe[2];
 
 #ifdef CC2520RPI_DEBUG
   void print_message (uint8_t* buf, uint8_t len) {
@@ -55,21 +51,18 @@ implementation {
   task void receive_task () {
     cc2520_metadata_t* meta;
 
-    // Copy the shared transfer buffer to the main thread only rxMsg buffer
-    memcpy((uint8_t*) rx_msg_ptr, tsfer_buf, tsfer_buf_len);
-
     // Save the meta information about the packet
-    meta = (cc2520_metadata_t*) tsfer_buf + tsfer_buf_len;
-    call PacketMetadata.setLqi(rx_msg_ptr, meta->lqi);
-    call PacketMetadata.setRssi(rx_msg_ptr, meta->rssi);
+    meta = (cc2520_metadata_t*) (rx_msg_ptr + rx_msg_ptr[0] - 1);
+    call PacketMetadata.setLqi((message_t*) rx_msg_ptr, meta->lqi);
+    call PacketMetadata.setRssi((message_t*) rx_msg_ptr, meta->rssi);
 
 #ifdef CC2520RPI_DEBUG
     {
       uint8_t sam, dam;
-      uint8_t* buf = tsfer_buf+6;
-      sam = (tsfer_buf[2] >> 6) & 0x3;
-      dam = (tsfer_buf[2] >> 2) & 0x3;
-      printf("CC2520RpiReceiveP: Received a packet. len: %i\n", tsfer_buf_len);
+      uint8_t* buf = rx_msg_ptr+6;
+      sam = (rx_msg_ptr[2] >> 6) & 0x3;
+      dam = (rx_msg_ptr[2] >> 2) & 0x3;
+      printf("CC2520RpiReceiveP: Received a packet. len: %i\n", rx_msg_ptr[0]+1);
       printf("    to:   ");
       if (dam == 2) {
         // short address
@@ -90,53 +83,37 @@ implementation {
 #endif
 
     // Signal the rest of the stack on the main thread
-    rx_msg_ptr = signal BareReceive.receive(rx_msg_ptr);
-
-    pthread_mutex_lock(&mutex_receive);
-    pending = FALSE;
-    pthread_cond_signal(&cond_pending);
-    pthread_mutex_unlock(&mutex_receive);
+    atomic rx_msg_ptr = (uint8_t*) signal BareReceive.receive((message_t*) rx_msg_ptr);
   }
 
-  void* receive (void *arg) {
-    uint8_t buf[256];
-    int ret;
+  async event void IO.receiveReady () {
+    ssize_t ret;
 
-#ifdef CC2520RPI_DEBUG
-    printf("CC2520RpiReceiveP: Receive thread started.\n");
-#endif
-
-    while (1) {
-      ret = read(cc2520_file, buf, 128);
-
-      if (ret > 0) {
-#ifdef CC2520RPI_DEBUG
-//        print_message(buf, ret);
-#endif
-
-        pthread_mutex_lock(&mutex_receive);
-        while (pending) {
-          pthread_cond_wait(&cond_pending, &mutex_receive);
-        }
-
-        // Copy the raw packet out of the character device buffer
-        memcpy(tsfer_buf, buf, ret);
-        tsfer_buf_len = ret;
-
-        pending = TRUE;
-        pthread_mutex_unlock(&mutex_receive);
-
-        post receive_task();
-      }
+    // read 1 byte in from the fifo
+    // this should be the length
+    ret = read(cc2520_pipe, rx_msg_ptr, 1);
+    if (ret != 1) {
+      fprintf(stderr, "CC2520RpiReceiveP: did not receive len from pipe\n");
+      return;
     }
 
-    return NULL;
+    // Read the rest of the packet from the fifo
+    ret = read(cc2520_pipe, rx_msg_ptr+1, rx_msg_ptr[0]);
+    if (ret <= 0) {
+      fprintf(stderr, "CC2520RpiReceiveP: read from pipe failed.\n");
+      return;
+    }
+
+    post receive_task();
   }
 
   command error_t SoftwareInit.init () {
     // We pass a buffer back and forth between
     // the upper layers.
-    rx_msg_ptr = &rx_msg_buf;
+    int cc2520_file;
+    int ret;
+
+    rx_msg_ptr = (uint8_t*) &rx_msg_buf;
 
     cc2520_file = open("/dev/radio", O_RDWR);
     if (cc2520_file < 0) {
@@ -144,13 +121,43 @@ implementation {
       exit(1);
     }
 
-    // Lock on the transfer buffer that is shared between the main thread and
-    // the receive thread
-    pthread_mutex_init(&mutex_receive, NULL);
-    pthread_cond_init(&cond_pending, NULL);
+    // create a pipe to buffer the input
+    ret = pipe(read_pipe);
+    if (ret == -1) {
+      fprintf(stderr, "CC2520RpiReceiveP: Could not create pipe.\n");
+      exit(1);
+    }
 
-    // Start a dedicated receiving thread.
-    pthread_create(&receive_thread, NULL, &receive, NULL);
+    // Create a very simple process that just reads in from the cc2520 driver
+    //  and puts the data in the pipe.
+    if (!fork()) {
+      // CHILD
+      uint8_t pkt_buf[MAX_PACKET_LEN];
+      close(read_pipe[0]);
+
+      while(1) {
+        ssize_t len;
+        len = read(cc2520_file, pkt_buf, MAX_PACKET_LEN);
+        if (len <= 0) {
+          fprintf(stderr, "CC2520RpiReceiveP: Pipe died.\n");
+          close(read_pipe[1]);
+        }
+        write(read_pipe[1], pkt_buf, len);
+      }
+    }
+
+    // PARENT
+    close(read_pipe[1]);
+    close(cc2520_file);
+
+    cc2520_pipe = read_pipe[0];
+
+    // Add the cc2520 pipe end to the select call
+    call IO.registerFileDescriptor(cc2520_pipe);
+
+#if CC2520RPI_DEBUG
+    printf("CC2520RpiReceiveP: registered receiver.\n");
+#endif
 
     return SUCCESS;
   }
