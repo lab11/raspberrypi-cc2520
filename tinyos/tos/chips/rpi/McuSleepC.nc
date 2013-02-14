@@ -12,9 +12,9 @@ configuration McuSleepC @safe() {
 
 implementation {
   components McuSleepP;
-  components ThreadWaitC;
+  components IOManagerC;
 
-  McuSleepP.ThreadWait -> ThreadWaitC.ThreadWait;
+  McuSleepP.BlockingIO -> IOManagerC.BlockingIO;
 
   McuSleep = McuSleepP.McuSleep;
   McuPowerState = McuSleepP.McuPowerState;
