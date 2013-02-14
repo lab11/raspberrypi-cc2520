@@ -8,6 +8,9 @@ configuration TunC {
 implementation {
   components TunP;
   components MainC;
+  components new IOFileC();
+
+  TunP.IO -> IOFileC.IO;
 
   MainC.SoftwareInit -> TunP.SoftwareInit;
 

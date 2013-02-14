@@ -6,7 +6,6 @@
 #include <string.h>
 #include <linux/if_tun.h>
 #include <linux/ioctl.h>
-#include <pthread.h>
 
 #include <stdarg.h>
 
@@ -15,21 +14,27 @@ module TunP {
     interface Init as SoftwareInit @exactlyonce();
     interface IPForward;
   }
+  uses {
+    interface IO;
+  }
 }
 
 implementation {
+
+  #define MAX_IPV6_PACKET_LEN 2048
+
   int ssystem(const char *fmt, ...);
 
   int tun_file;
   pthread_t receive_thread;
-  uint8_t in_buf[2048];
-  uint8_t out_buf[2048];
+  uint8_t in_buf[MAX_IPV6_PACKET_LEN];
+  uint8_t out_buf[MAX_IPV6_PACKET_LEN];
 
   struct ip6_hdr *iph;
   void *payload;
 
   // Send related state variables
-  struct send_info send_info_struct;
+  struct send_info send_info_struct = {NULL, 1, 1, 1, FALSE, 0};
 
   task void sendDone_task() {
     signal IPForward.sendDone(&send_info_struct);
@@ -72,36 +77,27 @@ implementation {
     return SUCCESS;
   }
 
-  task void receive_task() {
+  task void receive_task () {
+    // set up pointers and signal to the next layer
+    iph = (struct ip6_hdr*) in_buf;
+    payload = (iph + 1);
     signal IPForward.recv(iph, payload, NULL);
   }
 
-  void* receive(void* arg) {
+
+
+  // There is a packet waiting on the tun interface. Read() it and post to
+  // signal upper layers.
+  async event void IO.receiveReady () {
     int len;
-    uint8_t buf[2048];
+    uint8_t buf[MAX_IPV6_PACKET_LEN];
 
-#ifdef TUN_DEBUG
-    printf("receive thread tun\n");
-#endif
+    len = read(tun_file, buf, MAX_IPV6_PACKET_LEN);
+    printf("TunP: got packet\n");
 
-    while (1) {
-      len = read(tun_file, buf, 2048);
-#ifdef TUN_DEBUG
-      printf("TunP: got packet\n");
-#endif
+    memcpy(in_buf, buf, len);
 
-      // [NOTE]: At this point in_buf is a litte
-      // redundant, but we'll keep it around or now.
-      memcpy(in_buf, buf, len);
-
-      // set up pointers and signal to the next layer
-      iph = (struct ip6_hdr*) in_buf;
-      payload = (iph + 1);
-
-      post receive_task();
-    }
-
-    return NULL;
+    post receive_task();
   }
 
   command error_t SoftwareInit.init() {
@@ -136,7 +132,9 @@ implementation {
     // Dummy link local addr to make the dhcp server work
     ssystem("ifconfig tun0 inet6 add fe80::212:aaaa:bbbb:ffff/64");
 
-    pthread_create(&receive_thread, NULL, &receive, NULL);
+    // Register the file descriptor with the IO manager that will call select()
+    call IO.registerFileDescriptor(tun_file);
+
     return SUCCESS;
   }
 
