@@ -111,6 +111,11 @@ implementation {
       close(read_pipe[0]);
       close(write_pipe[1]);
 
+#if CC2520RPI_DEBUG
+      printf("CC2520RpiSendP: Spawned TX Process (%d). TOS Process (%d)\n",
+          getpid(), getppid());
+#endif
+
       while(1) {
         ssize_t len, ret_val;
         len = read(write_pipe[0], &whdr, sizeof(write_fifo_header_t));
