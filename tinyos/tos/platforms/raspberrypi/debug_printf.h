@@ -5,6 +5,7 @@
 
 #define CC2520RPI_DEBUG 1
 #define TUN_DEBUG 1
+#define IOMANAGER_DEBUG 1
 
 #define DBG(...)\
   do {\
@@ -15,7 +16,7 @@
   } while (0)
 
 
-// fprintf(stderr, "%s:%d\t%s:\t", __FILE__, __LINE__, __func__); \
+// fprintf(stderr, "%s:%d\t%s:\t", __FILE__, __LINE__, __func__);
 
 #define ERROR(...)\
   do {\
@@ -36,6 +37,12 @@
 #define TUN_PRINTF(...) DBG(__VA_ARGS__)
 #else
 #define TUN_PRINTF(...)
+#endif
+
+#ifdef IOMANAGER_DEBUG
+#define IOMANAGER_PRINTF(...) DBG(__VA_ARGS__)
+#else
+#define IOMANAGER_PRINTF(...)
 #endif
 
 #endif

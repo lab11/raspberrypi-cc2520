@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <errno.h>
+#include "debug_printf.h"
 
 module IOManagerP {
   provides {
@@ -24,6 +25,8 @@ implementation {
 
 
   command error_t IO.registerFileDescriptor[uint8_t id] (int file_descriptor) {
+    IOMANAGER_PRINTF("registering file descriptor %i for %i.\n", id,
+      file_descriptor);
     if (!is_init) {
       memset(map, 0x01, sizeof(uint8_t) * N_FDS);
       is_init = TRUE;
@@ -37,6 +40,7 @@ implementation {
     int     i;
     uint8_t nfds = 0;
 
+    // Clear the struct and set all fd that aren't 1
     FD_ZERO(&rfds);
     for (i=0; i<N_FDS; i++) {
       if (map[i] != 1) {
@@ -47,6 +51,7 @@ implementation {
       }
     }
 
+    // This blocks and is how we sleep!
     ret = select(nfds, &rfds, NULL, NULL, NULL);
 
     if (ret < 0) {
@@ -54,12 +59,11 @@ implementation {
         // suppress
       } else {
         // error
-        fprintf(stderr, "IOManagerP: select return error: %i\n", ret);
+        ERROR("select return error: %i\n", ret);
       }
 
     } else if (ret == 0) {
-      //
-      fprintf(stderr, "IOManagerP: select return 0.\n");
+      ERROR("select return 0.\n");
 
     } else {
       // some file is ready
