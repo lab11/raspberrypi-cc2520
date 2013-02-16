@@ -107,7 +107,7 @@ implementation {
       // CHILD
       write_fifo_header_t whdr;
       read_fifo_header_t rhdr;
-      uint8_t pkt_buf[MAX_PACKET_LEN];
+      uint8_t pkt_buf[PACKET_BUFFER_LEN];
       close(read_pipe[0]);
       close(write_pipe[1]);
 
@@ -119,10 +119,13 @@ implementation {
       while(1) {
         ssize_t len, ret_val;
         len = read(write_pipe[0], &whdr, sizeof(write_fifo_header_t));
-        if (len <= 0) {
-          fprintf(stderr, "CC2520RpiSendP: Error reading from pipe.\n");
+        if (len == 0) {
+          fprintf(stderr, "CC2520RpiSendP: Write pipe EOF.\n");
+        } else if (len < 0) {
+          fprintf(stderr, "CC2520RpiSendP: Pipe error: %i.\n", errno);
           close(read_pipe[1]);
           close(write_pipe[0]);
+          exit(1);
         }
 
         // Set the length byte from the whdr

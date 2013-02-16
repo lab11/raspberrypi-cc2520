@@ -6,7 +6,7 @@
 #include <errno.h>
 #include <sys/types.h>
 
-#define MAX_PACKET_LEN 128
+#define PACKET_BUFFER_LEN 256
 
 /* This is the low level receive module that gets packets from the CC2520 kernel
  * module.
@@ -132,7 +132,7 @@ implementation {
     //  and puts the data in the pipe.
     if (!fork()) {
       // CHILD
-      uint8_t pkt_buf[MAX_PACKET_LEN];
+      uint8_t pkt_buf[PACKET_BUFFER_LEN];
       close(read_pipe[0]);
 
 #if CC2520RPI_DEBUG
@@ -142,7 +142,7 @@ implementation {
 
       while(1) {
         ssize_t len;
-        len = read(cc2520_file, pkt_buf, MAX_PACKET_LEN);
+        len = read(cc2520_file, pkt_buf, PACKET_BUFFER_LEN);
         if (len <= 0) {
           fprintf(stderr, "CC2520RpiReceiveP: Pipe died.\n");
           close(read_pipe[1]);
