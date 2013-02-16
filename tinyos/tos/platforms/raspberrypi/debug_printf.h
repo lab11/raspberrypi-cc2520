@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #define CC2520RPI_DEBUG 1
+#define TUN_DEBUG 1
 
 #define DBG(...)\
   do {\
@@ -29,6 +30,12 @@
 #define RADIO_PRINTF(...) DBG(__VA_ARGS__)
 #else
 #define RADIO_PRINTF(...)
+#endif
+
+#ifdef TUN_DEBUG
+#define TUN_PRINTF(...) DBG(__VA_ARGS__)
+#else
+#define TUN_PRINTF(...)
 #endif
 
 #endif

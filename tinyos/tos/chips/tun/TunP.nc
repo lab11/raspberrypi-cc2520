@@ -9,6 +9,8 @@
 
 #include <stdarg.h>
 
+#define MAX_IPV6_PACKET_LEN 2048
+
 module TunP {
   provides {
     interface Init as SoftwareInit @exactlyonce();
@@ -20,8 +22,6 @@ module TunP {
 }
 
 implementation {
-
-  #define MAX_IPV6_PACKET_LEN 2048
 
   int ssystem(const char *fmt, ...);
 
@@ -50,9 +50,7 @@ implementation {
     // skip the frame header
     uint8_t* out_buf_start = out_buf;
 
-#ifdef TUN_DEBUG
-    printf("TunP: send to interface\n");
-#endif
+    TUN_PRINTF("send to interface\n");
 
     len = iov_len(msg->ip6_data) + sizeof(struct ip6_hdr);
 
@@ -68,9 +66,7 @@ implementation {
     ret = write(tun_file, out_buf, len + sizeof(struct tun_pi));
     if (ret < 0) {
       send_info_struct.failed = TRUE;
-#ifdef TUN_DEBUG
-      printf("TunP: send failed\n");
-#endif
+      TUN_PRINTF("send failed\n");
     }
 
     post sendDone_task();
@@ -93,7 +89,7 @@ implementation {
     uint8_t buf[MAX_IPV6_PACKET_LEN];
 
     len = read(tun_file, buf, MAX_IPV6_PACKET_LEN);
-    printf("TunP: got packet\n");
+    TUN_PRINTF("got packet\n");
 
     memcpy(in_buf, buf, len);
 
@@ -107,7 +103,7 @@ implementation {
     tun_file = open("/dev/net/tun", O_RDWR);
     if (tun_file < 0) {
       // error
-      fprintf(stderr, "TunP: Could not create a tun interface.\n");
+      ERROR("Could not create a tun interface.\n");
       exit(1);
     }
 
@@ -120,7 +116,7 @@ implementation {
     // Setup the interface
     err = ioctl(tun_file, TUNSETIFF, (void *) &ifr);
     if (err < 0) {
-      fprintf(stderr, "TunP: ioctl could not set up tun interface\n");
+      ERROR("ioctl could not set up tun interface\n");
       close(tun_file);
     }
 
@@ -146,10 +142,7 @@ implementation {
     va_start(ap, fmt);
     vsnprintf(cmd, sizeof(cmd), fmt, ap);
     va_end(ap);
-#ifdef TUN_DEBUG
-    printf("%s\n", cmd);
-    fflush(stdout);
-#endif
+    TUN_PRINTF("%s\n", cmd);
     return system(cmd);
   }
 }
