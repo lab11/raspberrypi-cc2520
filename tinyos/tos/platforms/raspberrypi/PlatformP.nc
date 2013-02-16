@@ -1,6 +1,6 @@
 #include "hardware.h"
 #include <bcm2835.h>
-#include <stdio.h>
+#include "debug_printf.h"
 
 module PlatformP {
   provides {
@@ -12,14 +12,17 @@ module PlatformP {
 }
 implementation {
   command error_t Init.init() {
-  	printf("[PlatformP]: Bringing system online...\n");
-  	bcm2835_init();
-	call LedsInit.init();
+
+    setvbuf(stdout, NULL, _IONBF, 0);
+
+    printf("[PlatformP]: Bringing system online...\n");
+    bcm2835_init();
+    call LedsInit.init();
     return SUCCESS;
   }
 
   // Fallback interface for LEDs if LedsC is not
-  // used. 
+  // used.
   default command error_t LedsInit.init() {
     return SUCCESS;
   }
