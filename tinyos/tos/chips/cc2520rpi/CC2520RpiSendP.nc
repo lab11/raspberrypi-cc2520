@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include "CC2520RpiDriver.h"
 
 module CC2520RpiSendP {
@@ -59,7 +57,7 @@ implementation {
         call PacketMetadata.setWasAcked(send_hdr.ptr_to_msg, FALSE);
         break;
       case CC2520_TX_LENGTH:
-        fprintf(stderr, "CC2520RpiSendP: INCORRECT LENGTH\n");
+        ERROR("INCORRECT LENGTH\n");
         break;
       case CC2520_TX_SUCCESS:
         call PacketMetadata.setWasAcked(send_hdr.ptr_to_msg, TRUE);
@@ -68,7 +66,7 @@ implementation {
         if (send_hdr.ret == send_hdr.len - 1) {
           call PacketMetadata.setWasAcked(send_hdr.ptr_to_msg, TRUE);
         } else {
-          fprintf(stderr, "CC2520RpiSendP: write() weird return code\n");
+          ERROR("write() weird return code\n");
         }
         break;
     }
@@ -83,21 +81,21 @@ implementation {
     // Open the character device for the CC2520
     cc2520_file = open("/dev/radio", O_RDWR);
     if (cc2520_file < 0) {
-      fprintf(stderr, "CC2520RpiSendP: Could not open radio.\n");
+      ERROR("Could not open radio.\n");
       exit(1);
     }
 
     // Create a pipe to buffer the output
     ret = pipe(write_pipe);
     if (ret == -1) {
-      fprintf(stderr, "CC2520RpiSendP: Could not create write pipe.\n");
+      ERROR("Could not create write pipe.\n");
       exit(1);
     }
 
     // Create a pipe to read back the meta information after a packet is sent
     ret = pipe(read_pipe);
     if (ret == -1) {
-      fprintf(stderr, "CC2520RpiSendP: Could not create read pipe.\n");
+      ERROR("Could not create read pipe.\n");
       exit(1);
     }
 
@@ -111,18 +109,16 @@ implementation {
       close(read_pipe[0]);
       close(write_pipe[1]);
 
-#if CC2520RPI_DEBUG
-      printf("CC2520RpiSendP: Spawned TX Process (%d). TOS Process (%d)\n",
-          getpid(), getppid());
-#endif
+      RADIO_PRINTF("Spawned TX Process (%d). TOS Process (%d)\n", getpid(),
+        getppid());
 
       while(1) {
         ssize_t len, ret_val;
         len = read(write_pipe[0], &whdr, sizeof(write_fifo_header_t));
         if (len == 0) {
-          fprintf(stderr, "CC2520RpiSendP: Write pipe EOF.\n");
+          ERROR("Write pipe EOF.\n");
         } else if (len < 0) {
-          fprintf(stderr, "CC2520RpiSendP: Pipe error: %i.\n", errno);
+          ERROR("Pipe error: %i.\n", errno);
           close(read_pipe[1]);
           close(write_pipe[0]);
           exit(1);
@@ -135,7 +131,7 @@ implementation {
         // crc bytes.
         len = read(write_pipe[0], pkt_buf + 1, whdr.len-2);
         if (len <= 0) {
-          fprintf(stderr, "CC2520RpiSendP: Error reading from pipe.\n");
+          ERROR("Error reading from pipe.\n");
           close(read_pipe[1]);
           close(write_pipe[0]);
         }
@@ -150,7 +146,7 @@ implementation {
         rhdr.len = whdr.len;
         ret_val = write(read_pipe[1], &rhdr, sizeof(read_fifo_header_t));
         if (ret_val == -1) {
-          fprintf(stderr, "CC2520RpiSendP: Error writing to read pipe.\n");
+          ERROR("Error writing to read pipe.\n");
         }
       }
     }
@@ -166,9 +162,7 @@ implementation {
     // Add the packet send result pipe to the select() call
     call IO.registerFileDescriptor(cc2520_read);
 
-#ifdef CC2520RPI_DEBUG
-    printf("CC2520RpiSendP: registered sender.\n");
-#endif
+    RADIO_PRINTF("registered sender.\n");
 
     return SUCCESS;
   }
@@ -179,7 +173,7 @@ implementation {
 
     ret = read(cc2520_read, &send_hdr, sizeof(read_fifo_header_t));
     if (ret <= 0) {
-      fprintf(stderr, "CC2520RpiSendP: Could not read from read fifo.\n");
+      ERROR("Could not read from read fifo.\n");
     }
 
     // Post a task to trigger sendDone so we can get out of the async
@@ -196,7 +190,7 @@ implementation {
       uint8_t* buf = (uint8_t*) msg;
       sam = (buf[2] >> 6) & 0x3;
       dam = (buf[2] >> 2) & 0x3;
-      printf("CC2520RpiSendP: Sending a packet. len: %i\n", buf[0]);
+      RADIO_PRINTF("Sending a packet. len: %i\n", buf[0]);
       buf += 6;
       printf("    to:   ");
       if (dam == 2) {
@@ -221,14 +215,14 @@ implementation {
     whdr.len = ((uint8_t*) msg)[0];
     ret = write(cc2520_write, &whdr, sizeof(write_fifo_header_t));
     if (ret == -1) {
-      fprintf(stderr, "CC2520RpiSendP: could not write to fifo.\n");
+      ERROR("could not write to fifo.\n");
     }
 
     // write the rest of the packet to the fifo
     // Write() the body of the packet (no length byte or 2 byte crc)
     ret = write(cc2520_write, ((uint8_t*)msg)+1, whdr.len-2);
     if (ret == -1) {
-      fprintf(stderr, "CC2520RpiSendP: could not write to fifo.\n");
+      ERROR("could not write to fifo.\n");
     }
 
     return SUCCESS;

@@ -28,8 +28,8 @@ module Ieee154AddressP {
     ieee154_laddr_t addr = call LocalIeeeEui64.getId();
     int i;
     uint8_t tmp;
-    /* the LocalIeeeEui is big endian */
-    /* however, Ieee 802.15.4 addresses are little endian */
+    // the LocalIeeeEui is big endian
+    // however, Ieee 802.15.4 addresses are little endian
     for (i = 0; i < 4; i++) {
       tmp = addr.data[i];
       addr.data[i] = addr.data[7 - i];

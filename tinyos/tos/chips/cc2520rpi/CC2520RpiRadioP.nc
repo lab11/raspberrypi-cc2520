@@ -48,13 +48,11 @@ implementation {
     uint8_t* ext_addr_ptr;
     int i;
 
-#if CC2520RPI_DEBUG
-    printf("Testing cc2520 driver...\n");
-#endif
+    RADIO_PRINTF("Starting cc2520 driver.\n");
     cc2520_file = open("/dev/radio", O_RDWR);
     if (cc2520_file < 0) {
-      fprintf(stderr, "CC2520Rpi: Failed to open /dev/radio.\n");
-      fprintf(stderr, "CC2520Rpi: Make sure the kernel module is loaded.\n");
+      ERROR("Failed to open /dev/radio.\n");
+      ERROR("Make sure the kernel module is loaded.\n");
       exit(1);
     }
 
@@ -87,9 +85,7 @@ implementation {
   }
 
   command error_t SplitControl.stop () {
-#if CC2520RPI_DEBUG
-    printf("Turning off the radio...\n");
-#endif
+    RADIO_PRINTF("Turning off the radio.\n");
     ioctl(cc2520_file, CC2520_IO_RADIO_OFF, NULL);
 
     signal SplitControl.stopDone(SUCCESS);
