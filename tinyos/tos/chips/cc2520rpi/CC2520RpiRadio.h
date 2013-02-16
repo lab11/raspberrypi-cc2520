@@ -50,6 +50,7 @@
 
 // Uncomment to enable printfs
 #define CC2520RPI_DEBUG 1
+//#define CC2520RPI_KERNEL_DRIVER_DEBUG 1
 
 typedef nx_struct cc2520_header_t {
   nxle_uint8_t length;
