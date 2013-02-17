@@ -1,7 +1,7 @@
 #include <signal.h>
 #include <time.h>
 
-extern void signal_wrapper(int, void*);
+int __nesc_keyword_signal(int signum, void* handler);
 
 generic module AlarmMilli32P() {
   provides {
@@ -29,8 +29,7 @@ implementation {
     // http://www.kernel.org/doc/man-pages/online/pages/man2/timer_create.2.html
     t_ret = timer_create(CLOCK_MONOTONIC, NULL, &timerid);
 
-    //sighandler_t brad_signal(int, sighandler_t);
-    signal_wrapper(SIGALRM, AlarmMilli32Fired);
+    __nesc_keyword_signal(SIGALRM, AlarmMilli32Fired);
 
     last_alarm = 0;
 

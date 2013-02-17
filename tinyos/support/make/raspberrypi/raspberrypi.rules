@@ -27,7 +27,6 @@ NCC_INCLUDE_DIRS = $(TOSROOTRPI)/tos/platforms/$(PLATFORM)
 
 OPTFLAGS ?= -O3 -g
 #CFLAGS += -mcpu=cortex-m3 -mthumb -fno-strict-aliasing
-CFLAGS += $(TOSROOTRPI)/tos/platforms/$(PLATFORM)/signalWrapper.c
 PFLAGS += $(EXTRA_MODULES)
 PFLAGS += $(foreach dir,$(INCLUDE_DIRS),-I$(dir))
 PFLAGS += -Wall -Wshadow $(NESC_FLAGS)
