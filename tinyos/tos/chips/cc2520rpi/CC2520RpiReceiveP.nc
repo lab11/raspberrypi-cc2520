@@ -46,11 +46,18 @@ implementation {
 
   task void receive_task () {
     cc2520_metadata_t* meta;
+    uint8_t rssi, crc_lqi;
 
     // Save the meta information about the packet
-    meta = (cc2520_metadata_t*) (rx_msg_ptr + rx_msg_ptr[0] - 1);
-    call PacketMetadata.setLqi((message_t*) rx_msg_ptr, meta->lqi);
-    call PacketMetadata.setRssi((message_t*) rx_msg_ptr, meta->rssi);
+    rssi    = rx_msg_ptr[rx_msg_ptr[0] - 1];
+    crc_lqi = rx_msg_ptr[rx_msg_ptr[0]];
+    if ((crc_lqi >> 7) == 0) {
+      RADIO_PRINTF("CRC failed. rssi: %x crc: %x lqi: %x\n",
+        rssi, (crc_lqi >> 7), crc_lqi & 0x7F);
+      return;
+    }
+    call PacketMetadata.setLqi((message_t*) rx_msg_ptr, crc_lqi & 0x7F);
+    call PacketMetadata.setRssi((message_t*) rx_msg_ptr, rssi);
 
 #ifdef CC2520RPI_DEBUG
     {

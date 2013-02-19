@@ -57,10 +57,7 @@ typedef nx_struct cc2520_header_t {
 } cc2520_header_t;
 
 typedef struct cc2520_metadata_t {
-  union {
-    uint8_t crc:1;
-    uint8_t rssi:7;
-  };
+  uint8_t rssi;
   uint8_t lqi;
 } cc2520_metadata_t;
 
