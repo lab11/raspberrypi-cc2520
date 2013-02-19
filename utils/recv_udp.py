@@ -1,7 +1,7 @@
 
 import socket
 
-me = '2001:638:709:1235::1'
+me = '::0'
 
 mebind = socket.getaddrinfo(me, 2001)[0]
 
