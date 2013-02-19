@@ -66,7 +66,7 @@ implementation {
         if (send_hdr.ret == send_hdr.len - 1) {
           call PacketMetadata.setWasAcked(send_hdr.ptr_to_msg, TRUE);
         } else {
-          ERROR("write() weird return code\n");
+          ERROR("write() weird return code: %i\n", send_hdr.ret);
         }
         break;
     }
