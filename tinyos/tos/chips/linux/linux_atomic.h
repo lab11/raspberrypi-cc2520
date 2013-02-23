@@ -1,5 +1,5 @@
-#ifndef __DEBIAN_HARDWARE_H__
-#define __DEBIAN_HARDWARE_H__
+#ifndef __LINUX_ATOMIC_H__
+#define __LINUX_ATOMIC_H__
 
 #include <signal.h>
 

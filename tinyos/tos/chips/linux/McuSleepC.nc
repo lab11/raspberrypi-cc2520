@@ -1,4 +1,4 @@
-#include "rpihardware.h"
+#include "linux_atomic.h"
 
 configuration McuSleepC @safe() {
   provides {
