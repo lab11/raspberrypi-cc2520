@@ -9,7 +9,7 @@
 
 #include "TinyError.h"
 
-interface HplRpiGeneralIO
+interface HplBcm2835GeneralIO
 {
   /**
    * Set pin to high.

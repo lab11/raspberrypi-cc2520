@@ -1,7 +1,7 @@
 #include <bcm2835.h>
 
-generic module HplRpiGeneralIOP(uint8_t pin) @safe() {
-  provides interface HplRpiGeneralIO as IO;
+generic module HplBcm2835GeneralIOP(uint8_t pin) @safe() {
+  provides interface HplBcm2835GeneralIO as IO;
 }
 implementation {
 
