@@ -76,12 +76,12 @@ Assuming you have the correct compilers, you should be able to run the following
 on your desktop and have it compile successfully:
 
     cd tinyos-main/apps/Blink
-    make raspberrypi
+    make rpi
 
-Then copy `build/raspberrypi/main.exe` to the RPI and you should be able to run
+Then copy `build/rpi/main.exe` to the RPI and you should be able to run
 it:
 
-    scp build/raspberrypi/main.exe <raspberrypi>:~/blink
+    scp build/rpi/main.exe <raspberrypi>:~/blink
     on the rpi:
     ./blink
 
