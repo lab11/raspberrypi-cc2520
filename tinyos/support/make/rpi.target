@@ -1,30 +1,29 @@
 #-*-Makefile-*- vim:syntax=make
-PLATFORM = raspberrypi
+PLATFORM = rpi
 
 #ifdef CC2520_CHANNEL
 #PFLAGS += -DCC2520_DEF_CHANNEL=$(CC2520_CHANNEL)
 #endif
 
-PFLAGS += -I$(TOSROOTRPI)/tos/platforms/raspberrypi
-PFLAGS += -I$(TOSROOTRPI)/tos/platforms/raspberrypi/chips/cc2420
-PFLAGS += -I$(TOSROOTRPI)/tos/platforms/raspberrypi/chips/cc2520rpi
-PFLAGS += -I$(TOSROOTRPI)/tos/platforms/raspberrypi/chips/macaddress
+PFLAGS += -I$(TOSROOTRPI)/tos/platforms/rpi
+PFLAGS += -I$(TOSROOTRPI)/tos/platforms/rpi/chips/cc2420
+PFLAGS += -I$(TOSROOTRPI)/tos/platforms/rpi/chips/cc2520rpi
+PFLAGS += -I$(TOSROOTRPI)/tos/platforms/rpi/chips/macaddress
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/cc2520rpi
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/cc2520rpiAM
-PFLAGS += -I$(TOSROOTRPI)/tos/chips/rpi
-PFLAGS += -I$(TOSROOTRPI)/tos/chips/rpi/gpio
-PFLAGS += -I$(TOSROOTRPI)/tos/chips/rpi/timer
+PFLAGS += -I$(TOSROOTRPI)/tos/chips/bcm2835
+PFLAGS += -I$(TOSROOTRPI)/tos/chips/bcm2835/gpio
+PFLAGS += -I$(TOSROOTRPI)/tos/chips/linux
+PFLAGS += -I$(TOSROOTRPI)/tos/chips/linux/timer
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/tun
 PFLAGS += -I$(TOSROOTRPI)/tos/interfaces
 PFLAGS += -I$(TOSROOTRPI)/tos/lib/net/blip
 PFLAGS += -I$(TOSROOTRPI)/tos/system
 
-
 PFLAGS += -DPRINTFUART_ENABLED=1
-
 PFLAGS += -DLINUX_PRINTF=1
 
-$(call TOSMake_include_platform,raspberrypi)
+$(call TOSMake_include_platform,rpi)
 
-raspberrypi: $(BUILD_DEPS)
+rpi: $(BUILD_DEPS)
 	@:

@@ -1,12 +1,12 @@
 #-*-Makefile-*- vim:syntax=make
-define RASPBERRYPI_HELP
+define RPI_HELP
 
-RASPBERRYPI extras:
+RPI extras:
   None available at the moment.
 
 endef
 
-HELP += $(RASPBERRYPI_HELP)
+HELP += $(RPI_HELP)
 
 CROSS_COMPILE = arm-linux-gnueabi
 OBJCOPY = $(CROSS_COMPILE)-objcopy
@@ -25,7 +25,7 @@ INCLUDE_DIRS ?= $(TOSDIR)/platforms/$(PLATFORM)
 #EXTRA_MODULES ?= $(TOSDIR)/platforms/$(PLATFORM)/vectors.c
 NCC_INCLUDE_DIRS = $(TOSROOTRPI)/tos/platforms/$(PLATFORM)
 
-OPTFLAGS ?= -O3 -g
+OPTFLAGS = -g -Os
 #CFLAGS += -mcpu=cortex-m3 -mthumb -fno-strict-aliasing
 CFLAGS += $(TOSROOTRPI)/tos/platforms/$(PLATFORM)/signalWrapper.c
 PFLAGS += $(EXTRA_MODULES)
