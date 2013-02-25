@@ -8,6 +8,12 @@ endef
 
 HELP += $(RPI_HELP)
 
+ifdef MAKE_DEPUTY_FLAG
+        NCC_SAFE_TINYOS_FLAGS = -DSAFE_TINYOS -I$(TOSDIR)/lib/safe -fnesc-deputy -fnesc-deputy-args='-I$(TOSDIR)/lib/safe/include --FLIDs=build/$(PLATFORM)/flids.txt --envmachine -DSAFE_TINYOS --nolib '
+else
+        NCC_SAFE_TINYOS_FLAGS =
+endif
+
 CROSS_COMPILE = arm-linux-gnueabi
 OBJCOPY = $(CROSS_COMPILE)-objcopy
 OBJDUMP = $(CROSS_COMPILE)-objdump
@@ -25,7 +31,7 @@ INCLUDE_DIRS ?= $(TOSDIR)/platforms/$(PLATFORM)
 #EXTRA_MODULES ?= $(TOSDIR)/platforms/$(PLATFORM)/vectors.c
 NCC_INCLUDE_DIRS = $(TOSROOTRPI)/tos/platforms/$(PLATFORM)
 
-OPTFLAGS = -g -Os
+OPTFLAGS += -g -Os
 #CFLAGS += -mcpu=cortex-m3 -mthumb -fno-strict-aliasing
 CFLAGS += $(TOSROOTRPI)/tos/platforms/$(PLATFORM)/signalWrapper.c
 PFLAGS += $(EXTRA_MODULES)
@@ -84,7 +90,7 @@ exe: exe0 bytes FORCE
 
 exe0: builddir $(BUILD_EXTRA_DEPS) FORCE
 	@echo "    compiling $(COMPONENT) to a $(PLATFORM) binary"
-	$(NCC) -o $(MAIN_EXE) -I $(NCC_INCLUDE_DIRS) $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(WIRING_CHECK_FLAGS) $(COMPONENT).nc $(LIBS) $(LDFLAGS)
+	$(NCC) -o $(MAIN_EXE) -I $(NCC_INCLUDE_DIRS) $(NCC_SAFE_TINYOS_FLAGS) $(OPTFLAGS) $(PFLAGS) $(CFLAGS) $(WIRING_CHECK_FLAGS) $(COMPONENT).nc $(LIBS) $(LDFLAGS)
 ifdef WIRING_CHECK_FILE
 	@nescc-wiring $(WIRING_CHECK_FILE)
 endif
