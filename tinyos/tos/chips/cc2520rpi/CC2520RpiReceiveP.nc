@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <stdio.h>
+#include <sys/prctl.h>
 
 
 #define PACKET_BUFFER_LEN 256
@@ -138,8 +139,20 @@ implementation {
       uint8_t pkt_buf[PACKET_BUFFER_LEN];
       close(read_pipe[0]);
 
-      RADIO_PRINTF("Spawned RX Process (%d). TOS Process (%d)\n",
-          getpid(), getppid());
+      {
+        const char RX_STR[] = "-2520-Rx";
+        char proc_name[17] = {0};
+        prctl(PR_GET_NAME, proc_name, 0, 0, 0);
+        if (strlen(proc_name) > (16 - strlen(RX_STR))) {
+          strcpy(proc_name + 16 - strlen(RX_STR), RX_STR);
+        } else {
+          strcat(proc_name, RX_STR);
+        }
+        prctl(PR_SET_NAME, proc_name, 0, 0, 0);
+
+        RADIO_PRINTF("Spawned RX Process (%d). TOS Process (%d)\n",
+            getpid(), getppid());
+      }
 
       while(1) {
         ssize_t len;
