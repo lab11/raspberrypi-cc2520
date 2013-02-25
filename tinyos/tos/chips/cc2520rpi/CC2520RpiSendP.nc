@@ -109,8 +109,20 @@ implementation {
       close(read_pipe[0]);
       close(write_pipe[1]);
 
-      RADIO_PRINTF("Spawned TX Process (%d). TOS Process (%d)\n", getpid(),
-        getppid());
+      {
+        const char RX_STR[] = "-2520-Tx";
+        char proc_name[17] = {0};
+        prctl(PR_GET_NAME, proc_name, 0, 0, 0);
+        if (strlen(proc_name) > (16 - strlen(RX_STR))) {
+          strcpy(proc_name + 16 - strlen(RX_STR), RX_STR);
+        } else {
+          strcat(proc_name, RX_STR);
+        }
+        prctl(PR_SET_NAME, proc_name, 0, 0, 0);
+
+        RADIO_PRINTF("Spawned TX Process (%d). TOS Process (%d)\n",
+            getpid(), getppid());
+      }
 
       while(1) {
         ssize_t len, ret_val;
