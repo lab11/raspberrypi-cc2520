@@ -211,10 +211,11 @@ implementation {
   }
 
   command void RadioAddress.setShortAddr (uint16_t address) {
-    addr_data.short_addr = address;
-    ioctl(cc2520_file, CC2520_IO_RADIO_OFF, NULL);
-    ioctl(cc2520_file, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
-    ioctl(cc2520_file, CC2520_IO_RADIO_ON, NULL);
+ // temporary comment to avoid bug in spi driver on rpi
+ //   addr_data.short_addr = address;
+ //   ioctl(cc2520_file, CC2520_IO_RADIO_OFF, NULL);
+ //   ioctl(cc2520_file, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
+ //   ioctl(cc2520_file, CC2520_IO_RADIO_ON, NULL);
   }
 
   async command uint16_t RadioAddress.getPanAddr () {
@@ -222,10 +223,10 @@ implementation {
   }
 
   command void RadioAddress.setPanAddr (uint16_t address) {
-    addr_data.pan_id = address;
-    ioctl(cc2520_file, CC2520_IO_RADIO_OFF, NULL);
-    ioctl(cc2520_file, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
-    ioctl(cc2520_file, CC2520_IO_RADIO_ON, NULL);
+ //   addr_data.pan_id = address;
+ //   ioctl(cc2520_file, CC2520_IO_RADIO_OFF, NULL);
+ //   ioctl(cc2520_file, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
+ //   ioctl(cc2520_file, CC2520_IO_RADIO_ON, NULL);
   }
 
 //----------- PacketMetadata ---
