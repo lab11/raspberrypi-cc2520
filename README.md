@@ -25,7 +25,8 @@ You need to enable IPV6 on the RPI:
     sudo vim /etc/modules
     add ipv6 on a newline
 
-If you want to run the border router application you need to enable interface forwarding:
+If you want to run the border router application you need to enable interface
+forwarding:
 
     sudo vim /etc/sysctl.conf
     uncomment the line: net.ipv6.conf.all.forwarding=1
@@ -60,8 +61,18 @@ need to help it along a bit. Add the following to your `.bashrc` file:
     export TOSROOTRPI=<path to git repo>/tinyos
     export TOSMAKE_PATH="$TOSROOTRPI/support/make $TOSMAKE_PATH"
 
-Until TinyOS pulls my changes you need to merge in my blip_interface branch
-to the tinyos-main repository.
+
+You also need some changes to `tinyos-main` in order to compile the TinyOS RPi
+code. Hopefully these will be merged into the main tinyos repo in order to make
+this step unnecessary.
+
+    cd ~/git/tinyos-main
+	git remote add bradjc https://github.com/bradjc/tinyos-main.git
+	git fetch bradjc
+	git merge bradjc/blip_interface
+	git merge bradjc/blip_rpi
+
+
 
 
 
