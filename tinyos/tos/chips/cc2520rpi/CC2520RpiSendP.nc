@@ -124,6 +124,9 @@ implementation {
             getpid(), getppid());
       }
 
+      // Tell kernel to deliver signal when parent dies.
+      prctl(PR_SET_PDEATHSIG, SIGKILL);
+
       while(1) {
         ssize_t len, ret_val;
         len = read(write_pipe[0], &whdr, sizeof(write_fifo_header_t));

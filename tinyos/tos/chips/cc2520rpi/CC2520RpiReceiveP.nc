@@ -140,6 +140,7 @@ implementation {
       close(read_pipe[0]);
 
       {
+        // Name the child process
         const char RX_STR[] = "-2520-Rx";
         char proc_name[17] = {0};
         prctl(PR_GET_NAME, proc_name, 0, 0, 0);
@@ -153,6 +154,9 @@ implementation {
         RADIO_PRINTF("Spawned RX Process (%d). TOS Process (%d)\n",
             getpid(), getppid());
       }
+
+      // Tell kernel to deliver signal when parent dies.
+      prctl(PR_SET_PDEATHSIG, SIGKILL);
 
       while(1) {
         ssize_t len;
