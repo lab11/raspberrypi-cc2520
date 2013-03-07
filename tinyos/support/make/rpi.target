@@ -14,6 +14,7 @@ PFLAGS += -I$(TOSROOTRPI)/tos/chips/cc2520rpiAM
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/bcm2835
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/bcm2835/gpio
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/linux
+PFLAGS += -I$(TOSROOTRPI)/tos/chips/linux/time
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/linux/timer
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/tun
 PFLAGS += -I$(TOSROOTRPI)/tos/interfaces
