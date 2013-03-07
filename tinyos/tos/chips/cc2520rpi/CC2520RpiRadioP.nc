@@ -243,6 +243,10 @@ implementation {
     return &(((cc2520packet_metadata_t*) msg->metadata)->ack);
   }
 
+  timestamp_metadata_t* getMetaTimestamp (message_t* msg) {
+    return &(((cc2520packet_metadata_t*) msg->metadata)->timestamp);
+  }
+
   command uint8_t PacketMetadata.getLqi (message_t* msg) {
     return getMetaCC2520(msg)->lqi;
   }
@@ -251,12 +255,20 @@ implementation {
     return getMetaCC2520(msg)->rssi;
   }
 
+  command uint64_t PacketMetadata.getTimestamp (message_t* msg) {
+    return getMetaTimestamp(msg)->timestamp_micro;
+  }
+
   command void PacketMetadata.setLqi (message_t *msg, uint8_t lqi) {
     getMetaCC2520(msg)->lqi = lqi;
   }
 
   command void PacketMetadata.setRssi (message_t *msg, uint8_t rssi) {
     getMetaCC2520(msg)->rssi = rssi;
+  }
+
+  command void PacketMetadata.setTimestamp (message_t* msg, uint64_t t) {
+    getMetaTimestamp(msg)->timestamp_micro = t;
   }
 
   command void PacketMetadata.setRetries (message_t *msg, uint16_t maxRetries) {

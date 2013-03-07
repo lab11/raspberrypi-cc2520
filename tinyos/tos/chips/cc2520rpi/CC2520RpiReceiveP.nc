@@ -17,6 +17,7 @@ module CC2520RpiReceiveP {
   uses {
     interface PacketMetadata;
     interface IO;
+    interface UnixTime;
   }
 }
 
@@ -46,7 +47,6 @@ implementation {
 #endif
 
   task void receive_task () {
-    cc2520_metadata_t* meta;
     uint8_t rssi, crc_lqi;
 
     // Save the meta information about the packet
@@ -59,6 +59,10 @@ implementation {
     }
     call PacketMetadata.setLqi((message_t*) rx_msg_ptr, crc_lqi & 0x7F);
     call PacketMetadata.setRssi((message_t*) rx_msg_ptr, rssi);
+
+    // Set the timestamp of when the packet was received
+    call PacketMetadata.setTimestamp((message_t*) rx_msg_ptr,
+                                     call UnixTime.getMicroseconds());
 
 #ifdef CC2520RPI_DEBUG
     {

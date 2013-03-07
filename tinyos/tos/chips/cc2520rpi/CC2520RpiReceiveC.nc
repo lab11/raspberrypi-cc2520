@@ -11,11 +11,13 @@ implementation {
   components CC2520RpiRadioP as RadioP;
   components MainC;
   components new IOFileC();
+  components UnixTimeC;
 
   MainC.SoftwareInit -> ReceiveP.SoftwareInit;
 
   ReceiveP.PacketMetadata -> RadioP.PacketMetadata;
   ReceiveP.IO -> IOFileC.IO;
+  ReceiveP.UnixTime -> UnixTimeC.UnixTime;
 
   BareReceive = ReceiveP.BareReceive;
 

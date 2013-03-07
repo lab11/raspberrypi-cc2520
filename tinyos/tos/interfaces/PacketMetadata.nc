@@ -7,6 +7,11 @@ interface PacketMetadata {
   command void setLqi (message_t *msg, uint8_t lqi);
   command void setRssi (message_t *msg, uint8_t rssi);
 
+  // Returns the timestamp of when the packet was received, in microseconds
+  // from the unix epoch.
+  command uint64_t getTimestamp (message_t* msg);
+  command void setTimestamp (message_t* msg, uint64_t timestamp);
+
 
   /**
    * Set the maximum number of times attempt message delivery

@@ -44,7 +44,6 @@
 #include <Ieee154PacketLayer.h>
 #include <ActiveMessageLayer.h>
 #include <MetadataFlagsLayer.h>
-#include <TimeStampingLayer.h>
 #include <LowPowerListeningLayer.h>
 #include <PacketLinkLayer.h>
 
@@ -73,6 +72,10 @@ typedef nx_struct security_header_t {
   nx_uint32_t frameCounter;
   nx_uint8_t keyID[1]; // One byte for now
 } security_header_t;
+
+typedef struct timestamp_metadata_t {
+  uint64_t timestamp_micro;
+} timestamp_metadata_t;
 
 typedef nx_struct cc2520packet_header_t
 {
