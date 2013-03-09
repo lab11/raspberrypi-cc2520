@@ -9,7 +9,7 @@ microcontrollers. A side-effect of being used in WSNs, however, is the
 microcontrollers are very memory constrained. This is often a problem when
 certain nodes need to keep data about a large network of nodes, for instance
 routing information for all of the nodes. To remedy this we propose using a
-Raspberry Pi as a mote in a WSN. This provides both amble storage (memory) and
+Raspberry Pi as a mote in a WSN. This provides both ample storage (memory) and
 convenient control as all the utilities in Linux are available.
 
 
@@ -35,7 +35,7 @@ forwarding:
 
 The TinyOS code requires a library for the low level BCM2835 GPIO from
 http://www.open.com.au/mikem/bcm2835/. Download and compile it on the RPI as
-instructed on the website. In order to cross compile tinyos code on your machine
+instructed on the website. In order to cross compile TinyOs code on your machine
 you also need the library and headers on your local machine. To build this on
 your local machine:
 
@@ -145,7 +145,9 @@ the likely case that isn't available, you can run a DHCP server on the RPI.
 
 I'm using [Dibbler](http://klub.com.pl/dhcpv6/). I couldn't figure out how to
 cross compile it so I downloaded it to the RPi and built it on there (yeah it
-took a little while).
+took a little while). Alternatively, you can try getting
+[these directions](http://klub.com.pl/dhcpv6/doxygen/dc/dec/compilation.html#compilationCross)
+for cross-compiling Dibbler to work.
 
     tar xf dibbler-x.x.x.tar.gz
     ./configure
@@ -208,6 +210,6 @@ The driver needs some work to get it to work in the general TinyOS environment, 
   - Create an interface for the wireless network.
     - Send all incoming packets to the border router to that interface.
     - Let linux decide what to do with the packet (send to dhcp server, internet, or back to the border router app)
-    - When packets come back in use rpl to route as normal back in to the wsn
+    - When packets come back in use rpl to route as normal back in to the WSN
 
 
