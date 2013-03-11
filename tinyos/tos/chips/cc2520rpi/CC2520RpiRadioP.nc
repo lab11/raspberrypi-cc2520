@@ -289,7 +289,7 @@ implementation {
   }
 
   async command error_t PacketMetadata.requestAck (message_t* msg) {
-    getHeaderIeee(msg)->fcf &= ~(uint16_t)(1 << IEEE154_FCF_ACK_REQ);
+    getHeaderIeee(msg)->fcf |= (uint16_t)(1 << IEEE154_FCF_ACK_REQ);
     return SUCCESS;
   }
 
