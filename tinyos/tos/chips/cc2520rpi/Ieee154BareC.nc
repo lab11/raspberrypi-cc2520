@@ -12,27 +12,15 @@ configuration Ieee154BareC {
     interface Packet as BarePacket;
     interface Send as BareSend;
     interface Receive as BareReceive;
-
-    interface LowPowerListening;
-    interface PacketLink;
-    interface PacketAcknowledgements;
   }
 }
 
 implementation {
   components CC2520RpiRadioC;
-  components Ieee154BareP;
-
-  Ieee154BareP.PacketMetadata -> CC2520RpiRadioC.PacketMetadata;
-  Ieee154BareP.RadioAddress -> CC2520RpiRadioC.RadioAddress;
 
   SplitControl = CC2520RpiRadioC.SplitControl;
 
   BarePacket = CC2520RpiRadioC.Packet;
   BareSend = CC2520RpiRadioC.Send;
   BareReceive = CC2520RpiRadioC.Receive;
-
-  LowPowerListening = CC2520RpiRadioC.LowPowerListening;
-  PacketLink = Ieee154BareP.PacketLink;
-  PacketAcknowledgements = Ieee154BareP.PacketAcknowledgements;
 }

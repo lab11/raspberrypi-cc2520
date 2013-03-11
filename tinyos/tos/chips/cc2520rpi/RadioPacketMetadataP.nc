@@ -1,5 +1,5 @@
 
-module Ieee154BareP {
+module RadioPacketMetadataP {
   provides {
     interface PacketAcknowledgements;
     interface PacketLink;
