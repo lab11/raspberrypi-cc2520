@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="1" unitdist="mm" unit="mm" style="lines" multiple="1" display="yes" altdistance="0.1" altunitdist="mm" altunit="mm"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.05" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -58,7 +58,7 @@
 <layer number="48" name="Document" color="7" fill="1" visible="no" active="yes"/>
 <layer number="49" name="Reference" color="7" fill="1" visible="no" active="yes"/>
 <layer number="50" name="dxf" color="7" fill="1" visible="no" active="no"/>
-<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="no" active="yes"/>
 <layer number="52" name="bDocu" color="7" fill="1" visible="no" active="yes"/>
 <layer number="53" name="tGND_GNDA" color="7" fill="9" visible="no" active="no"/>
 <layer number="54" name="bGND_GNDA" color="1" fill="9" visible="no" active="no"/>
@@ -123,10 +123,10 @@
 </layers>
 <board>
 <plain>
-<wire x1="0" y1="0" x2="20.3" y2="0" width="0" layer="20"/>
-<wire x1="20.3" y1="0" x2="20.3" y2="33.96" width="0" layer="20"/>
-<wire x1="20.3" y1="33.96" x2="0" y2="33.833" width="0" layer="20"/>
-<wire x1="0" y1="33.833" x2="0" y2="0" width="0" layer="20"/>
+<wire x1="0" y1="0" x2="19.558" y2="0" width="0" layer="20"/>
+<wire x1="19.558" y1="0" x2="19.558" y2="34.036" width="0" layer="20"/>
+<wire x1="19.558" y1="34.036" x2="0" y2="34.036" width="0" layer="20"/>
+<wire x1="0" y1="34.036" x2="0" y2="0" width="0" layer="20"/>
 <text x="8.001" y="1.397" size="0.762" layer="21" font="vector" ratio="10" rot="R90">1</text>
 <text x="25.908" y="23.876" size="1.016" layer="21" font="vector" ratio="12" align="bottom-center">Raspberry Pi
 CC2520
@@ -159,9 +159,6 @@ Interface</text>
 <text x="1.016" y="27.051" size="0.762" layer="21" font="vector" ratio="10" rot="R90" align="bottom-center">FIFO</text>
 <text x="1.016" y="29.591" size="0.762" layer="21" font="vector" ratio="10" rot="R90" align="bottom-center">CS</text>
 <text x="1.016" y="32.131" size="0.762" layer="21" font="vector" ratio="10" rot="R90" align="bottom-center">CE1</text>
-<wire x1="14.859" y1="21.971" x2="18.288" y2="25.4" width="0" layer="21"/>
-<wire x1="18.288" y1="25.4" x2="21.59" y2="25.4" width="0" layer="21"/>
-<wire x1="14.859" y1="21.971" x2="14.732" y2="21.971" width="0" layer="21"/>
 </plain>
 <libraries>
 <library name="logos">
@@ -1617,7 +1614,7 @@ SMT</description>
 <class number="0" name="default" width="0" drill="0">
 </class>
 </classes>
-<designrules name="sunstone-2lyr_v1.0.0.3">
+<designrules name="sunstone-2lyr_v1.0.0.3 *">
 <description language="en">&lt;b&gt;EAGLE Design Rules for *2* Layer Designs (DS)&lt;/b&gt;
 &lt;p&gt;
 This Sunstone Circuits 2 Layer .DRU has been set to cover our minimum requirements for our double sided products. For questions, comments, suggestions, please contact Sunstone Customer Support: &lt;p&gt;&lt;b&gt;Email:&lt;/b&gt;  mailto:support@sunstone.com&lt;br&gt;&lt;b&gt;Phone:&lt;/b&gt; 800-228-8198.&lt;p&gt; v1.1Mod10/16/07~Layers-core reversal.Distance C/D.Restring%.Supply G%.&lt;p&gt; v1.2 Mod12/06/07~Distance C/D to 20mils.&lt;p&gt;v1.3Mod12/12/07~Supply/Annulus Value to 12.5mils&lt;p&gt;1/15/08 SSC-EAGLE-2Lyr_v1.0.0.3~For Release&lt;p&gt;10/3/08 Description Edit.&lt;p&gt;
@@ -1638,7 +1635,7 @@ This Sunstone Circuits 2 Layer .DRU has been set to cover our minimum requiremen
 <param name="mdSmdSmd" value="6mil"/>
 <param name="mdViaViaSameLayer" value="8mil"/>
 <param name="mnLayersViaInSmd" value="2"/>
-<param name="mdCopperDimension" value="20mil"/>
+<param name="mdCopperDimension" value="10mil"/>
 <param name="mdDrill" value="16mil"/>
 <param name="mdSmdStop" value="0mil"/>
 <param name="msWidth" value="6mil"/>
@@ -1883,8 +1880,10 @@ This Sunstone Circuits 2 Layer .DRU has been set to cover our minimum requiremen
 <attribute name="NAME" x="8.255" y="25.273" size="0.762" layer="25" font="vector" ratio="10" rot="R270"/>
 <attribute name="VALUE" x="5.715" y="25.273" size="1.27" layer="27" rot="R270"/>
 </element>
-<element name="B1" library="rpi-cc2520" package="2450BM" value="2450BM15A0002" x="16.51" y="17.907">
+<element name="B1" library="rpi-cc2520" package="2450BM" value="2450BM15A0002" x="16.51" y="17.907" smashed="yes">
 <attribute name="DIGIKEY" value="712-1536-1-ND" x="16.51" y="17.907" size="0.762" layer="27" font="vector" ratio="10" display="off"/>
+<attribute name="NAME" x="16.51" y="19.357" size="0.762" layer="25" font="vector" ratio="10" align="bottom-center"/>
+<attribute name="VALUE" x="16.51" y="15.457" size="1.016" layer="27" font="vector" ratio="12" align="bottom-center"/>
 </element>
 </elements>
 <signals>
@@ -1913,8 +1912,8 @@ This Sunstone Circuits 2 Layer .DRU has been set to cover our minimum requiremen
 <signal name="GND">
 <polygon width="0.254" layer="16" isolate="0.3048">
 <vertex x="0" y="33.909"/>
-<vertex x="20.32" y="33.909"/>
-<vertex x="20.32" y="0"/>
+<vertex x="19.558" y="33.909"/>
+<vertex x="19.558" y="0"/>
 <vertex x="0" y="0"/>
 </polygon>
 <contactref element="JP2" pad="9"/>
@@ -1945,18 +1944,18 @@ This Sunstone Circuits 2 Layer .DRU has been set to cover our minimum requiremen
 <via x="11.049" y="16.891" extent="1-16" drill="0.2032"/>
 <via x="10.033" y="16.891" extent="1-16" drill="0.2032"/>
 <via x="10.033" y="17.907" extent="1-16" drill="0.2032"/>
-<polygon width="0.2032" layer="1">
+<polygon width="0.2032" layer="1" spacing="0.0254">
 <vertex x="0" y="0"/>
-<vertex x="20.32" y="0"/>
-<vertex x="20.32" y="17.018"/>
+<vertex x="19.558" y="0"/>
+<vertex x="19.558" y="17.145"/>
 <vertex x="15.74" y="17.145"/>
 <vertex x="15.74" y="23.15"/>
 <vertex x="10.3" y="28.575"/>
 <vertex x="12.319" y="30.6"/>
 <vertex x="18.58" y="24.3"/>
-<vertex x="18.58" y="19.05"/>
-<vertex x="20.32" y="19.05"/>
-<vertex x="20.32" y="33.909"/>
+<vertex x="18.58" y="17.1704"/>
+<vertex x="19.558" y="17.1704"/>
+<vertex x="19.558" y="33.909"/>
 <vertex x="0" y="33.909"/>
 </polygon>
 <via x="13.335" y="22.098" extent="1-16" drill="0.2032"/>
@@ -1967,7 +1966,7 @@ This Sunstone Circuits 2 Layer .DRU has been set to cover our minimum requiremen
 <contactref element="B1" pad="5"/>
 <contactref element="B1" pad="2"/>
 <contactref element="B1" pad="6"/>
-<wire x1="16.51" y1="17.007" x2="16.51" y2="18.807" width="0" layer="19" extent="1-1"/>
+<wire x1="16.51" y1="18.807" x2="16.51" y2="17.007" width="0.35" layer="1"/>
 </signal>
 <signal name="!RESET">
 <contactref element="JP2" pad="11"/>
@@ -2299,15 +2298,15 @@ This Sunstone Circuits 2 Layer .DRU has been set to cover our minimum requiremen
 <approved hash="1,20,4507e647e7384478"/>
 <approved hash="1,20,fb0ce64ce10ffc4f"/>
 <approved hash="1,20,4505e045e1a044e0"/>
-<approved hash="19,1,c2fc1e181d1fc1fb"/>
-<approved hash="19,1,ca9c1678170bcbef"/>
 <approved hash="19,1,cedc1238140bc8ef"/>
+<approved hash="19,1,ca9c1678170bcbef"/>
+<approved hash="19,1,c2fc1e181d1fc1fb"/>
+<approved hash="19,1,2a9c0e780f0a2bee"/>
 <approved hash="19,1,22fc0618051e21fa"/>
 <approved hash="19,1,2edc0a380c0a28ee"/>
-<approved hash="19,1,2a9c0e780f0a2bee"/>
 <approved hash="19,1,cedc6238640cc8e8"/>
-<approved hash="19,1,c2fc6e186d18c1fc"/>
 <approved hash="19,1,ca9c6678670ccbe8"/>
+<approved hash="19,1,c2fc6e186d18c1fc"/>
 </errors>
 </board>
 </drawing>
