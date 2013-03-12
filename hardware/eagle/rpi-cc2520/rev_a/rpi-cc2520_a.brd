@@ -1981,17 +1981,26 @@ This Sunstone Circuits 2 Layer .DRU has been set to cover our minimum requiremen
 <element name="C1" library="rcl" package="C0603" value="1uF" x="-15.24" y="-7.62">
 <attribute name="DIGIKEY" value="490-1550-1-ND" x="-15.24" y="-7.62" size="1.778" layer="27" display="off"/>
 </element>
-<element name="C2" library="rcl" package="C0402" value="100nF" x="-15.24" y="-12.7">
+<element name="C141" library="rcl" package="C0402" value="100nF" x="-15.24" y="-12.7">
 <attribute name="DIGIKEY" value="490-1318-1-ND" x="-15.24" y="-12.7" size="1.778" layer="27" display="off"/>
 </element>
-<element name="C3" library="rcl" package="C0402" value="100nF" x="-15.24" y="-17.78">
+<element name="C151" library="rcl" package="C0402" value="100nF" x="-15.24" y="-17.78">
 <attribute name="DIGIKEY" value="490-1318-1-ND" x="-15.24" y="-17.78" size="1.778" layer="27" display="off"/>
 </element>
-<element name="C4" library="rcl" package="C0402" value="100nF" x="-15.24" y="-22.86">
+<element name="C161" library="rcl" package="C0402" value="100nF" x="-15.24" y="-22.86">
 <attribute name="DIGIKEY" value="490-1318-1-ND" x="-15.24" y="-22.86" size="1.778" layer="27" display="off"/>
 </element>
 <element name="L1" library="SparkFun-Passives" package="0603" value="" x="-15.24" y="-27.94">
 <attribute name="DIGIKEY" value="490-1015-1-ND" x="-15.24" y="-27.94" size="1.778" layer="27" display="off"/>
+</element>
+<element name="C171" library="rcl" package="C0402" value="39pF" x="-15.24" y="-33.02">
+<attribute name="DIGIKEY" value="490-1286-1-ND" x="-15.24" y="-33.02" size="1.778" layer="27" display="off"/>
+</element>
+<element name="C191" library="rcl" package="C0402" value="82pF" x="-15.24" y="-38.1">
+<attribute name="DIGIKEY" value="490-1290-1-ND" x="-15.24" y="-38.1" size="1.778" layer="27" display="off"/>
+</element>
+<element name="C172" library="rcl" package="C0402" value="1.8pF" x="-15.24" y="-43.18">
+<attribute name="DIGIKEY" value="399-1003-1-ND" x="-15.24" y="-43.18" size="1.778" layer="27" display="off"/>
 </element>
 </elements>
 <signals>
@@ -2087,9 +2096,9 @@ This Sunstone Circuits 2 Layer .DRU has been set to cover our minimum requiremen
 <contactref element="JP2" pad="14"/>
 <contactref element="JP2" pad="20"/>
 <contactref element="U1" pad="THERMALPAD"/>
-<contactref element="C2" pad="2"/>
-<contactref element="C3" pad="2"/>
-<contactref element="C4" pad="2"/>
+<contactref element="C141" pad="2"/>
+<contactref element="C151" pad="2"/>
+<contactref element="C161" pad="2"/>
 <contactref element="C1" pad="2"/>
 <wire x1="16.383" y1="35.687" x2="27.813" y2="35.687" width="0" layer="19" extent="1-1"/>
 <wire x1="8.636" y1="32.258" x2="16.383" y2="35.687" width="0" layer="19" extent="1-1"/>
@@ -2441,29 +2450,43 @@ This Sunstone Circuits 2 Layer .DRU has been set to cover our minimum requiremen
 </signal>
 <signal name="N$5">
 <contactref element="U1" pad="8"/>
-</signal>
-<signal name="N$4">
 <contactref element="U1" pad="11"/>
-<contactref element="C2" pad="1"/>
+<contactref element="C141" pad="1"/>
 <contactref element="L1" pad="1"/>
 <contactref element="U1" pad="20"/>
 <contactref element="U1" pad="24"/>
 <contactref element="U1" pad="22"/>
-<contactref element="C4" pad="1"/>
+<contactref element="C161" pad="1"/>
 <contactref element="U1" pad="14"/>
 <contactref element="U1" pad="16"/>
-<contactref element="C3" pad="1"/>
+<contactref element="C151" pad="1"/>
 <contactref element="C1" pad="1"/>
 <wire x1="-15.89" y1="-22.86" x2="-16.09" y2="-27.94" width="0" layer="19" extent="1-1"/>
 <wire x1="-15.89" y1="-17.78" x2="-15.89" y2="-22.86" width="0" layer="19" extent="1-1"/>
 <wire x1="-15.89" y1="-12.7" x2="-15.89" y2="-17.78" width="0" layer="19" extent="1-1"/>
 <wire x1="-16.09" y1="-7.62" x2="-15.89" y2="-12.7" width="0" layer="19" extent="1-1"/>
-<wire x1="-15.24" y1="0.14" x2="-16.09" y2="-7.62" width="0" layer="19" extent="1-1"/>
+<wire x1="-16.74" y1="0.14" x2="-16.09" y2="-7.62" width="0" layer="19" extent="1-1"/>
+<wire x1="-15.24" y1="0.14" x2="-16.74" y2="0.14" width="0" layer="19" extent="1-1"/>
 <wire x1="-13.74" y1="0.14" x2="-15.24" y2="0.14" width="0" layer="19" extent="1-1"/>
 <wire x1="-12.84" y1="1.54" x2="-13.74" y2="0.14" width="0" layer="19" extent="1-1"/>
 <wire x1="-12.84" y1="3.54" x2="-12.84" y2="1.54" width="0" layer="19" extent="1-1"/>
 <wire x1="-13.74" y1="4.94" x2="-12.84" y2="3.54" width="0" layer="19" extent="1-1"/>
 <wire x1="-14.74" y1="4.94" x2="-13.74" y2="4.94" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="N$4">
+<contactref element="U1" pad="17"/>
+<contactref element="C171" pad="1"/>
+<wire x1="-12.84" y1="2.04" x2="-15.89" y2="-33.02" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="N$6">
+<contactref element="C191" pad="2"/>
+<contactref element="U1" pad="19"/>
+<wire x1="-12.84" y1="3.04" x2="-14.59" y2="-38.1" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="N$7">
+<contactref element="C171" pad="2"/>
+<contactref element="C172" pad="1"/>
+<wire x1="-14.59" y1="-33.02" x2="-15.89" y2="-43.18" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 </board>
