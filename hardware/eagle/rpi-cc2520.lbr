@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.3">
+<eagle version="6.4">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -183,6 +183,25 @@
 <text x="0" y="2.54" size="1.016" layer="25" font="vector" ratio="12" align="bottom-center">&gt;NAME</text>
 <text x="0" y="-3.175" size="1.016" layer="27" font="vector" ratio="12" align="bottom-center">&gt;VALUE</text>
 </package>
+<package name="NX2520SA">
+<description>crystal</description>
+<smd name="1" x="-0.85" y="-0.85" dx="1.2" dy="1" layer="1"/>
+<smd name="2" x="0.85" y="-0.85" dx="1.2" dy="1" layer="1"/>
+<smd name="3" x="0.85" y="0.85" dx="1.2" dy="1" layer="1"/>
+<smd name="4" x="-0.85" y="0.85" dx="1.2" dy="1" layer="1"/>
+<wire x1="-1.25" y1="-1" x2="-1.25" y2="-0.1" width="0.127" layer="21"/>
+<wire x1="-1.25" y1="-0.1" x2="-1.25" y2="1" width="0.127" layer="21"/>
+<wire x1="-1.25" y1="1" x2="1.25" y2="1" width="0.127" layer="21"/>
+<wire x1="1.25" y1="1" x2="1.25" y2="-1" width="0.127" layer="21"/>
+<wire x1="1.25" y1="-1" x2="0" y2="-1" width="0.127" layer="21"/>
+<text x="0" y="2" size="1.016" layer="25" font="vector" ratio="12" align="bottom-center">&gt;NAME</text>
+<text x="0" y="-3" size="1.016" layer="27" font="vector" ratio="12" align="bottom-center">&gt;VALUE</text>
+<wire x1="0" y1="-1" x2="-1.25" y2="-1" width="0.127" layer="21"/>
+<wire x1="-1.25" y1="-0.1" x2="0" y2="-0.1" width="0.127" layer="21"/>
+<wire x1="0" y1="-0.1" x2="0" y2="-1" width="0.127" layer="21"/>
+<wire x1="0" y1="-1.6" x2="-1.7" y2="-1.6" width="0.127" layer="21"/>
+<wire x1="-1.7" y1="-1.6" x2="-1.7" y2="-0.1" width="0.127" layer="21"/>
+</package>
 </packages>
 <symbols>
 <symbol name="CC2520EM">
@@ -206,6 +225,18 @@
 <wire x1="15.24" y1="20.32" x2="-15.24" y2="20.32" width="0.254" layer="94"/>
 <text x="-12.7" y="22.86" size="1.27" layer="95" ratio="12" align="bottom-center">&gt;NAME</text>
 <text x="-12.7" y="-20.32" size="1.27" layer="96" ratio="12" align="bottom-center">&gt;VALUE</text>
+</symbol>
+<symbol name="CRYSTAL">
+<pin name="1" x="-5.08" y="0" visible="pad" length="short"/>
+<pin name="2" x="5.08" y="0" visible="pad" length="short" rot="R180"/>
+<wire x1="-2.54" y1="2.54" x2="-2.54" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="2.54" y1="2.54" x2="2.54" y2="-2.54" width="0.254" layer="94"/>
+<wire x1="-1.27" y1="3.81" x2="-1.27" y2="-3.81" width="0.254" layer="94"/>
+<wire x1="-1.27" y1="-3.81" x2="1.27" y2="-3.81" width="0.254" layer="94"/>
+<wire x1="1.27" y1="-3.81" x2="1.27" y2="3.81" width="0.254" layer="94"/>
+<wire x1="1.27" y1="3.81" x2="-1.27" y2="3.81" width="0.254" layer="94"/>
+<text x="-2.54" y="7.62" size="1.27" layer="95">&gt;NAME</text>
+<text x="-2.54" y="5.08" size="1.27" layer="96">&gt;VALUE</text>
 </symbol>
 </symbols>
 <devicesets>
@@ -236,6 +267,25 @@ http://ti.com/tool/cc2520em_refdes</description>
 </connects>
 <technologies>
 <technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+<deviceset name="NX2520SA" prefix="X">
+<description>CRYSTAL 32MHZ 10PF SMD</description>
+<gates>
+<gate name="G$1" symbol="CRYSTAL" x="0" y="0"/>
+</gates>
+<devices>
+<device name="" package="NX2520SA">
+<connects>
+<connect gate="G$1" pin="1" pad="1"/>
+<connect gate="G$1" pin="2" pad="3"/>
+</connects>
+<technologies>
+<technology name="">
+<attribute name="DIGIKEY" value="644-1065-1-ND" constant="no"/>
+</technology>
 </technologies>
 </device>
 </devices>
