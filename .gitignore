@@ -20,6 +20,7 @@ build
 
 *.b#*
 *.s#*
+*.l#*
 *.top
 *.bot
 *.bsk
