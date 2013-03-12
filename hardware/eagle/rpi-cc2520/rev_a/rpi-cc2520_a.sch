@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
 <layer number="2" name="Route2" color="1" fill="3" visible="no" active="no"/>
@@ -9176,12 +9176,18 @@ SMT</description>
 <part name="FRAME1" library="frames" deviceset="LETTER_L" device=""/>
 <part name="U$1" library="logos" deviceset="UMICH_SOLID" device="_SMALL"/>
 <part name="JP1" library="pinhead" deviceset="PINHD-1X2" device=""/>
-<part name="D1" library="SparkFun-LED" deviceset="LED" device="0603"/>
-<part name="D2" library="SparkFun-LED" deviceset="LED" device="0603"/>
-<part name="D3" library="SparkFun-LED" deviceset="LED" device="0603"/>
-<part name="R1" library="rcl" deviceset="R-US_" device="R0603"/>
-<part name="R2" library="rcl" deviceset="R-US_" device="R0603"/>
-<part name="R3" library="rcl" deviceset="R-US_" device="R0603"/>
+<part name="D1" library="SparkFun-LED" deviceset="LED" device="0603">
+<attribute name="DIGIKEY" value="160-1834-1-ND"/>
+</part>
+<part name="D2" library="SparkFun-LED" deviceset="LED" device="0603">
+<attribute name="DIGIKEY" value="160-1835-1-ND"/>
+</part>
+<part name="D3" library="SparkFun-LED" deviceset="LED" device="0603">
+<attribute name="DIGIKEY" value="160-1837-1-ND"/>
+</part>
+<part name="R1" library="rcl" deviceset="R-US_" device="R0603" value="470"/>
+<part name="R2" library="rcl" deviceset="R-US_" device="R0603" value="470"/>
+<part name="R3" library="rcl" deviceset="R-US_" device="R0603" value="470"/>
 <part name="P+1" library="SparkFun" deviceset="VCC" device=""/>
 <part name="P+2" library="SparkFun" deviceset="VCC" device=""/>
 <part name="P+3" library="SparkFun" deviceset="VCC" device=""/>
@@ -9264,9 +9270,15 @@ SMT</description>
 <instance part="FRAME1" gate="G$2" x="147.32" y="0"/>
 <instance part="U$1" gate="G$1" x="231.14" y="172.72"/>
 <instance part="JP1" gate="G$1" x="223.52" y="160.02" rot="R180"/>
-<instance part="D1" gate="G$1" x="218.44" y="134.62"/>
-<instance part="D2" gate="G$1" x="228.6" y="134.62"/>
-<instance part="D3" gate="G$1" x="238.76" y="134.62"/>
+<instance part="D1" gate="G$1" x="218.44" y="134.62">
+<attribute name="DIGIKEY" x="218.44" y="134.62" size="1.27" layer="96" display="off"/>
+</instance>
+<instance part="D2" gate="G$1" x="228.6" y="134.62">
+<attribute name="DIGIKEY" x="228.6" y="134.62" size="1.27" layer="96" display="off"/>
+</instance>
+<instance part="D3" gate="G$1" x="238.76" y="134.62">
+<attribute name="DIGIKEY" x="238.76" y="134.62" size="1.27" layer="96" display="off"/>
+</instance>
 <instance part="R1" gate="G$1" x="218.44" y="124.46" rot="R90"/>
 <instance part="R2" gate="G$1" x="228.6" y="124.46" rot="R90"/>
 <instance part="R3" gate="G$1" x="238.76" y="124.46" rot="R90"/>
