@@ -130,7 +130,7 @@
 <text x="5.588" y="0.508" size="0.762" layer="21" font="vector" ratio="10" rot="R90">1</text>
 <text x="17.145" y="10.795" size="0.762" layer="21" font="vector" ratio="12" rot="R90" align="bottom-center">RPi+CC2520</text>
 <text x="18.161" y="10.795" size="0.762" layer="21" font="vector" ratio="10" distance="25" rot="R90" align="bottom-center">B. Campbell</text>
-<text x="19.177" y="10.795" size="0.635" layer="21" font="vector" ratio="10" rot="R90" align="bottom-center">2013/03/12</text>
+<text x="19.177" y="10.795" size="0.635" layer="21" font="vector" ratio="10" rot="R90" align="bottom-center">2013/03/13</text>
 <text x="6.35" y="1.651" size="0.762" layer="21" font="vector" ratio="10" rot="R90" align="top-center">3.3V</text>
 <text x="1.016" y="1.778" size="0.762" layer="21" font="vector" ratio="10" rot="R90" align="bottom-center">5V</text>
 <text x="6.35" y="4.191" size="0.762" layer="51" font="vector" ratio="10" rot="R90" align="top-center">SDA</text>
@@ -2172,11 +2172,11 @@ This Sunstone Circuits 2 Layer .DRU has been set to cover our minimum requiremen
 <wire x1="3.683" y1="5.461" x2="3.683" y2="2.921" width="0.4064" layer="16"/>
 <wire x1="3.683" y1="2.921" x2="4.953" y2="1.651" width="0.4064" layer="16"/>
 <wire x1="9.652" y1="6.008" x2="9.652" y2="5.842" width="0.4064" layer="1"/>
-<wire x1="3.683" y1="5.461" x2="7.62" y2="5.461" width="0.4064" layer="16"/>
-<wire x1="7.62" y1="5.461" x2="8.128" y2="5.969" width="0.4064" layer="16"/>
-<via x="8.128" y="5.969" extent="1-16" drill="0.2032"/>
-<wire x1="8.128" y1="5.969" x2="8.167" y2="6.008" width="0.4064" layer="1"/>
-<wire x1="8.167" y1="6.008" x2="9.652" y2="6.008" width="0.4064" layer="1"/>
+<wire x1="3.683" y1="5.461" x2="8.128" y2="5.461" width="0.4064" layer="16"/>
+<wire x1="8.128" y1="5.461" x2="8.636" y2="5.969" width="0.4064" layer="16"/>
+<via x="8.636" y="5.969" extent="1-16" drill="0.2032"/>
+<wire x1="8.636" y1="5.969" x2="8.675" y2="6.008" width="0.4064" layer="1"/>
+<wire x1="8.675" y1="6.008" x2="9.652" y2="6.008" width="0.4064" layer="1"/>
 <contactref element="U2" pad="2"/>
 <contactref element="R6" pad="2"/>
 <wire x1="4.953" y1="1.651" x2="6.096" y2="0.508" width="0.4064" layer="1"/>
@@ -2376,114 +2376,6 @@ This Sunstone Circuits 2 Layer .DRU has been set to cover our minimum requiremen
 <wire x1="18.657" y1="2.44" x2="18.657" y2="1.27" width="0.2032" layer="1"/>
 </signal>
 </signals>
-<errors>
-<approved hash="1,20,451f205f205c451c"/>
-<approved hash="1,20,4305e645e69a43da"/>
-<approved hash="1,20,43072647269843d8"/>
-<approved hash="1,20,4b04c644c69a4bda"/>
-<approved hash="1,20,4d1cc05cc05e4d1e"/>
-<approved hash="1,20,4f0cc24cc19a4cda"/>
-<approved hash="1,20,470f224f219844d8"/>
-<approved hash="1,20,470de24de19a44da"/>
-<approved hash="1,20,451de05de05e451e"/>
-<approved hash="1,20,db0c264c21fddcbd"/>
-<approved hash="1,20,cc0441444121cc61"/>
-<approved hash="1,20,c404e2c4e2e3c423"/>
-<approved hash="1,20,c40266c26681c441"/>
-<approved hash="1,20,4707244724644724"/>
-<approved hash="1,20,4404e2c4e2a04460"/>
-<approved hash="1,20,c47e213e2121c461"/>
-<approved hash="1,20,4d0442c441e14e21"/>
-<approved hash="1,20,470421c422e04420"/>
-<approved hash="1,20,4f7cc0bcc0ec4f2c"/>
-<approved hash="1,20,cc7e42be42a1cc61"/>
-<approved hash="1,20,c4f927b92768c428"/>
-<approved hash="1,20,4404e744e7784438"/>
-<approved hash="1,20,c10422c421e7c227"/>
-<approved hash="1,20,430c60cc600043c0"/>
-<approved hash="1,20,531cdddcdd2053e0"/>
-<approved hash="1,20,cc1c415c4122cc62"/>
-<approved hash="1,20,dd11e051e19edcde"/>
-<approved hash="1,20,ce0441c441e2ce22"/>
-<approved hash="1,20,467c27bc27a14661"/>
-<approved hash="1,20,433c4dfc42a04c60"/>
-<approved hash="1,20,3d047e447f613c21"/>
-<approved hash="1,20,430f25cf22984458"/>
-<approved hash="1,20,cc06cf46cf20cc60"/>
-<approved hash="1,20,451c27dc26e24422"/>
-<approved hash="1,20,fb05144514a3fbe3"/>
-<approved hash="1,20,cf0458445862cf22"/>
-<approved hash="1,20,457c27bc27e84528"/>
-<approved hash="1,20,457c663c66684528"/>
-<approved hash="1,20,c50bda4bdb09c449"/>
-<approved hash="1,20,db0b184b189adbda"/>
-<approved hash="1,20,c30bdc4bdb85c4c5"/>
-<approved hash="1,20,4503da43dba044e0"/>
-<approved hash="1,20,4703d843db664426"/>
-<approved hash="1,20,c703d843d8a1c7e1"/>
-<approved hash="1,20,bd042044206ebd2e"/>
-<approved hash="1,20,bf0c224c2114bc54"/>
-<approved hash="1,20,c50227c22722c5e2"/>
-<approved hash="1,20,470c224c228147c1"/>
-<approved hash="1,20,cb0cdc4cdc81cbc1"/>
-<approved hash="1,20,cd3c42fc4122cee2"/>
-<approved hash="1,20,c779e5b9e5e8c728"/>
-<approved hash="1,20,cd06c3c6c326cde6"/>
-<approved hash="1,20,cf04c1c4c2a3cc63"/>
-<approved hash="1,20,433c4dfc42a14c61"/>
-<approved hash="1,20,c50d2a4d2b0fc44f"/>
-<approved hash="1,20,cf1c4ddc4ee5cc25"/>
-<approved hash="1,20,c33a41fa4eaccc6c"/>
-<approved hash="1,20,cf044dc44d25cfe5"/>
-<approved hash="1,20,db06eac6ebd8da18"/>
-<approved hash="1,20,c73c627c61a3c4e3"/>
-<approved hash="1,20,5b047e4461a044e0"/>
-<approved hash="1,20,5c041ec41eee5c2e"/>
-<approved hash="1,20,5304d044cfa04ce0"/>
-<approved hash="1,20,4d0443c443e04d20"/>
-<approved hash="1,20,cf1cc0dcc1d9ce19"/>
-<approved hash="1,20,dd0e204e2180dcc0"/>
-<approved hash="1,20,4d0c43cc428e4c4e"/>
-<approved hash="1,20,5d043ec4212142e1"/>
-<approved hash="1,20,cb065ac65a26cbe6"/>
-<approved hash="1,20,c50466446725c465"/>
-<approved hash="1,20,4404674467224462"/>
-<approved hash="1,20,4704644467244464"/>
-<approved hash="1,20,c40ae2cae29ac45a"/>
-<approved hash="1,20,450ce04ce0b845f8"/>
-<approved hash="1,20,7d7c203c20147d54"/>
-<approved hash="1,20,bf0528452b22bc62"/>
-<approved hash="1,20,490cc6ccc1084ec8"/>
-<approved hash="1,20,450bda4bdb064446"/>
-<approved hash="1,20,451c23dc23de451e"/>
-<approved hash="1,20,cf04d844db61cc21"/>
-<approved hash="1,20,c90c78cc7b09cac9"/>
-<approved hash="1,20,c50e26ce210ec2ce"/>
-<approved hash="1,20,bb1a985ae7a8c4e8"/>
-<approved hash="1,20,4703d843dba644e6"/>
-<approved hash="1,20,4705224521a044e0"/>
-<approved hash="1,20,4504264427614421"/>
-<approved hash="1,20,44043b443b214461"/>
-<approved hash="1,20,5d1c23dc223e5cfe"/>
-<approved hash="1,20,333cb07ccf664c26"/>
-<approved hash="1,20,c705e445e764c424"/>
-<approved hash="1,20,4507e647e7384478"/>
-<approved hash="1,20,5f041ec41fee5e2e"/>
-<approved hash="1,20,fb0ce64ce10ffc4f"/>
-<approved hash="1,20,4505e045e1a044e0"/>
-<approved hash="1,20,c27e21be21a1c261"/>
-<approved hash="19,1,c2fc1e181d1fc1fb"/>
-<approved hash="19,1,cedc1238140bc8ef"/>
-<approved hash="19,1,ca9c1678170bcbef"/>
-<approved hash="19,1,22fc0618051e21fa"/>
-<approved hash="19,1,2edc0a380c0a28ee"/>
-<approved hash="19,1,2a9c0e780f0a2bee"/>
-<approved hash="19,1,c2fc6e186d18c1fc"/>
-<approved hash="19,1,ca9c6678670ccbe8"/>
-<approved hash="19,1,cedc6238640cc8e8"/>
-<approved hash="5,1,967dd4fe4579f9ed"/>
-<approved hash="5,1,7701cbcd5a55188e"/>
-</errors>
 </board>
 </drawing>
 </eagle>
