@@ -38,4 +38,5 @@ build
 merged.placement.txt
 merged.toollist.drl
 *.xls#
+docs/cc2520em
 
