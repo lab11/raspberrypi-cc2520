@@ -37,4 +37,5 @@ build
 *.sco
 merged.placement.txt
 merged.toollist.drl
+*.xls#
 
