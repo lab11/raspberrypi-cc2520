@@ -9021,7 +9021,7 @@ SMT</description>
 <smd name="4" x="2.375" y="2.375" dx="1.91" dy="1.91" layer="1"/>
 <smd name="3" x="2.375" y="-2.375" dx="1.91" dy="1.91" layer="1"/>
 <smd name="2" x="-2.375" y="-2.375" dx="1.91" dy="1.91" layer="1"/>
-<smd name="1" x="0" y="0" dx="1.52" dy="1.52" layer="1"/>
+<smd name="1" x="0" y="0" dx="1.52" dy="1.52" layer="1" roundness="100"/>
 <wire x1="-3.175" y1="3.175" x2="-3.175" y2="-3.175" width="0.127" layer="21"/>
 <wire x1="-3.175" y1="-3.175" x2="3.175" y2="-3.175" width="0.127" layer="21"/>
 <wire x1="3.175" y1="-3.175" x2="3.175" y2="3.175" width="0.127" layer="21"/>
