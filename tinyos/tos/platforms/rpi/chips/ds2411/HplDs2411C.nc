@@ -6,7 +6,7 @@ configuration HplDs2411C {
 implementation {
   components HplBcm2835GeneralIOC as Hpl;
   components new Bcm2835GpioC() as BcmGpio;
-  BcmGpio.HplGeneralIO -> Hpl.Port1_08;
+  BcmGpio.IO -> Hpl.Port1_08;
 
   Gpio = BcmGpio.GeneralIO;
 }

@@ -1,11 +1,11 @@
-#include "DallasId48.h"
+#include "ds2411.h"
 
 module Ds2411P {
   provides {
     interface ReadId48;
   }
   uses {
-    interface OneWireStream as OneWire;
+    interface OneWireReadWrite as OneWire;
   }
 }
 implementation {

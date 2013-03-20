@@ -4,7 +4,7 @@ module LocalIeeeEui64P {
     interface LocalIeeeEui64;
   }
   uses {
-    interface ReadId48C;
+    interface ReadId48;
   }
 }
 
@@ -20,7 +20,7 @@ implementation {
     error_t e;
 
     if (!have_id) {
-      e = call ReadId48C.read(buf);
+      e = call ReadId48.read(buf);
       if (e == SUCCESS) {
         // Copy the lower 5 bytes of the unique id into the eui64 id. This
         // preserves the MAC address prefix that identifies this as a Berkeley

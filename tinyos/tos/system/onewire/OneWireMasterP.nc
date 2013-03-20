@@ -8,7 +8,7 @@
 
 module OneWireMasterP {
   provides {
-    interface OneWireStream as OneWire;
+    interface OneWireReadWrite as OneWire;
   }
   uses {
     interface GeneralIO as Pin;

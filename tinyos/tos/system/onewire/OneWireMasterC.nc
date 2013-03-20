@@ -9,7 +9,6 @@ configuration OneWireMasterC {
   }
   uses {
     interface GeneralIO as Pin;
-    interface BusyWait<TMicro, uint16_t>;
   }
 }
 implementation {
