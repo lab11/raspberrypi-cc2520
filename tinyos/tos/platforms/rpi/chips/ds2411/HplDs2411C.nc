@@ -4,9 +4,9 @@ configuration HplDs2411C {
   }
 }
 implementation {
-  components HplMsp430GeneralIOC as Hpl;
-  components new Msp430GpioC() as MspGpio;
-  MspGpio.HplGeneralIO -> Hpl.Port24;
+  components HplBcm2835GeneralIOC as Hpl;
+  components new Bcm2835GpioC() as BcmGpio;
+  BcmGpio.HplGeneralIO -> Hpl.Port1_08;
 
-  Gpio = MspGpio.GeneralIO;
+  Gpio = BcmGpio.GeneralIO;
 }
