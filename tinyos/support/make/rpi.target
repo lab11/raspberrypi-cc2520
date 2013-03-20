@@ -6,13 +6,15 @@ PLATFORM = rpi
 #endif
 
 PFLAGS += -I$(TOSROOTRPI)/tos/platforms/rpi
+PFLAGS += -I$(TOSROOTRPI)/tos/platforms/rpi/eui64
 PFLAGS += -I$(TOSROOTRPI)/tos/platforms/rpi/chips/cc2420
 PFLAGS += -I$(TOSROOTRPI)/tos/platforms/rpi/chips/cc2520rpi
-PFLAGS += -I$(TOSROOTRPI)/tos/platforms/rpi/chips/macaddress
+PFLAGS += -I$(TOSROOTRPI)/tos/platforms/rpi/chips/ds2411
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/cc2520rpi
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/cc2520rpiAM
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/bcm2835
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/bcm2835/gpio
+PFLAGS += -I$(TOSROOTRPI)/tos/chips/ds2411
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/linux
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/linux/time
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/linux/timer
@@ -20,6 +22,7 @@ PFLAGS += -I$(TOSROOTRPI)/tos/chips/tun
 PFLAGS += -I$(TOSROOTRPI)/tos/interfaces
 PFLAGS += -I$(TOSROOTRPI)/tos/lib/net/blip
 PFLAGS += -I$(TOSROOTRPI)/tos/system
+PFLAGS += -I$(TOSROOTRPI)/tos/system/onewire
 
 PFLAGS += -DPRINTFUART_ENABLED=1
 PFLAGS += -DLINUX_PRINTF=1
