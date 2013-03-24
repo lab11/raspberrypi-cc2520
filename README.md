@@ -191,25 +191,11 @@ an IPv6 address.
 Hardware
 --------
 
+I'm working on small PCB that will fit directly on to the main header on the
+RPi. It will contain the CC2520, an SMA connector for an antenna, the DS2411
+id chip, and three LEDs. The eagle files and gerbers can be found in the
+`hardware/eagle` folder.
+
 Currently we have an interface board that allows you to use the CC2520EM
-evaluation module with the raspberry pi. We intend to wrap those into a single
-board.
-
-
-
-To Do
------
-
-The driver needs some work to get it to work in the general TinyOS environment, as well as to work with BLIP.
-
-- [x] Add BareReceive and BareSend interfaces to CC2520Rpi driver
-  - This allows the BLIP stack to use extended 802.15.4 addressing internally.
-- [x] Check on how I'm setting the seq numbers
-- [x] Clean up setting RSSI, channel, etc.
-- [x] Create BorderRouter application.
-  - Create an interface for the wireless network.
-    - Send all incoming packets to the border router to that interface.
-    - Let linux decide what to do with the packet (send to dhcp server, internet, or back to the border router app)
-    - When packets come back in use rpl to route as normal back in to the WSN
-
+evaluation module with the raspberry pi.
 
