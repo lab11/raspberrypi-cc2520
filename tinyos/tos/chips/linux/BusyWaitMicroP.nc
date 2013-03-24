@@ -1,6 +1,4 @@
-
-#include <time.h>
-#include <errno.h>
+#include <sys/time.h>
 
 module BusyWaitMicroP {
   provides {
@@ -11,18 +9,20 @@ module BusyWaitMicroP {
 implementation {
 
   async command void BusyWait.wait (uint16_t dt) {
-    struct timespec t;
-    struct timespec rem;
-    int ret;
+    struct timeval now, pulse;
+    int micros;
 
-    t.tv_sec = 0;
-    t.tv_nsec = ((long) dt) * 1000;
+    gettimeofday(&pulse, NULL);
+    micros = 0;
 
-    ret = nanosleep(&t, &rem);
-    if (ret == -1) {
-      if (errno == EINTR) {
-        nanosleep(&rem, NULL);
+    while (micros < (int) dt) {
+       gettimeofday(&now, NULL);
+       if (now.tv_sec > pulse.tv_sec) {
+        micros = 1000000L;
+      } else {
+        micros = 0;
       }
+       micros = micros + (now.tv_usec - pulse.tv_usec);
     }
   }
 
