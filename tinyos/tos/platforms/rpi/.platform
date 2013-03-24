@@ -4,11 +4,13 @@
 # by ncc.
 
 push ( @includes,
+  "%T/chips/ds2411",
   "%T/lib/timer",
   "%T/lib/serial",
   "%T/lib/power",
   "%T/lib/rfxlink/layers",
   "%T/lib/rfxlink/util",
+  "%T/system/onewire",
 );
 
 @opts = qw(
