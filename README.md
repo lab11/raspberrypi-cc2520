@@ -71,6 +71,7 @@ this step unnecessary.
 	git fetch bradjc
 	git merge bradjc/blip_interface
 	git merge bradjc/blip_rpi
+	git merge bradjc/ds2411
 
 
 
