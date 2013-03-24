@@ -14,7 +14,6 @@ implementation {
 
   // The CRC polynomial is X^8 + X^5 + X^4 + 1,
   // code is taken from http://linux.die.net/man/3/_crc_ccitt_update
-
   bool ds2411_check_crc (const ds2411_serial_t *id) {
     uint8_t crc = 0;
     uint8_t idx;
@@ -34,7 +33,7 @@ implementation {
 
   error_t readId () {
     error_t e;
-    
+
     e = call OneWire.read(DS2411_READ_ADDR,
                           ds2411id.data,
                           DS2411_DATA_LENGTH);
@@ -47,14 +46,13 @@ implementation {
     }
     return e;
   }
-  
+
   command error_t ReadId48.read (uint8_t *id) {
     error_t e = SUCCESS;
     if (!haveId) {
       e = readId();
     }
     if (haveId) {
-      uint8_t i;
       memcpy(id, ds2411id.serial, DS2411_SERIAL_LENGTH);
     }
     return e;

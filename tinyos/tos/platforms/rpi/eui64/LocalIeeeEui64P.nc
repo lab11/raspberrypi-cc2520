@@ -16,7 +16,7 @@ implementation {
   bool have_id = FALSE;
 
   command ieee_eui64_t LocalIeeeEui64.getId () {
-    uint8_t buf[6];
+    uint8_t buf[6] = {0};
     error_t e;
 
     if (!have_id) {
@@ -26,7 +26,11 @@ implementation {
         // preserves the MAC address prefix that identifies this as a Berkeley
         // device (yes a little weird) and minimizes the chance two nodes have
         // the same address.
-        memcpy(id.data+3, buf+1, 5);
+        id.data[3] = buf[4];
+        id.data[4] = buf[3];
+        id.data[5] = buf[2];
+        id.data[6] = buf[1];
+        id.data[7] = buf[0];
         have_id = TRUE;
       }
     }

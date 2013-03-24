@@ -16,9 +16,9 @@ module OneWireMasterP {
   }
 }
 implementation {
-    
+
   typedef enum {
-    DELAY_5US = 5,                              
+    DELAY_5US = 5,
     RESET_LOW_TIME = 560,            // min: 480us, max: 640 us
     DELAY_60US = 60,                 // min: 15us, max: 60us
     PRESENCE_DETECT_LOW_TIME = 240,  // min: 60us, max: 240us
@@ -28,6 +28,9 @@ implementation {
 
   // Returns TRUE if the device responds and is on, FALSE if the ds2411 does
   // not respond.
+  //
+  // Note: without a pull-up resistor on the data line the return value is not
+  // guaranteed to be accurate.
   bool reset () {
     uint16_t i;
     call Pin.makeInput();
@@ -52,14 +55,14 @@ implementation {
     call Pin.makeInput();
     call BusyWait.wait(SLOT_TIME);
   }
-  
+
   void writeZero () {
     call Pin.makeOutput();
     call BusyWait.wait(DELAY_60US);
     call Pin.makeInput();
     call BusyWait.wait(DELAY_5US);
   }
-  
+
   bool readBit () {
     bool bit;
     call Pin.makeOutput();
@@ -70,7 +73,7 @@ implementation {
     call BusyWait.wait(SLOT_TIME);
     return bit;
   }
-  
+
   void writeByte (uint8_t c) {
     uint8_t j;
     for (j = 0; j < 8; j++) {
@@ -93,7 +96,7 @@ implementation {
     }
     return c;
   }
-  
+
   command error_t OneWire.read(uint8_t cmd, uint8_t* buf, uint8_t len) {
     error_t e = SUCCESS;
     atomic {
@@ -109,7 +112,7 @@ implementation {
     }
     return e;
   }
-  
+
   command error_t OneWire.write(const uint8_t* buf, uint8_t len) {
     error_t e = SUCCESS;
     atomic {
