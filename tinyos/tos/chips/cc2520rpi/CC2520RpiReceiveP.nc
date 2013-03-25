@@ -91,7 +91,8 @@ implementation {
 #endif
 
     // Signal the rest of the stack on the main thread
-    atomic rx_msg_ptr = (uint8_t*) signal BareReceive.receive((message_t*) rx_msg_ptr);
+    atomic rx_msg_ptr = (uint8_t*)
+                        signal BareReceive.receive((message_t*) rx_msg_ptr);
   }
 
   async event void IO.receiveReady () {
@@ -99,17 +100,36 @@ implementation {
 
     // read 1 byte in from the fifo
     // this should be the length
-    ret = read(cc2520_pipe, rx_msg_ptr, 1);
-    if (ret != 1) {
-      ERROR("did not receive len from pipe\n");
-      return;
+    while (1) {
+      ret = read(cc2520_pipe, rx_msg_ptr, 1);
+      if (ret == 1) {
+        break;
+      } else if (ret == -1) {
+        ERROR("did not receive len from pipe\n");
+        switch (errno) {
+          case EAGAIN: ERROR("eagain\n"); break;
+          case EBADF:  ERROR("bad file descriptor\n"); break;
+          case EFAULT: ERROR("efault: buf is outside address space\n"); break;
+          case EINTR:  ERROR("interrupted by signal\n"); break;
+          case EINVAL: ERROR("unabled to read\n"); break;
+          case EIO:    ERROR("i/o error\n"); break;
+          default:     ERROR("other\n"); break;
+        }
+        exit(1);
+      }
     }
 
     // Read the rest of the packet from the fifo
     ret = read(cc2520_pipe, rx_msg_ptr+1, rx_msg_ptr[0]);
     if (ret <= 0) {
-      ERROR("read from pipe failed.\n");
-      return;
+      switch (errno) {
+          case EAGAIN: ERROR("eagain\n"); break;
+          case EBADF:  ERROR("bad file descriptor\n"); break;
+          case EINTR:  ERROR("interrupted by signal\n"); break;
+          case EINVAL: ERROR("unabled to read\n"); break;
+          case EIO:    ERROR("i/o error\n"); break;
+        }
+        exit(1);
     }
 
     post receive_task();
