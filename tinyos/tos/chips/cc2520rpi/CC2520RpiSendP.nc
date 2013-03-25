@@ -205,7 +205,7 @@ implementation {
       uint8_t* buf = (uint8_t*) msg;
       sam = (buf[2] >> 6) & 0x3;
       dam = (buf[2] >> 2) & 0x3;
-      RADIO_PRINTF("Sending a packet. len: %i\n", buf[0]);
+      RADIO_PRINTF("Sending a packet. len: %i\n", buf[0]+1);
       buf += 6;
       printf("    to:   ");
       if (dam == 2) {
