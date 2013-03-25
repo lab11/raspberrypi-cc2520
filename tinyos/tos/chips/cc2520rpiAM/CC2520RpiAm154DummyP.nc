@@ -7,6 +7,6 @@ module CC2520RpiAm154DummyP {
 }
 
 implementation {
-  event message_t* Ieee154Receive.receive(message_t* msg) { }
+  event message_t* Ieee154Receive.receive(message_t* msg) { return msg; }
   event void Ieee154Send.sendDone(message_t* msg, error_t error) { }
 }
