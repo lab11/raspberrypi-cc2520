@@ -68,6 +68,10 @@ implementation {
     } else {
       // some file is ready
       int j;
+      
+      if (ret > 1) {
+        IOMANAGER_PRINTF("select finds %i file descriptors ready\n", ret);
+      }
       for (j=0; j<N_FDS; j++) {
         if (FD_ISSET(map[j], &rfds)) {
           signal IO.receiveReady[j]();
