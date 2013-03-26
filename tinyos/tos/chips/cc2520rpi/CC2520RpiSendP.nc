@@ -162,6 +162,9 @@ implementation {
         ret_val = write(read_pipe[1], &rhdr, sizeof(read_fifo_header_t));
         if (ret_val == -1) {
           ERROR("Error writing to read pipe.\n");
+        } else if (ret_val != sizeof(read_fifo_header_t)) {
+          ERROR("Return code was not fully written to the pipe\n");
+          ERROR("Only %i bytes were written\n", ret_val);
         }
       }
     }
