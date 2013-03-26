@@ -189,6 +189,8 @@ implementation {
   async event void IO.receiveReady () {
     ssize_t ret;
 
+    RADIO_PRINTF("send receive ready.\n");
+
     ret = read(cc2520_read, &send_hdr, sizeof(read_fifo_header_t));
     if (ret <= 0) {
       ERROR("Could not read from read fifo.\n");
@@ -242,6 +244,8 @@ implementation {
     if (ret == -1) {
       ERROR("could not write to fifo.\n");
     }
+
+    RADIO_PRINTF("send packet.\n");
 
     return SUCCESS;
   }
