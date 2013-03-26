@@ -48,6 +48,22 @@ implementation {
   }
 #endif
 
+  // Makes the given file descriptor non-blocking.
+  // Returns 1 on success, 0 on failure.
+  int make_nonblocking (int fd) {
+    int flags, ret;
+
+    flags = fcntl(fd, F_GETFL, 0);
+    if (flags == -1) {
+      return 0;
+    }
+    // Set the nonblocking flag.
+    flags |= O_NONBLOCK;
+    ret = fcntl(fd, F_SETFL, flags);
+    
+    return ret != -1;
+  }
+
   task void sendDone_task() {
 
     switch (send_hdr.ret) {
@@ -177,6 +193,11 @@ implementation {
     cc2520_read = read_pipe[0];
     cc2520_write = write_pipe[1];
 
+    // Make the end of the pipe we read from to check if the packet was acked,
+    // etc., nonblocking. This prevents the application from locking up with a
+    // spurious select() return.
+    make_nonblocking(cc2520_read);
+
     // Add the packet send result pipe to the select() call
     call IO.registerFileDescriptor(cc2520_read);
 
@@ -192,8 +213,24 @@ implementation {
     RADIO_PRINTF("send receive ready.\n");
 
     ret = read(cc2520_read, &send_hdr, sizeof(read_fifo_header_t));
-    if (ret <= 0) {
-      ERROR("Could not read from read fifo.\n");
+    if (ret == -1) {
+      ERROR("Error with packet result fifo.\n");
+      ERROR("errno: %i\n", errno);
+      exit(1);
+    } else if (ret == 0) {
+      // This appears to be a spurious call from select() that shouldn't really
+      // happen but does. Because this fd is nonblocking, the read() returned
+      // with 0 and we should just go back to sleeping.
+      // If there is really data here, select() will trigger this again.
+      return;
+    } else if (ret != sizeof(read_fifo_header_t)) {
+      // Not sure what happened here. This is definitely an error somewhere.
+      ERROR("Read only %i bytes from the packet result fifo\n", ret);
+      
+      // Don't signal the sendDone() task with invalid information. I'm not sure
+      // how this will affect certain applications, but hopefully this case
+      // doesn't happen.
+      return;
     }
 
     // Post a task to trigger sendDone so we can get out of the async

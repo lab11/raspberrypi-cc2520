@@ -46,6 +46,22 @@ implementation {
   }
 #endif
 
+  // Makes the given file descriptor non-blocking.
+  // Returns 1 on success, 0 on failure.
+  int make_nonblocking (int fd) {
+    int flags, ret;
+
+    flags = fcntl(fd, F_GETFL, 0);
+    if (flags == -1) {
+      return 0;
+    }
+    // Set the nonblocking flag.
+    flags |= O_NONBLOCK;
+    ret = fcntl(fd, F_SETFL, flags);
+    
+    return ret != -1;
+  }
+
   task void receive_task () {
     uint8_t rssi, crc_lqi;
 
@@ -100,36 +116,41 @@ implementation {
 
     // read 1 byte in from the fifo
     // this should be the length
-    while (1) {
-      ret = read(cc2520_pipe, rx_msg_ptr, 1);
-      if (ret == 1) {
-        break;
-      } else if (ret == -1) {
-        ERROR("did not receive len from pipe\n");
-        switch (errno) {
-          case EAGAIN: ERROR("eagain\n"); break;
-          case EBADF:  ERROR("bad file descriptor\n"); break;
-          case EFAULT: ERROR("efault: buf is outside address space\n"); break;
-          case EINTR:  ERROR("interrupted by signal\n"); break;
-          case EINVAL: ERROR("unabled to read\n"); break;
-          case EIO:    ERROR("i/o error\n"); break;
-          default:     ERROR("other\n"); break;
-        }
-        exit(1);
+    ret = read(cc2520_pipe, rx_msg_ptr, 1);
+    if (ret == 0) {
+      // Got a spurious wakeup from select() and didn't get a length. Just go
+      // back to select().
+      return;
+
+    } else if (ret == -1) {
+      ERROR("did not receive len from pipe\n");
+      switch (errno) {
+        case EAGAIN: ERROR("eagain\n"); break;
+        case EBADF:  ERROR("bad file descriptor\n"); break;
+        case EFAULT: ERROR("efault: buf is outside address space\n"); break;
+        case EINTR:  ERROR("interrupted by signal\n"); break;
+        case EINVAL: ERROR("unabled to read\n"); break;
+        case EIO:    ERROR("i/o error\n"); break;
+        default:     ERROR("other\n"); break;
       }
+      exit(1);
     }
 
     // Read the rest of the packet from the fifo
     ret = read(cc2520_pipe, rx_msg_ptr+1, rx_msg_ptr[0]);
-    if (ret <= 0) {
+    if (ret == -1) {
       switch (errno) {
-          case EAGAIN: ERROR("eagain\n"); break;
-          case EBADF:  ERROR("bad file descriptor\n"); break;
-          case EINTR:  ERROR("interrupted by signal\n"); break;
-          case EINVAL: ERROR("unabled to read\n"); break;
-          case EIO:    ERROR("i/o error\n"); break;
-        }
-        exit(1);
+        case EAGAIN: ERROR("eagain\n"); break;
+        case EBADF:  ERROR("bad file descriptor\n"); break;
+        case EINTR:  ERROR("interrupted by signal\n"); break;
+        case EINVAL: ERROR("unabled to read\n"); break;
+        case EIO:    ERROR("i/o error\n"); break;
+      }
+      exit(1);
+    } else if (ret != rx_msg_ptr[0]) {
+      // Didn't get a full packet. Let's just drop it and hope for good things
+      // in the future.
+      return;
     }
 
     post receive_task();
@@ -198,6 +219,9 @@ implementation {
     close(cc2520_file);
 
     cc2520_pipe = read_pipe[0];
+
+    // Make the pipe non blocking just in case we get a spurious select() call
+    make_nonblocking(cc2520_pipe);
 
     // Add the cc2520 pipe end to the select call
     call IO.registerFileDescriptor(cc2520_pipe);

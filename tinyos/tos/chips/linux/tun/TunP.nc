@@ -36,6 +36,22 @@ implementation {
   // Send related state variables
   struct send_info send_info_struct = {NULL, 1, 1, 1, FALSE, 0};
 
+  // Makes the given file descriptor non-blocking.
+  // Returns 1 on success, 0 on failure.
+  int make_nonblocking (int fd) {
+    int flags, ret;
+
+    flags = fcntl(fd, F_GETFL, 0);
+    if (flags == -1) {
+      return 0;
+    }
+    // Set the nonblocking flag.
+    flags |= O_NONBLOCK;
+    ret = fcntl(fd, F_SETFL, flags);
+    
+    return ret != -1;
+  }
+
   task void sendDone_task() {
     signal IPForward.sendDone(&send_info_struct);
   }
@@ -89,6 +105,14 @@ implementation {
     uint8_t buf[MAX_IPV6_PACKET_LEN];
 
     len = read(tun_file, buf, MAX_IPV6_PACKET_LEN);
+    if (len == 0) {
+      // spurious wakeup from select()
+      return;
+    } else if (len == -1) {
+      ERROR("Reading from tun caused errors.\n");
+      ERROR("errno: %i\n", errno);
+      exit(1);
+    }
     TUN_PRINTF("got packet\n");
 
     memcpy(in_buf, buf, len);
@@ -119,6 +143,9 @@ implementation {
       ERROR("ioctl could not set up tun interface\n");
       close(tun_file);
     }
+
+    // Make nonblocking in case select() gives us trouble
+    make_nonblocking(tun_file);
 
     // Setup the IP Addresses
     // Todo: this should be made nicer somehow (not use ifconfig, be flexible)
