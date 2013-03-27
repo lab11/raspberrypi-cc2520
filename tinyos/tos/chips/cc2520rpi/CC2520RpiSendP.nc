@@ -60,7 +60,7 @@ implementation {
     // Set the nonblocking flag.
     flags |= O_NONBLOCK;
     ret = fcntl(fd, F_SETFL, flags);
-    
+
     return ret != -1;
   }
 
@@ -214,19 +214,23 @@ implementation {
 
     ret = read(cc2520_read, &send_hdr, sizeof(read_fifo_header_t));
     if (ret == -1) {
-      ERROR("Error with packet result fifo.\n");
-      ERROR("errno: %i\n", errno);
-      exit(1);
-    } else if (ret == 0) {
-      // This appears to be a spurious call from select() that shouldn't really
-      // happen but does. Because this fd is nonblocking, the read() returned
-      // with 0 and we should just go back to sleeping.
-      // If there is really data here, select() will trigger this again.
-      return;
+      switch (errno) {
+        case EAGAIN:
+          // This appears to be a spurious call from select() that shouldn't
+          // really happen but does. Because this fd is nonblocking, the read()
+          // returned with -1 and we should just go back to sleeping.
+          // If there is really data here, select() will trigger this again.
+          RADIO_PRINTF("spurious select wakeup.\n");
+          return;
+        default:
+          ERROR("Error with packet result fifo. errno: %i\n", errno);
+          ERROR("%s\n", strerror(errno));
+          exit(1);
+      }
     } else if (ret != sizeof(read_fifo_header_t)) {
       // Not sure what happened here. This is definitely an error somewhere.
       ERROR("Read only %i bytes from the packet result fifo\n", ret);
-      
+
       // Don't signal the sendDone() task with invalid information. I'm not sure
       // how this will affect certain applications, but hopefully this case
       // doesn't happen.

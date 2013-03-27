@@ -48,7 +48,7 @@ implementation {
     // Set the nonblocking flag.
     flags |= O_NONBLOCK;
     ret = fcntl(fd, F_SETFL, flags);
-    
+
     return ret != -1;
   }
 
@@ -106,13 +106,19 @@ implementation {
 
     len = read(tun_file, buf, MAX_IPV6_PACKET_LEN);
     if (len == 0) {
-      // spurious wakeup from select()
       return;
     } else if (len == -1) {
-      ERROR("Reading from tun caused errors.\n");
-      ERROR("errno: %i\n", errno);
-      exit(1);
+      switch (errno) {
+        case EAGAIN:
+          // select fired incorrectly
+          return;
+        default:
+          ERROR("Reading from tun caused errors.\n");
+          ERROR("errno: %i\n", errno);
+          exit(1);
+      }
     }
+
     TUN_PRINTF("got packet\n");
 
     memcpy(in_buf, buf, len);
@@ -127,7 +133,8 @@ implementation {
     tun_file = open("/dev/net/tun", O_RDWR);
     if (tun_file < 0) {
       // error
-      ERROR("Could not create a tun interface.\n");
+      ERROR("Could not create a tun interface. errno: %i\n", errno);
+      ERROR("%s\n", strerror(errno));
       exit(1);
     }
 

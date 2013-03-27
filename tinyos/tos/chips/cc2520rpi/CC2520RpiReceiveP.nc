@@ -58,7 +58,7 @@ implementation {
     // Set the nonblocking flag.
     flags |= O_NONBLOCK;
     ret = fcntl(fd, F_SETFL, flags);
-    
+
     return ret != -1;
   }
 
@@ -118,34 +118,31 @@ implementation {
     // this should be the length
     ret = read(cc2520_pipe, rx_msg_ptr, 1);
     if (ret == 0) {
-      // Got a spurious wakeup from select() and didn't get a length. Just go
-      // back to select().
+      // Didn't get any data
+      RADIO_PRINTF("Read 0 bytes from pipe.\n");
       return;
 
     } else if (ret == -1) {
-      ERROR("did not receive len from pipe\n");
       switch (errno) {
-        case EAGAIN: ERROR("eagain\n"); break;
-        case EBADF:  ERROR("bad file descriptor\n"); break;
-        case EFAULT: ERROR("efault: buf is outside address space\n"); break;
-        case EINTR:  ERROR("interrupted by signal\n"); break;
-        case EINVAL: ERROR("unabled to read\n"); break;
-        case EIO:    ERROR("i/o error\n"); break;
-        default:     ERROR("other\n"); break;
+        case EAGAIN:
+          // This appears to be a spurious call from select() that shouldn't
+          // really happen but does. Because this fd is nonblocking, the read()
+          // returned with -1 and we should just go back to sleeping.
+          // If there is really data here, select() will trigger this again.
+          RADIO_PRINTF("spurious select wakeup.\n");
+          return;
+        default:
+          ERROR("Error reading length from cc2520. errno: %i\n", errno);
+          ERROR("%s\n", strerror(errno));
+          exit(1);
       }
-      exit(1);
     }
 
     // Read the rest of the packet from the fifo
     ret = read(cc2520_pipe, rx_msg_ptr+1, rx_msg_ptr[0]);
     if (ret == -1) {
-      switch (errno) {
-        case EAGAIN: ERROR("eagain\n"); break;
-        case EBADF:  ERROR("bad file descriptor\n"); break;
-        case EINTR:  ERROR("interrupted by signal\n"); break;
-        case EINVAL: ERROR("unabled to read\n"); break;
-        case EIO:    ERROR("i/o error\n"); break;
-      }
+      ERROR("Error reading packet from cc2520. errno: %i\n", errno);
+      ERROR("%s", strerror(errno));
       exit(1);
     } else if (ret != rx_msg_ptr[0]) {
       // Didn't get a full packet. Let's just drop it and hope for good things
