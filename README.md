@@ -3,6 +3,10 @@ raspberrypi-cc2520
 
 Code, hardware, and instructions to use the TI CC2520 with the Raspberry Pi.
 
+[
+![rpi-cc2520](https://raw.github.com/bradjc/raspberrypi-cc2520/master/media/rpi-cc2520_2ndgen_500px.jpg)
+](https://raw.github.com/bradjc/raspberrypi-cc2520/master/media/rpi-cc2520_2ndgen.jpg)
+
 The CC2520 is a 802.15.4 (Zigbee) radio commonly used in low power wireless
 sensor networks. Typically 802.15.4 radios are used with WSN motes and embedded
 microcontrollers. A side-effect of being used in WSNs, however, is the
