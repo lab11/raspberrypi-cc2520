@@ -1,0 +1,19 @@
+
+# Adding 'install' to the command line will automatically scp the exe to an rpi
+
+ifndef INSTALL
+  $(warning No RPi target given. Cannot install.)
+  BUILD_DEPS = exe
+else
+  BUILD_DEPS = exe program
+endif
+
+# Check if a number was given or something else
+NUMBER_CHECK := $(shell python -c "import sys; int(sys.argv[1]); print('number')" $(INSTALL) 2>&1)
+
+# Set the rpi hostname
+ifeq ($(NUMBER_CHECK), number)
+  RPI_ID = rpi$(INSTALL)
+else
+  RPI_ID = $(INSTALL)
+endif

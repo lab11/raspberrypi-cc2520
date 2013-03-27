@@ -67,7 +67,7 @@ endif
 
 ifndef BUILD_DEPS
   ifeq ($(filter $(BUILDLESS_DEPS),$(GOALS)),)
-    BUILD_DEPS = bin tosimage bytes $(POST_BUILD_EXTRA_DEPS)
+    BUILD_DEPS = exe $(POST_BUILD_EXTRA_DEPS)
   endif
 endif
 
@@ -79,11 +79,8 @@ PFLAGS += -DDEFINED_TOS_AM_GROUP=$(DEFAULT_LOCAL_GROUP)
 endif
 
 
-DEFAULT_PROGRAM ?= sam-ba
-
-# Use the 'if' function instead of the 'ifdef' construct because ifdef freaks
-# out with call in there.  I don't know why.
-#$(if $(PROGRAM),,$(call TOSMake_include,sam3/$(DEFAULT_PROGRAM).extra))
+program:
+	scp build/rpi/main.exe $(RPI_ID):~/$(COMPONENT)
 
 exe: exe0 bytes FORCE
 	@:
