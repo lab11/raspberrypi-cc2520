@@ -3,9 +3,12 @@
 
 #include <stdio.h>
 
-#define CC2520RPI_DEBUG 1
+#define RPI_DEBUG 1
+//#define CC2520RPI_DEBUG 1
+//#define CC2520RPI_KERNEL_DRIVER_DEBUG 1
 #define TUN_DEBUG 1
 #define IOMANAGER_DEBUG 1
+
 
 #define DBG(...)\
   do {\
@@ -26,6 +29,12 @@
     funlockfile(stderr);\
   } while (0)
 
+
+#ifdef RPI_DEBUG
+#define RPI_PRINTF(...) DBG(__VA_ARGS__)
+#else
+#define RPI_PRINTF(...)
+#endif
 
 #ifdef CC2520RPI_DEBUG
 #define RADIO_PRINTF(...) DBG(__VA_ARGS__)

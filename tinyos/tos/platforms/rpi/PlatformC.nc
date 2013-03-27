@@ -11,5 +11,9 @@ configuration PlatformC {
 }
 implementation {
   components PlatformP;
+  components LedsC;
+
+  PlatformP.Leds -> LedsC;
+
   Init = PlatformP;
 }
