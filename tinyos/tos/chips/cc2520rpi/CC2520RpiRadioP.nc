@@ -33,7 +33,13 @@ implementation {
   struct cc2520_set_address_data addr_data = {0, 0, DEFINED_TOS_AM_GROUP};
   struct cc2520_set_ack_data ack_data = {SOFTWAREACK_TIMEOUT};
   struct cc2520_set_txpower_data txpower_data = {CC2520_DEF_RFPOWER};
+#ifdef LOW_POWER_LISTENING
+  struct cc2520_set_lpl_data lpl_data = {LPL_DEF_REMOTE_WAKEUP*1000,
+                                         LPL_SLEEP_INTERVAL*1000,
+                                         FALSE};
+#else
   struct cc2520_set_lpl_data lpl_data = {0, 0, FALSE};
+#endif
 #ifdef CC2520RPI_KERNEL_DRIVER_DEBUG
   struct cc2520_set_print_messages_data print_data = {TRUE};
 #else
