@@ -17,7 +17,6 @@ push ( @includes, qw(
 
   -gcc=arm-linux-gnueabi-gcc
   -mcpu=arm1176jzf-s
-  -nostartfiles
   -fnesc-target=pc
 
 );

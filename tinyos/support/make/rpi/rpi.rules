@@ -19,7 +19,7 @@ OBJCOPY = $(CROSS_COMPILE)-objcopy
 OBJDUMP = $(CROSS_COMPILE)-objdump
 SET_ID = tos-set-symbols
 NCC = ncc
-LIBS = -lm -lbcm2835 -lrt -lpthread
+LIBS = -lm -lbcm2835 -lrt -lpthread -lc
 
 AMADDR = ActiveMessageAddressC\$$addr
 BUILDDIR ?= build/$(PLATFORM)
@@ -31,7 +31,7 @@ INCLUDE_DIRS ?= $(TOSDIR)/platforms/$(PLATFORM)
 #EXTRA_MODULES ?= $(TOSDIR)/platforms/$(PLATFORM)/vectors.c
 NCC_INCLUDE_DIRS = $(TOSROOTRPI)/tos/platforms/$(PLATFORM)
 
-OPTFLAGS += -g -Os
+OPTFLAGS = -Os
 #CFLAGS += -mcpu=cortex-m3 -mthumb -fno-strict-aliasing
 CFLAGS += $(TOSROOTRPI)/tos/platforms/$(PLATFORM)/signalWrapper.c
 PFLAGS += $(EXTRA_MODULES)
