@@ -16,14 +16,15 @@ generic module UartReceiveBBP (uint32_t baud_rate) {
 implementation {
 
 
-  uint32_t baudPeriod = (1/baud_rate)*1000000;
+  //uint32_t baudPeriod = (1/baud_rate)*1000000;
+  uint32_t baudPeriod = 100;
 
   uint8_t buf[100];
 
   command error_t Init.init() {
-  //  call UartRxPin.makeInput();
+    call UartRxPin.makeInput();
     call Leds.led1On();
-    call UartRxInt.enableRisingEdge();
+    call UartRxInt.enableFallingEdge();
     return SUCCESS;
   }
 
@@ -34,7 +35,7 @@ implementation {
   async event void UartRxInt.fired() {
     int i;
     uint8_t byte;
-
+    call UartRxInt.disable();
     call Leds.led1Toggle();
 
     i = 0;
@@ -47,6 +48,7 @@ implementation {
       } else {
         byte = byte & 0xFE;
       }
+      call Leds.led1Toggle();
       byte = byte << 1;
       i++;
 
@@ -54,6 +56,7 @@ implementation {
     }
     memcpy(buf, &byte, 1);
     post received_byte();
+    call UartRxInt.enableFallingEdge();
   }
 
 }
