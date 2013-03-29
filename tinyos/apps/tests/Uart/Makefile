@@ -1,0 +1,3 @@
+COMPONENT=UartTestC
+
+include $(MAKERULES)
