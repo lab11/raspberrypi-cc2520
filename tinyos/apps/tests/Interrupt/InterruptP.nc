@@ -19,7 +19,7 @@ implementation {
   }
 
   async event void Int.fired () {
-
+    call Leds.led1Toggle();
   }
 
   event void TimerMilliC.fired () {

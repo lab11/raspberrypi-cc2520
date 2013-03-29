@@ -47,4 +47,8 @@ implementation {
   default command error_t LedsInit.init() {
     return SUCCESS;
   }
+
+  default command error_t InterruptInit.init() {
+    return SUCCESS;
+  }
 }
