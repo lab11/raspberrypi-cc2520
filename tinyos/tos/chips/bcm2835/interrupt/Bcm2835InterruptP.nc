@@ -60,11 +60,10 @@ implementation {
   int int_settings_pipe;
   int write_pipe[2];
 
- // read_fifo_header_t send_hdr;
-
 
   // Callback for the alarm
   void InterruptSignal (int sig, siginfo_t* siginfo, void* a) {
+    INT_PRINTF("Got an interrupt! %i\n", siginfo->si_value);
     signal Port1_10.fired();
   }
 
@@ -78,51 +77,9 @@ implementation {
     return -1;
   }
 
-
-  // Makes the given file descriptor non-blocking.
-  // Returns 1 on success, 0 on failure.
- /* int make_nonblocking (int fd) {
-    int flags, ret;
-
-    flags = fcntl(fd, F_GETFL, 0);
-    if (flags == -1) {
-      return 0;
-    }
-    // Set the nonblocking flag.
-    flags |= O_NONBLOCK;
-    ret = fcntl(fd, F_SETFL, flags);
-
-    return ret != -1;
-  }*/
-/*
-  task void sendDone_task() {
-
-    switch (send_hdr.ret) {
-      case CC2520_TX_BUSY:
-      case CC2520_TX_ACK_TIMEOUT:
-      case CC2520_TX_FAILED:
-        call PacketMetadata.setWasAcked(send_hdr.ptr_to_msg, FALSE);
-        break;
-      case CC2520_TX_LENGTH:
-        ERROR("INCORRECT LENGTH\n");
-        break;
-      case CC2520_TX_SUCCESS:
-        call PacketMetadata.setWasAcked(send_hdr.ptr_to_msg, TRUE);
-        break;
-      default:
-        if (send_hdr.ret == send_hdr.len - 1) {
-          call PacketMetadata.setWasAcked(send_hdr.ptr_to_msg, TRUE);
-        } else {
-          ERROR("write() weird return code: %i\n", send_hdr.ret);
-        }
-        break;
-    }
-
-    signal BareSend.sendDone(send_hdr.ptr_to_msg, SUCCESS);
-  }
-*/
   command error_t SoftwareInit.init() {
     int ret;
+    struct sigaction sa;
 
     // Create a pipe to send interrupt setting information to the interrupt
     // managing process
@@ -132,11 +89,19 @@ implementation {
       exit(1);
     }
 
+    // Register the callback as the signal handler
+    INT_PRINTF("Registering the signal handler for SIGUSR1\n");
+    sa.sa_sigaction = InterruptSignal;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_SIGINFO;
+    ret = sigaction(SIGUSR1, &sa, NULL);
+
     // Create a process that pulls interrupt config info from a pipe and watches
     // for any interrups. When one is found it signals the main process.
     if (!fork()) {
       // CHILD
       int i;
+
       int export_fd;
       char filename[50];
 
@@ -284,7 +249,9 @@ implementation {
 
             // handle new data from the pipe
             ret = read(write_pipe[0], &iset, sizeof(interrupt_setting_t));
-            if (ret == -1) {
+            if (ret == 0) {
+              break;
+            } if (ret == -1) {
               ERROR("Failure reading config from pipe. errno: %i\n", errno);
               ERROR("%s\n", strerror(errno));
               exit(1);
@@ -318,10 +285,11 @@ implementation {
                   switch (errno) {
                     case ENOENT:
                       INT_PRINTF("Tried to remove fd from epoll that wasn't \
-                                  there. It must have already been none.\n");
+there. It must have already been none.\n");
                       break;
                     default:
-                      ERROR("Could not add write pipe to epoll. errno: %i\n", errno);
+                      ERROR("Could not add write pipe to epoll. errno: %i\n",
+                            errno);
                       ERROR("%s\n", strerror(errno));
                       exit(1);
                   }
@@ -340,10 +308,17 @@ implementation {
                                 gpio_value_fds[pin_index],
                                 &ev_int[pin_index]);
                 if (ret == -1) {
-                  ERROR("Could not add pin %i to epoll. errno: %i\n",
-                        iset.pin_number, errno);
-                  ERROR("%s\n", strerror(errno));
-                  exit(1);
+                  switch (errno) {
+                    case EEXIST:
+                      INT_PRINTF("Tried to add a pin to epoll that is already \
+there.\n");
+                      break;
+                    default:
+                      ERROR("Could not add pin %i to epoll. errno: %i\n",
+                            iset.pin_number, errno);
+                      ERROR("%s\n", strerror(errno));
+                      exit(1);
+                  }
                 } else {
                   INT_PRINTF("Successfully added pin %i to the epoll.\n",
                              iset.pin_number);
@@ -354,16 +329,14 @@ implementation {
                 break;
             }
 
-
-
-
           } else {
             // Some interrupt triggered
             int interrupt_fd;
             int pin_index = -1;
             int j;
             uint8_t int_val_buf[5];
-            memset(int_val_buf, 0, 5);
+            union sigval sv;
+
 
             // !!!TODO: optimize this
             for (j=0; j<NUMBER_OF_INTERRUPT_PINS; j++) {
@@ -387,71 +360,15 @@ implementation {
             }
             lseek(ready_event.data.fd, 0, SEEK_SET);
 
+            // signal the parent process that an interrupt occured
+            sv.sival_int = pins[pin_index];
+            ret = sigqueue(getppid(), SIGUSR1, sv);
+
           }
         }
 
       }
 
-
-
-
-
-/*
-
-
-        len = read(write_pipe[0], &iset, sizeof(interrupt_setting_t));
-        if (len == -1) {
-          ERROR("Pipe error: %i.\n", errno);
-          ERROR("%s\n", strerror(errno));
-          exit(1);
-        }
-
-        sprintf(filename, "/sys/class/gpio/gpio%i/edge", iset.pin_number);
-        gpio_edge_fd = open(filename, O_WR);
-        if (gpio_edge_fd == -1) {
-          ERROR("Could not open file to set interrupt. errno: %i", errno);
-          ERROR("%s\n", strerror(errno));
-          exit(1);
-        }
-        ret = write(gpio_edge_fd,
-                    &(setting_str[iset.setting]),
-                    strlen(setting_str[iset.settingq]));
-        if (ret == -1) {
-          ERROR("Coild not write to int edge. errno: %i\n", errno);
-          ERROR("%s\n", strerror(errno));
-          exit(1);
-        }
-        close(gpio_edge_fd);
-
-        // Set the length byte from the whdr
-        pkt_buf[0] = whdr.len;
-        // Read the actual packet
-        // The remainder of the packet will be the length byte minus the two
-        // crc bytes.
-        len = read(write_pipe[0], pkt_buf + 1, whdr.len-2);
-        if (len <= 0) {
-          ERROR("Error reading from pipe.\n");
-          close(read_pipe[1]);
-          close(write_pipe[0]);
-        }
-
-        // When writing to the cc2520 driver, the length is the length byte
-        // plus 1 (for itself) minux the 2 byte crc
-        ret_val = write(cc2520_file, pkt_buf, whdr.len-1);
-
-        // write the return code to the read fifo
-        rhdr.ptr_to_msg = whdr.ptr_to_msg;
-        rhdr.ret = ret_val;
-        rhdr.len = whdr.len;
-        ret_val = write(read_pipe[1], &rhdr, sizeof(read_fifo_header_t));
-        if (ret_val == -1) {
-          ERROR("Error writing to read pipe.\n");
-        } else if (ret_val != sizeof(read_fifo_header_t)) {
-          ERROR("Return code was not fully written to the pipe\n");
-          ERROR("Only %i bytes were written\n", ret_val);
-        }
-      }
-      */
     }
 
     // PARENT
@@ -470,6 +387,8 @@ implementation {
     iset.pin_number = 15;
     iset.setting = INTERRUPT_RISING;
 
+    INT_PRINTF("port 10 enable rising\n");
+
     ret = write(int_settings_pipe, &iset, sizeof(interrupt_setting_t));
 
     return SUCCESS;
@@ -482,6 +401,8 @@ implementation {
     iset.pin_number = 15;
     iset.setting = INTERRUPT_FALLING;
 
+    INT_PRINTF("port 10 enable rising\n");
+
     ret = write(int_settings_pipe, &iset, sizeof(interrupt_setting_t));
 
     return SUCCESS;
@@ -492,98 +413,4 @@ implementation {
   }
 
 
-
-
-/*
-  // Read from read_fifo to get send metadata for the last sent packet
-  async event void IO.receiveReady () {
-    ssize_t ret;
-
-    RADIO_PRINTF("send receive ready.\n");
-
-    ret = read(cc2520_read, &send_hdr, sizeof(read_fifo_header_t));
-    if (ret == -1) {
-      switch (errno) {
-        case EAGAIN:
-          // This appears to be a spurious call from select() that shouldn't
-          // really happen but does. Because this fd is nonblocking, the read()
-          // returned with -1 and we should just go back to sleeping.
-          // If there is really data here, select() will trigger this again.
-          RADIO_PRINTF("spurious select wakeup.\n");
-          return;
-        default:
-          ERROR("Error with packet result fifo. errno: %i\n", errno);
-          ERROR("%s\n", strerror(errno));
-          exit(1);
-      }
-    } else if (ret != sizeof(read_fifo_header_t)) {
-      // Not sure what happened here. This is definitely an error somewhere.
-      ERROR("Read only %i bytes from the packet result fifo\n", ret);
-
-      // Don't signal the sendDone() task with invalid information. I'm not sure
-      // how this will affect certain applications, but hopefully this case
-      // doesn't happen.
-      return;
-    }
-
-    // Post a task to trigger sendDone so we can get out of the async
-    post sendDone_task();
-  }
-*/
-
-  /*
-  command error_t BareSend.send (message_t* msg) {
-    write_fifo_header_t whdr;
-    ssize_t ret;
-
-#ifdef CC2520RPI_DEBUG
-    {
-      uint8_t sam, dam;
-      uint8_t* buf = (uint8_t*) msg;
-      sam = (buf[2] >> 6) & 0x3;
-      dam = (buf[2] >> 2) & 0x3;
-      RADIO_PRINTF("Sending a packet. len: %i\n", buf[0]+1);
-      buf += 6;
-      printf("    to:   ");
-      if (dam == 2) {
-        // short address
-        print_message(buf, 2);
-        buf += 2;
-      } else if (dam == 3) {
-        print_message(buf, 8);
-        buf += 8;
-      }
-      printf("    from: ");
-      if (sam == 2) {
-        // short address
-        print_message(buf, 2);
-      } else if (sam == 3) {
-        print_message(buf, 8);
-      }
-    }
-#endif
-
-    whdr.ptr_to_msg = msg;
-    whdr.len = ((uint8_t*) msg)[0];
-    ret = write(cc2520_write, &whdr, sizeof(write_fifo_header_t));
-    if (ret == -1) {
-      ERROR("could not write to fifo.\n");
-    }
-
-    // write the rest of the packet to the fifo
-    // Write() the body of the packet (no length byte or 2 byte crc)
-    ret = write(cc2520_write, ((uint8_t*)msg)+1, whdr.len-2);
-    if (ret == -1) {
-      ERROR("could not write to fifo.\n");
-    }
-
-    RADIO_PRINTF("send packet.\n");
-
-    return SUCCESS;
-  }
-
-  command error_t BareSend.cancel (message_t* msg) {
-    return FAIL;
-  }
-  */
 }
