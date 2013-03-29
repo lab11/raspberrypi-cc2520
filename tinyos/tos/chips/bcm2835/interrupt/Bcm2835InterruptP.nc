@@ -12,19 +12,12 @@ module Bcm2835InterruptP {
 
 /*
     provides interface Bcm2835Interrupt as Port1_03; // GPIO 2
-    provides interface Bcm2835Interrupt as Port1_05; // GPIO 3
-    provides interface Bcm2835Interrupt as Port1_07; // GPIO 4
     provides interface Bcm2835Interrupt as Port1_08; // GPIO 14
   */  interface GpioInterrupt as Port1_10; // GPIO 15
-  /*  provides interface Bcm2835Interrupt as Port1_11; // GPIO 17
-    provides interface Bcm2835Interrupt as Port1_12; // GPIO 18
+   /* provides interface Bcm2835Interrupt as Port1_12; // GPIO 18
     provides interface Bcm2835Interrupt as Port1_13; // GPIO 27
-    provides interface Bcm2835Interrupt as Port1_15; // GPIO 22
-    provides interface Bcm2835Interrupt as Port1_16; // GPIO 23
-    provides interface Bcm2835Interrupt as Port1_18; // GPIO 24
     provides interface Bcm2835Interrupt as Port1_19; // GPIO 10
     provides interface Bcm2835Interrupt as Port1_21; // GPIO 9
-    provides interface Bcm2835Interrupt as Port1_22; // GPIO 25
     provides interface Bcm2835Interrupt as Port1_23; // GPIO 11
     provides interface Bcm2835Interrupt as Port1_24; // GPIO 8
     provides interface Bcm2835Interrupt as Port1_26; // GPIO 7
@@ -60,11 +53,22 @@ implementation {
   int int_settings_pipe;
   int write_pipe[2];
 
+  uint8_t chip_to_header[28] = {0};
+
 
   // Callback for the alarm
   void InterruptSignal (int sig, siginfo_t* siginfo, void* a) {
-    INT_PRINTF("Got an interrupt! %i\n", siginfo->si_value);
-    signal Port1_10.fired();
+    uint8_t header_pin;
+    int chip_pin = (int) siginfo->si_value.sival_int;
+
+    header_pin = chip_to_header[chip_pin];
+    INT_PRINTF("Got an interrupt! pin: %i, port1_%i\n", chip_pin, header_pin);
+
+    switch (header_pin) {
+      case 10: signal Port1_10.fired(); break;
+      default:
+        break;
+    }
   }
 
   int get_pin_index (int pin_number) {
@@ -95,6 +99,18 @@ implementation {
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_SIGINFO;
     ret = sigaction(SIGUSR1, &sa, NULL);
+
+    // map the pin numbers on the bcm2835 chip to the pin on the external header
+    chip_to_header[2] = 3;
+    chip_to_header[7] = 26;
+    chip_to_header[8] = 24;
+    chip_to_header[9] = 21;
+    chip_to_header[10] = 19;
+    chip_to_header[11] = 23;
+    chip_to_header[14] = 8;
+    chip_to_header[15] = 10;
+    chip_to_header[18] = 12;
+    chip_to_header[27] = 13;
 
     // Create a process that pulls interrupt config info from a pipe and watches
     // for any interrups. When one is found it signals the main process.
@@ -189,7 +205,7 @@ implementation {
         sprintf(filename, "/sys/class/gpio/gpio%i/value", pins[i]);
         gpio_value_fds[i] = open(filename, O_RDWR);
         if (gpio_value_fds[i] == -1) {
-          ERROR("Could not open file to read interrupt. errno: %i\n",
+          ERROR("Could not open file to read interrupt pin %i. errno: %i\n",
                 pins[i], errno);
           ERROR("%s\n", strerror(errno));
           exit(1);
@@ -197,7 +213,7 @@ implementation {
         // Do an initial read to prevent a spurious interrupt
         ret = read(gpio_value_fds[i], temp_buf, 5);
         if (ret == -1) {
-          ERROR("Could not read val from pin %i. errno: %i\n", errno);
+          ERROR("Could not read val from pin %i. errno: %i\n", pins[i], errno);
           ERROR("%s\n", strerror(errno));
           exit(1);
         }
@@ -226,8 +242,6 @@ implementation {
       }
 
       while(1) {
-        ssize_t len, ret_val;
-
         int number_fds;
         struct epoll_event ready_event;
 
@@ -331,7 +345,6 @@ there.\n");
 
           } else {
             // Some interrupt triggered
-            int interrupt_fd;
             int pin_index = -1;
             int j;
             uint8_t int_val_buf[5];
@@ -379,32 +392,29 @@ there.\n");
     return SUCCESS;
   }
 
-
-  async command error_t Port1_10.enableRisingEdge() {
+  void configure_interrupt (uint8_t pin_number, setting_e set) {
     int ret;
     interrupt_setting_t iset;
 
-    iset.pin_number = 15;
-    iset.setting = INTERRUPT_RISING;
-
-    INT_PRINTF("port 10 enable rising\n");
+    iset.pin_number = pin_number;
+    iset.setting = set;
 
     ret = write(int_settings_pipe, &iset, sizeof(interrupt_setting_t));
+    if (ret == -1) {
+      ERROR("Unable to write to control pipe.\n");
+      ERROR("%s\n", strerror(errno));
+      exit(1);
+    }
+  }
 
+
+  async command error_t Port1_10.enableRisingEdge() {
+    configure_interrupt(15, INTERRUPT_RISING);
     return SUCCESS;
   }
 
   async command error_t Port1_10.enableFallingEdge() {
-    int ret;
-    interrupt_setting_t iset;
-
-    iset.pin_number = 15;
-    iset.setting = INTERRUPT_FALLING;
-
-    INT_PRINTF("port 10 enable rising\n");
-
-    ret = write(int_settings_pipe, &iset, sizeof(interrupt_setting_t));
-
+    configure_interrupt(15, INTERRUPT_FALLING);
     return SUCCESS;
 
   }
