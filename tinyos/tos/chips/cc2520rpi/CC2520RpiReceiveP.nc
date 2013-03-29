@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <sys/prctl.h>
 
+#include "file_helpers.h"
+
 
 #define PACKET_BUFFER_LEN 256
 
@@ -45,22 +47,6 @@ implementation {
     printf("%s\n", pbuf);
   }
 #endif
-
-  // Makes the given file descriptor non-blocking.
-  // Returns 1 on success, 0 on failure.
-  int make_nonblocking (int fd) {
-    int flags, ret;
-
-    flags = fcntl(fd, F_GETFL, 0);
-    if (flags == -1) {
-      return 0;
-    }
-    // Set the nonblocking flag.
-    flags |= O_NONBLOCK;
-    ret = fcntl(fd, F_SETFL, flags);
-
-    return ret != -1;
-  }
 
   task void receive_task () {
     uint8_t rssi, crc_lqi;

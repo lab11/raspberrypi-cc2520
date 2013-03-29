@@ -26,6 +26,9 @@ PFLAGS += -I$(TOSROOTRPI)/tos/lib/net/blip
 PFLAGS += -I$(TOSROOTRPI)/tos/system
 PFLAGS += -I$(TOSROOTRPI)/tos/system/onewire
 
+PFLAGS += -I$(TOSROOTRPI)/support/sdk/c/linux
+PFLAGS += $(TOSROOTRPI)/support/sdk/c/linux/file_helpers.c
+
 PFLAGS += -DPRINTFUART_ENABLED=1
 PFLAGS += -DLINUX_PRINTF=1
 

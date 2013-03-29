@@ -1,6 +1,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "file_helpers.h"
+
 module UartP {
   provides {
     interface Init as SoftwareInit @exactlyonce();
@@ -17,22 +19,6 @@ implementation {
   uint8_t uart_buf[1024];
   uint32_t last_uart_len;
 
-  // Makes the given file descriptor non-blocking.
-  // Returns 1 on success, 0 on failure.
-  int make_nonblocking (int fd) {
-    int flags, ret;
-
-    flags = fcntl(fd, F_GETFL, 0);
-    if (flags == -1) {
-      return 0;
-    }
-    // Set the nonblocking flag.
-    flags |= O_NONBLOCK;
-    ret = fcntl(fd, F_SETFL, flags);
-
-    return ret != -1;
-  }
-
   task void uart_recv_task () {
     uint32_t len;
 
@@ -42,6 +28,11 @@ implementation {
   }
 
   command error_t SoftwareInit.init() {
+
+    // http://raspberrypihobbyist.blogspot.com/2012/08/raspberry-pi-serial-port.html
+
+    UART_PRINTF("Initializing the UART Driver.\n");
+    UART_PRINTF("Opening the file /dev/ttyAMA0.\n");
 
     uart_fd = open("/dev/ttyAMA0", O_RDWR);
     if (uart_fd == -1) {
@@ -57,7 +48,6 @@ implementation {
 
     // Add the packet send result pipe to the select() call
     call IO.registerFileDescriptor(uart_fd);
-
 
     return SUCCESS;
   }
@@ -89,4 +79,3 @@ implementation {
   }
 
 }
-

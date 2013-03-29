@@ -6,8 +6,9 @@
 #include <string.h>
 #include <linux/if_tun.h>
 #include <linux/ioctl.h>
-
 #include <stdarg.h>
+
+#include "file_helpers.h"
 
 #define MAX_IPV6_PACKET_LEN 2048
 
@@ -35,22 +36,6 @@ implementation {
 
   // Send related state variables
   struct send_info send_info_struct = {NULL, 1, 1, 1, FALSE, 0};
-
-  // Makes the given file descriptor non-blocking.
-  // Returns 1 on success, 0 on failure.
-  int make_nonblocking (int fd) {
-    int flags, ret;
-
-    flags = fcntl(fd, F_GETFL, 0);
-    if (flags == -1) {
-      return 0;
-    }
-    // Set the nonblocking flag.
-    flags |= O_NONBLOCK;
-    ret = fcntl(fd, F_SETFL, flags);
-
-    return ret != -1;
-  }
 
   task void sendDone_task() {
     signal IPForward.sendDone(&send_info_struct);
