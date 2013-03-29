@@ -8,6 +8,7 @@
 //#define CC2520RPI_KERNEL_DRIVER_DEBUG 1
 #define TUN_DEBUG 1
 #define IOMANAGER_DEBUG 1
+#define RPI_INTERRUPT_DEBUG 1
 
 
 #define DBG(...)\
@@ -52,6 +53,12 @@
 #define IOMANAGER_PRINTF(...) DBG(__VA_ARGS__)
 #else
 #define IOMANAGER_PRINTF(...)
+#endif
+
+#ifdef RPI_INTERRUPT_DEBUG
+#define INT_PRINTF(...) DBG(__VA_ARGS__)
+#else
+#define INT_PRINTF(...)
 #endif
 
 #endif
