@@ -8,7 +8,7 @@
 
 module Bcm2835InterruptP {
   provides {
-    interface Init as SoftwareInit @exactlyonce();
+    interface Init;
 
 /*
     provides interface Bcm2835Interrupt as Port1_03; // GPIO 2
@@ -81,7 +81,7 @@ implementation {
     return -1;
   }
 
-  command error_t SoftwareInit.init() {
+  command error_t Init.init() {
     int ret;
     struct sigaction sa;
 
@@ -414,12 +414,14 @@ there.\n");
   }
 
   async command error_t Port1_10.enableFallingEdge() {
+    printf("falling edge\n");
     configure_interrupt(15, INTERRUPT_FALLING);
     return SUCCESS;
-
   }
-  async command error_t Port1_10.disable() {
 
+  async command error_t Port1_10.disable() {
+    configure_interrupt(15, INTERRUPT_NONE);
+    return SUCCESS;
   }
 
 

@@ -11,6 +11,7 @@ module PlatformP {
   }
   uses {
     interface Init as LedsInit;
+    interface Init as InterruptInit;
     interface Leds;
   }
 }
@@ -32,6 +33,8 @@ implementation {
     RPI_PRINTF("Bringing system online.\n");
     bcm2835_init();
     call LedsInit.init();
+
+    call InterruptInit.init();
 
     RPI_PRINTF("Setting SIGINT signal handler.\n");
     signal_wrapper(SIGINT, sigint_handler);

@@ -7,9 +7,9 @@ configuration Bcm2835InterruptC {
 
 implementation {
   components Bcm2835InterruptP as IntP;
-  components MainC;
+  components PlatformP;
 
-  MainC.SoftwareInit -> IntP.SoftwareInit;
+  PlatformP.InterruptInit -> IntP.Init;
 
   Port1_10 = IntP.Port1_10;
 }
