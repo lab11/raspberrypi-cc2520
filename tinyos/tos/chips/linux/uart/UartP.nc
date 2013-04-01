@@ -10,6 +10,7 @@ module UartP {
   }
   uses {
     interface IO;
+    interface UnixTime;
   }
 }
 
@@ -21,10 +22,13 @@ implementation {
 
   task void uart_recv_task () {
     uint32_t len;
+    uint64_t timestamp;
 
     atomic len =  last_uart_len;
 
-    signal UartBuffer.receive(uart_buf, len);
+    timestamp = call UnixTime.getMicroseconds();
+
+    signal UartBuffer.receive(uart_buf, len, timestamp);
   }
 
   command error_t SoftwareInit.init() {
@@ -70,6 +74,12 @@ implementation {
           ERROR("%s\n", strerror(errno));
           exit(1);
       }
+    }
+
+    if (ret == 1 && uart_buf[0] == '\n') {
+      //suppress this because who wants a new line?
+      // Probably need to come back and look at if this is a good solution.
+      return;
     }
 
     atomic last_uart_len = ret;
