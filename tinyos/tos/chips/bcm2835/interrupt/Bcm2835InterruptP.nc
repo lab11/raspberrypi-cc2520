@@ -10,18 +10,7 @@ module Bcm2835InterruptP {
   provides {
     interface Init;
 
-/*
-    provides interface Bcm2835Interrupt as Port1_03; // GPIO 2
-    provides interface Bcm2835Interrupt as Port1_08; // GPIO 14
-  */  interface GpioInterrupt as Port1_10; // GPIO 15
-   /* provides interface Bcm2835Interrupt as Port1_12; // GPIO 18
-    provides interface Bcm2835Interrupt as Port1_13; // GPIO 27
-    provides interface Bcm2835Interrupt as Port1_19; // GPIO 10
-    provides interface Bcm2835Interrupt as Port1_21; // GPIO 9
-    provides interface Bcm2835Interrupt as Port1_23; // GPIO 11
-    provides interface Bcm2835Interrupt as Port1_24; // GPIO 8
-    provides interface Bcm2835Interrupt as Port1_26; // GPIO 7
-    */
+    interface GpioInterrupt as Port1[uint8_t bcm_pin];
   }
 }
 
@@ -53,22 +42,13 @@ implementation {
   int int_settings_pipe;
   int write_pipe[2];
 
-  uint8_t chip_to_header[28] = {0};
-
-
   // Callback for the alarm
   void InterruptSignal (int sig, siginfo_t* siginfo, void* a) {
-    uint8_t header_pin;
     int chip_pin = (int) siginfo->si_value.sival_int;
 
-    header_pin = chip_to_header[chip_pin];
-    INT_PRINTF("Got an interrupt! pin: %i, port1_%i\n", chip_pin, header_pin);
+    INT_PRINTF("Got an interrupt! pin: %i\n", chip_pin);
 
-    switch (header_pin) {
-      case 10: signal Port1_10.fired(); break;
-      default:
-        break;
-    }
+    signal Port1.fired[chip_pin]();
   }
 
   int get_pin_index (int pin_number) {
@@ -99,18 +79,6 @@ implementation {
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_SIGINFO;
     ret = sigaction(SIGUSR1, &sa, NULL);
-
-    // map the pin numbers on the bcm2835 chip to the pin on the external header
-    chip_to_header[2] = 3;
-    chip_to_header[7] = 26;
-    chip_to_header[8] = 24;
-    chip_to_header[9] = 21;
-    chip_to_header[10] = 19;
-    chip_to_header[11] = 23;
-    chip_to_header[14] = 8;
-    chip_to_header[15] = 10;
-    chip_to_header[18] = 12;
-    chip_to_header[27] = 13;
 
     // Create a process that pulls interrupt config info from a pipe and watches
     // for any interrups. When one is found it signals the main process.
@@ -408,21 +376,21 @@ there.\n");
   }
 
 
-  async command error_t Port1_10.enableRisingEdge() {
-    configure_interrupt(15, INTERRUPT_RISING);
+  async command error_t Port1.enableRisingEdge[uint8_t bcm_pin]() {
+    configure_interrupt(bcm_pin, INTERRUPT_RISING);
     return SUCCESS;
   }
 
-  async command error_t Port1_10.enableFallingEdge() {
-    printf("falling edge\n");
-    configure_interrupt(15, INTERRUPT_FALLING);
+  async command error_t Port1.enableFallingEdge[uint8_t bcm_pin]() {
+    configure_interrupt(bcm_pin, INTERRUPT_FALLING);
     return SUCCESS;
   }
 
-  async command error_t Port1_10.disable() {
-    configure_interrupt(15, INTERRUPT_NONE);
+  async command error_t Port1.disable[uint8_t bcm_pin]() {
+    configure_interrupt(bcm_pin, INTERRUPT_NONE);
     return SUCCESS;
   }
 
+  default async event void Port1.fired[uint8_t bcm_pin]() {}
 
 }
