@@ -26,5 +26,4 @@ implementation {
     call Leds.led0Toggle();
   }
 
-
 }
