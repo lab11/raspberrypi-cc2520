@@ -32,6 +32,10 @@ implementation {
         id.data[6] = buf[1];
         id.data[7] = buf[0];
         have_id = TRUE;
+
+        EUI64_PRINTF("EUI64 ID: %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
+          id.data[0], id.data[1], id.data[2], id.data[3], id.data[4],
+          id.data[5], id.data[6], id.data[7]);
       }
     }
     return id;

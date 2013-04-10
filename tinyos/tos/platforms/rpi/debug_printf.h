@@ -4,12 +4,13 @@
 #include <stdio.h>
 
 #define RPI_DEBUG 1
-//#define CC2520RPI_DEBUG 1
-//#define CC2520RPI_KERNEL_DRIVER_DEBUG 1
+#define CC2520RPI_DEBUG 1
+#define CC2520RPI_KERNEL_DRIVER_DEBUG 1
 #define TUN_DEBUG 1
-#define IOMANAGER_DEBUG 1
+//#define IOMANAGER_DEBUG 1
 //#define RPI_INTERRUPT_DEBUG 1
 #define UART_DEBUG 1
+#define EUI64_DEBUG 1
 
 
 #define DBG(...)\
@@ -66,6 +67,12 @@
 #define UART_PRINTF(...) DBG(__VA_ARGS__)
 #else
 #define UART_PRINTF(...)
+#endif
+
+#ifdef EUI64_DEBUG
+#define EUI64_PRINTF(...) DBG(__VA_ARGS__)
+#else
+#define EUI64_PRINTF(...)
 #endif
 
 #endif
