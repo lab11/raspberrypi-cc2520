@@ -18,7 +18,6 @@ push ( @includes, qw(
   -gcc=arm-linux-gnueabi-gcc
   -mcpu=arm1176jzf-s
   -fnesc-target=pc
-
 );
 
 push @opts, "-fnesc-scheduler=TinySchedulerC,TinySchedulerC.TaskBasic,TaskBasic,TaskBasic,runTask,postTask" if !$with_scheduler_flag;
