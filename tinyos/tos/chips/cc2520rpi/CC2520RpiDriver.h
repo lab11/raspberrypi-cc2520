@@ -66,9 +66,9 @@ struct cc2520_set_txpower_data {
 
 // Transmit error codes
 #define CC2520_TX_SUCCESS 0
-#define CC2520_TX_BUSY 1
-#define CC2520_TX_LENGTH 2
-#define CC2520_TX_ACK_TIMEOUT 3
-#define CC2520_TX_FAILED 4
+#define CC2520_TX_BUSY 255
+#define CC2520_TX_LENGTH 254
+#define CC2520_TX_ACK_TIMEOUT 253
+#define CC2520_TX_FAILED 252
 
 #endif

@@ -56,6 +56,7 @@ implementation {
       case CC2520_TX_BUSY:
       case CC2520_TX_ACK_TIMEOUT:
       case CC2520_TX_FAILED:
+        RADIO_PRINTF("Sending packet failed. Error: %i\n", send_hdr.ret);
         call PacketMetadata.setWasAcked(send_hdr.ptr_to_msg, FALSE);
         break;
       case CC2520_TX_LENGTH:
