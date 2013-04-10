@@ -68,7 +68,7 @@ implementation {
     } else {
       // some file is ready
       int j;
-      
+
       if (ret > 1) {
         IOMANAGER_PRINTF("select finds %i file descriptors ready\n", ret);
       }
