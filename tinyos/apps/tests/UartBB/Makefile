@@ -1,3 +1,0 @@
-COMPONENT=UartC
-
-include $(MAKERULES)
