@@ -13,7 +13,6 @@ implementation {
   uint8_t p = 0;
 
   event void Boot.booted() {
-    //call Int.enableRisingEdge();
     call Int.enableFallingEdge();
     call TimerMilliC.startPeriodic(250);
   }
