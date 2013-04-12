@@ -1,4 +1,12 @@
 
+/* File based implementation of Linux userspace interrupts.
+ * Unfortunately because this module works by letting the kernel module write
+ * to a file with information about interrupts, there is about a 2ms delay
+ * between the interrupt being triggered and the TinyOS app registering it.
+ * This means this module cannot be used for anything that requires tight
+ * timing.
+ */
+
 configuration Bcm2835InterruptC {
   provides {
     interface GpioInterrupt as Port1_03;
