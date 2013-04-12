@@ -111,7 +111,11 @@ implementation {
       }
 
       // Tell kernel to deliver signal when parent dies.
-      prctl(PR_SET_PDEATHSIG, SIGKILL);
+      ret = prctl(PR_SET_PDEATHSIG, SIGKILL);
+      if (ret == -1) {
+        ERROR("Error setting signal when the parent dies.\n");
+        ERROR("%s\n", strerror(errno));
+      }
 
       // Initialize all of the interrupt files
       // open the export file we need to write to

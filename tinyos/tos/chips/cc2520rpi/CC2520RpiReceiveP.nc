@@ -184,7 +184,11 @@ implementation {
       }
 
       // Tell kernel to deliver signal when parent dies.
-      prctl(PR_SET_PDEATHSIG, SIGKILL);
+      ret = prctl(PR_SET_PDEATHSIG, SIGKILL);
+      if (ret == -1) {
+        ERROR("Error setting signal when the parent dies.\n");
+        ERROR("%s\n", strerror(errno));
+      }
 
       while(1) {
         ssize_t len;
