@@ -196,11 +196,10 @@ an IPv6 address.
 Hardware
 --------
 
-I'm working on small PCB that will fit directly on to the main header on the
-RPi. It will contain the CC2520, an SMA connector for an antenna, the DS2411
+I have a small PCB that fits directly on to the main header on the
+RPi. It contains the CC2520, an SMA connector for an antenna, the DS2411
 id chip, and three LEDs. The eagle files and gerbers can be found in the
 `hardware/eagle` folder.
 
-Currently we have an interface board that allows you to use the CC2520EM
-evaluation module with the raspberry pi.
+
 
