@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-module RandomMlcgP @safe() {
+module RandomLinuxP @safe() {
   provides {
     interface Init;
     interface ParameterInit<uint16_t> as SeedInit;
@@ -26,12 +26,12 @@ implementation {
     return SUCCESS;
   }
 
-  /* Return the next 32 bit random number */
+  // Return the next 32 bit random number
   async command uint32_t Random.rand32 () {
     return (uint32_t) rand();
   }
 
-  /* Return low 16 bits of next 32 bit random number */
+  // Return low 16 bits of next 32 bit random number
   async command uint16_t Random.rand16 () {
     return (uint16_t) rand();
   }
