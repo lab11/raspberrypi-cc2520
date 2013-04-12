@@ -106,7 +106,7 @@ implementation {
         }
         prctl(PR_SET_NAME, proc_name, 0, 0, 0);
 
-        RADIO_PRINTF("Spawned Interrupt Process (%d). TOS Process (%d)\n",
+        INT_PRINTF("Spawned Interrupt Process (%d). TOS Process (%d)\n",
             getpid(), getppid());
       }
 
