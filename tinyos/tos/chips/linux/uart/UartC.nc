@@ -1,7 +1,12 @@
 
+/* Provides an easy way to read from the serial port /dev/ttyAMA0 on the RPi.
+ * Be sure to check that the serial port isn't being used by the kernel, etc.
+ * if you get errors.
+ */
+
 configuration UartC {
   provides {
-  	interface UartBuffer;
+    interface UartBuffer;
   }
 }
 
@@ -18,4 +23,3 @@ implementation {
 
   UartBuffer = UartP.UartBuffer;
 }
-
