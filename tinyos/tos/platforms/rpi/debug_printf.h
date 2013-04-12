@@ -11,6 +11,7 @@
 //#define RPI_INTERRUPT_DEBUG 1
 #define UART_DEBUG 1
 #define EUI64_DEBUG 1
+#define CMDLINE_DEBUG 1
 
 
 #define DBG(...)\
@@ -73,6 +74,12 @@
 #define EUI64_PRINTF(...) DBG(__VA_ARGS__)
 #else
 #define EUI64_PRINTF(...)
+#endif
+
+#ifdef CMDLINE_DEBUG
+#define CMDLINE_PRINTF(...) DBG(__VA_ARGS__)
+#else
+#define CMDLINE_PRINTF(...)
 #endif
 
 #endif
