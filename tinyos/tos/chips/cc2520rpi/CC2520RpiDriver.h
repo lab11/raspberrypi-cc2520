@@ -35,12 +35,22 @@ struct cc2520_set_csma_data {
 };
 
 struct cc2520_set_print_messages_data {
-  bool enabled;
+  uint8_t debug_level;
 };
 
 struct cc2520_set_txpower_data {
   uint8_t txpower;
 };
+
+// Define different levels of debug printing
+// print nothing
+#define DEBUG_PRINT_OFF 0
+// print only when something goes wrong
+#define DEBUG_PRINT_ERR 1
+// print occasional messages about interesting things
+#define DEBUG_PRINT_INFO 2
+// print a good amount of debuging output
+#define DEBUG_PRINT_DBG 3
 
 // Possible TX Powers:
 #define CC2520_TXPOWER_5DBM 0xF7

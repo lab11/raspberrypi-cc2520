@@ -42,9 +42,9 @@ implementation {
   struct cc2520_set_lpl_data lpl_data = {0, 0, FALSE};
 #endif
 #ifdef CC2520RPI_KERNEL_DRIVER_DEBUG
-  struct cc2520_set_print_messages_data print_data = {TRUE};
+  struct cc2520_set_print_messages_data print_data = {DEBUG_PRINT_DBG};
 #else
-  struct cc2520_set_print_messages_data print_data = {FALSE};
+  struct cc2520_set_print_messages_data print_data = {DEBUG_PRINT_OFF};
 #endif
 
   ieee_eui64_t ext_addr;
