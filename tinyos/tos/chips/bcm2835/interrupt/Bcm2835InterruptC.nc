@@ -1,3 +1,4 @@
+#include "gpio.h"
 
 /* File based implementation of Linux userspace interrupts.
  * Unfortunately because this module works by letting the kernel module write
@@ -28,14 +29,14 @@ implementation {
 
   PlatformP.InterruptInit -> IntP.Init;
 
-  Port1_03 = IntP.Port1[2];
-  Port1_08 = IntP.Port1[14];
-  Port1_10 = IntP.Port1[15];
-  Port1_12 = IntP.Port1[18];
-  Port1_13 = IntP.Port1[27];
-  Port1_19 = IntP.Port1[10];
-  Port1_21 = IntP.Port1[9];
-  Port1_23 = IntP.Port1[11];
-  Port1_24 = IntP.Port1[8];
-  Port1_26 = IntP.Port1[7];
+  Port1_03 = IntP.Port1[RPI_V2_GPIO_P1_03];
+  Port1_08 = IntP.Port1[RPI_V2_GPIO_P1_08];
+  Port1_10 = IntP.Port1[RPI_V2_GPIO_P1_10];
+  Port1_12 = IntP.Port1[RPI_V2_GPIO_P1_12];
+  Port1_13 = IntP.Port1[RPI_V2_GPIO_P1_13];
+  Port1_19 = IntP.Port1[RPI_V2_GPIO_P1_19];
+  Port1_21 = IntP.Port1[RPI_V2_GPIO_P1_21];
+  Port1_23 = IntP.Port1[RPI_V2_GPIO_P1_23];
+  Port1_24 = IntP.Port1[RPI_V2_GPIO_P1_24];
+  Port1_26 = IntP.Port1[RPI_V2_GPIO_P1_26];
 }

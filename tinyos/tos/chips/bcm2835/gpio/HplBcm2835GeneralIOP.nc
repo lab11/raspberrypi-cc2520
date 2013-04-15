@@ -1,61 +1,126 @@
-#include <bcm2835.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
-generic module HplBcm2835GeneralIOP(uint8_t pin) @safe() {
-  provides interface HplBcm2835GeneralIO as IO;
+module HplBcm2835GeneralIOP {
+  provides {
+    interface Init;
+    interface HplBcm2835GeneralIO as Gpio[uint8_t bcm_pin];
+  }
 }
 implementation {
 
-  // Variables to keep track of the pin state. These are necessary because the
-  // bcm2835 library does not have functions that correspond to all of the
-  // functions in this module.
-  bool pin_high  = FALSE;
-  bool pin_input = TRUE;
+#define BCM2708_PERI_BASE 0x20000000
+#define GPIO_BASE         (BCM2708_PERI_BASE + 0x200000) // GPIO controller
 
-  async command void IO.set() {
-    bcm2835_gpio_set(pin);
-    atomic pin_high = TRUE;
+#define PAGE_SIZE (4*1024)
+#define BLOCK_SIZE (4*1024)
+
+// GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x) or SET_GPIO_ALT(x,y)
+#define INP_GPIO(g)       *(gpio+((g)/10)) &= ~(7<<(((g)%10)*3))
+#define OUT_GPIO(g)       *(gpio+((g)/10)) |=  (1<<(((g)%10)*3))
+#define SET_GPIO_ALT(g,a) *(gpio+(((g)/10))) |= (((a)<=3?(a)+4:(a)==4?3:2)<<(((g)%10)*3))
+
+#define GPIO_SET(g)       *(gpio+7) = (1<<(g))  // sets bits which are 1 ignores bits which are 0
+#define GPIO_CLR(g)       *(gpio+10) = (1<<(g)) // clears bits which are 1 ignores bits which are 0
+#define GPIO_READ(g)      (((*(gpio+13) & (1<<(g))) >> (g)) & 0x1)
+
+#define PIN_NOTE_CLR(a, g)   a &= (~(1<<g))
+#define PIN_NOTE_SET(a, g)   a |= (1<<g)
+#define PIN_NOTE_GET(a, g)   ((a >> g) & 0x1)
+
+  volatile unsigned *gpio;
+
+  // Variable to keep track of the pin state. This is an easy way to make
+  // toggle() easy to implement.
+  unsigned int pin_level = 0;
+  unsigned int pin_output = 0;
+
+
+  command error_t Init.init() {
+    int mem_fd;
+    void *gpio_map;
+
+    // open /dev/mem
+    mem_fd = open("/dev/mem", O_RDWR|O_SYNC);
+    if (mem_fd == -1) {
+      ERROR("Could not open /dev/mem\n");
+      ERROR("%s\n", strerror(errno));
+      exit(1);
+    }
+
+    // mmap GPIO
+    gpio_map = mmap(
+      NULL,                 // Any adddress in our space will do
+      BLOCK_SIZE,           // Map length
+      PROT_READ|PROT_WRITE, // Enable reading & writting to mapped memory
+      MAP_SHARED,           // Shared with other processes
+      mem_fd,               // File to map
+      GPIO_BASE             // Offset to GPIO peripheral
+    );
+    if (gpio_map == MAP_FAILED) {
+      ERROR("mmap of gpio failed.\n");
+      ERROR("%s\n", strerror(errno));
+      exit(1);
+    }
+
+    close(mem_fd); // No need to keep mem_fd open after mmap
+
+    // Always use volatile pointer!
+    gpio = (volatile unsigned*) gpio_map;
+
+    return SUCCESS;
+
   }
 
-  async command void IO.clr() {
-    bcm2835_gpio_clr(pin);
-    atomic pin_high = FALSE;
+  async command void Gpio.set[uint8_t bcm_pin]() {
+    GPIO_SET(bcm_pin);
+    atomic PIN_NOTE_SET(pin_level, bcm_pin);
   }
 
-  async command void IO.toggle() {
+  async command void Gpio.clr[uint8_t bcm_pin]() {
+    GPIO_CLR(bcm_pin);
+    atomic PIN_NOTE_CLR(pin_level, bcm_pin);
+  }
+
+  async command void Gpio.toggle[uint8_t bcm_pin]() {
     atomic {
-      if (pin_high) {
-        bcm2835_gpio_clr(pin);
-        pin_high = FALSE;
+      if (PIN_NOTE_GET(pin_level, bcm_pin)) {
+        GPIO_CLR(bcm_pin);
+        atomic PIN_NOTE_CLR(pin_level, bcm_pin);
       } else {
-        bcm2835_gpio_set(pin);
-        pin_high = TRUE;
+        GPIO_SET(bcm_pin);
+        atomic PIN_NOTE_SET(pin_level, bcm_pin);
       }
     }
   }
 
-  async command uint8_t IO.getRaw() {
-    return bcm2835_gpio_lev(pin);
+  async command uint8_t Gpio.getRaw[uint8_t bcm_pin]() {
+    return GPIO_READ(bcm_pin);
   }
 
-  async command bool IO.get() {
-    return bcm2835_gpio_lev(pin) == 1;
+  async command bool Gpio.get[uint8_t bcm_pin]() {
+    return GPIO_READ(bcm_pin) == 1;
   }
 
-  async command void IO.makeInput() {
-    bcm2835_gpio_fsel(pin, BCM2835_GPIO_FSEL_INPT);
-    atomic pin_input = TRUE;
+  async command void Gpio.makeInput[uint8_t bcm_pin]() {
+    INP_GPIO(bcm_pin);
+    atomic PIN_NOTE_CLR(pin_output, bcm_pin);
   }
 
-  async command bool IO.isInput() {
-    atomic return pin_input;
+  async command bool Gpio.isInput[uint8_t bcm_pin]() {
+    atomic return PIN_NOTE_GET(pin_output, bcm_pin) == 0;
   }
 
-  async command void IO.makeOutput() {
-    bcm2835_gpio_fsel(pin, BCM2835_GPIO_FSEL_OUTP);
-    atomic pin_input = FALSE;
+  async command void Gpio.makeOutput[uint8_t bcm_pin]() {
+    INP_GPIO(bcm_pin);
+    OUT_GPIO(bcm_pin);
+    atomic PIN_NOTE_SET(pin_output, bcm_pin);
   }
 
-  async command bool IO.isOutput() {
-    atomic return pin_input == FALSE;
+  async command bool Gpio.isOutput[uint8_t bcm_pin]() {
+    atomic return PIN_NOTE_GET(pin_output, bcm_pin) == 1;
   }
 }

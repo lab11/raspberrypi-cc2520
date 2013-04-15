@@ -1,5 +1,4 @@
 #include "hardware.h"
-#include <bcm2835.h>
 #include "debug_printf.h"
 #include <signal.h>
 
@@ -10,6 +9,7 @@ module PlatformP {
     interface Init;
   }
   uses {
+    interface Init as GpioInit;
     interface Init as LedsInit;
     interface Init as InterruptInit;
     interface Leds;
@@ -31,9 +31,8 @@ implementation {
     setvbuf(stdout, NULL, _IONBF, 0);
 
     RPI_PRINTF("Bringing system online.\n");
-    bcm2835_init();
+    call GpioInit.init();
     call LedsInit.init();
-
     call InterruptInit.init();
 
     RPI_PRINTF("Setting SIGINT signal handler.\n");

@@ -35,19 +35,6 @@ forwarding:
     sudo vim /etc/sysctl.conf
     uncomment the line: net.ipv6.conf.all.forwarding=1
 
-### BCM2835 GPIO Library
-
-The TinyOS code requires a library for the low level BCM2835 GPIO from
-http://www.open.com.au/mikem/bcm2835/. Download and compile it on the RPI as
-instructed on the website. In order to cross compile TinyOs code on your machine
-you also need the library and headers on your local machine. To build this on
-your local machine:
-
-    ./configure --host arm-linux-gnueabi
-    make
-    sudo mv src/libbcm2835.a /usr/arm-linux-gnueabi/lib
-    sudo mv src/bcm2835.h /usr/arm-linux-gnueabi/include
-
 
 ### TinyOS
 
