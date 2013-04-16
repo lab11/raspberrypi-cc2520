@@ -17,28 +17,32 @@ Raspberry Pi as a mote in a WSN. This provides both ample storage (memory) and
 convenient control as all the utilities in Linux are available.
 
 
+Hardware
+--------
+
+I have a small PCB that fits directly on to the main header on the
+RPi. It contains the CC2520, an SMA connector for an antenna, the DS2411
+id chip, and three LEDs. The eagle files, gerbers and BOM can be found in the
+`hardware/eagle/rpi-cc2520` folder.
+
+
 Software
 --------
 
-### Kernel
+### Kernel Module
 
-You need the kernel module from https://github.com/ab500/linux-cc2520-driver.
-
-You need to enable IPV6 on the RPI:
-
-    sudo vim /etc/modules
-    add ipv6 on a newline
-
-If you want to run the border router application you need to enable interface
-forwarding:
-
-    sudo vim /etc/sysctl.conf
-    uncomment the line: net.ipv6.conf.all.forwarding=1
-
+In order to support the CC2520
+you need the kernel module from https://github.com/ab500/linux-cc2520-driver.
+This kernel module is designed to run on top of the Raspbian Linux distribution.
 
 ### TinyOS
 
-On your non-RPI computer you need a copy of the main TinyOS repository and the
+All of the code I have for the RPi/CC2520 is based on TinyOS. You can use the
+CC2520 driver without TinyOS (see the tests in the linux-cc2520-driver repo),
+but for my purposes TinyOS was the best option.
+
+To setup my workflow,
+on your non-RPI computer you need a copy of the main TinyOS repository and the
 tinyos folder from this repo. You also need to install the dependencies for
 TinyOS. There are instructions here:
 [http://docs.tinyos.net/tinywiki/index.php/Installing_TinyOS_2.1.1]. If you want
@@ -47,7 +51,8 @@ the simple Linux install I use, look here:
 applications are designed to be cross compiled for the RPI.
 
 In order for the TinyOS build system to figure out all the correct paths you
-need to help it along a bit. Add the following to your `.bashrc` file:
+need to help it along a bit. Add the following to your `.bashrc` file, in
+addition to the environment variables from the main TinyOS install:
 
     export TOSROOTRPI=<path to git repo>/tinyos
     export TOSMAKE_PATH="$TOSROOTRPI/support/make $TOSMAKE_PATH"
@@ -55,7 +60,8 @@ need to help it along a bit. Add the following to your `.bashrc` file:
 
 You also need some changes to `tinyos-main` in order to compile the TinyOS RPi
 code. Hopefully these will be merged into the main tinyos repo in order to make
-this step unnecessary.
+this step unnecessary. Until then, you need to pull my changes to TinyOS in
+order to successfully compile.
 
     cd ~/git/tinyos-main
 	git remote add bradjc https://github.com/bradjc/tinyos-main.git
@@ -64,6 +70,44 @@ this step unnecessary.
 	git merge bradjc/blip_rpi
 	git merge bradjc/ds2411
 
+
+#### Supported TinyOS Features
+
+  - Gpio
+  - Interrupts (high latency, can't use for timing critical operations)
+  - 802.15.4 Packets
+  - Active Message
+  - Timers
+  - DS2411
+  - Busy wait
+  - Command line arguments
+  - Printf
+  - Random numbers
+  - Unix timestamps
+  - Uart receive
+  - TUN interface
+
+
+Setup
+-----
+
+Depending on what you want to do there are various changes to need to make to
+the default Raspbian install.
+
+### IPv6
+To use IPv6
+you need to enable IPV6 on the RPI:
+
+    sudo vim /etc/modules
+    add ipv6 on a newline
+
+### Interface Forwarding
+
+If you want to run the border router application you need to enable interface
+forwarding:
+
+    sudo vim /etc/sysctl.conf
+    uncomment the line: net.ipv6.conf.all.forwarding=1
 
 
 
@@ -81,20 +125,34 @@ on your desktop and have it compile successfully:
     cd tinyos-main/apps/Blink
     make rpi
 
-Then copy `build/rpi/main.exe` to the RPI and you should be able to run
-it:
+To install it to the RPi you can simply do:
 
-    scp build/rpi/main.exe <raspberrypi>:~/blink
-    on the rpi:
-    ./blink
+    make rpi install.<ipaddress of the rpi>
 
-Pins 7, 12, and 13 should be toggling.
+Then on the rpi:
+
+    sudo ./BlinkAppC
+
+Pins 7, 12, and 13 should be toggling and the LEDs on the interface board should
+be blinking.
 
 
 ### RadioCountToLeds
 
 To test the radio with TinyOS, run the RadioCountToLeds app on the RPi and
 another mote. The basic process is the same as with the blink app above.
+
+
+### Debug
+
+If you need to, you can run the TinyOS application with GDB. To add the debug
+symbols:
+
+    make rpi debug
+
+Then on the RPi:
+
+    sudo gdb ./AppC
 
 
 Setting Up an Actual Border Router
@@ -180,13 +238,7 @@ an IPv6 address.
 
 
 
-Hardware
---------
 
-I have a small PCB that fits directly on to the main header on the
-RPi. It contains the CC2520, an SMA connector for an antenna, the DS2411
-id chip, and three LEDs. The eagle files and gerbers can be found in the
-`hardware/eagle` folder.
 
 
 
