@@ -16,6 +16,7 @@ PFLAGS += -I$(TOSROOTRPI)/tos/chips/bcm2835
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/bcm2835/gpio
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/bcm2835/interrupt
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/ds2411
+PFLAGS += -I$(TOSROOTRPI)/tos/chips/idrfid
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/linux
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/linux/time
 PFLAGS += -I$(TOSROOTRPI)/tos/chips/linux/timer
