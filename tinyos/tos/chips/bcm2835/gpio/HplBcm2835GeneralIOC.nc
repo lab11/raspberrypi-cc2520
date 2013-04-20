@@ -21,6 +21,11 @@ configuration HplBcm2835GeneralIOC {
   provides interface HplBcm2835GeneralIO as Port1_24; // GPIO 8
   provides interface HplBcm2835GeneralIO as Port1_26; // GPIO 7
 
+  provides interface HplBcm2835GeneralIO as Port5_03; // GPIO 28
+  provides interface HplBcm2835GeneralIO as Port5_04; // GPIO 29
+  provides interface HplBcm2835GeneralIO as Port5_05; // GPIO 30
+  provides interface HplBcm2835GeneralIO as Port5_06; // GPIO 31
+
 }
 
 implementation {
@@ -47,5 +52,10 @@ implementation {
   Port1_23 = IoP.Gpio[RPI_V2_GPIO_P1_23];
   Port1_24 = IoP.Gpio[RPI_V2_GPIO_P1_24];
   Port1_26 = IoP.Gpio[RPI_V2_GPIO_P1_26];
+
+  Port5_03 = IoP.Gpio[RPI_V2_GPIO_P5_03];
+  Port5_04 = IoP.Gpio[RPI_V2_GPIO_P5_04];
+  Port5_05 = IoP.Gpio[RPI_V2_GPIO_P5_05];
+  Port5_06 = IoP.Gpio[RPI_V2_GPIO_P5_06];
 
 }

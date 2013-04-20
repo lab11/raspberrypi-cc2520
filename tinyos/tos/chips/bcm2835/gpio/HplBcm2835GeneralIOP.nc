@@ -19,17 +19,17 @@ implementation {
 #define BLOCK_SIZE (4*1024)
 
 // GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x) or SET_GPIO_ALT(x,y)
-#define INP_GPIO(g)       *(gpio+((g)/10)) &= ~(7<<(((g)%10)*3))
-#define OUT_GPIO(g)       *(gpio+((g)/10)) |=  (1<<(((g)%10)*3))
-#define SET_GPIO_ALT(g,a) *(gpio+(((g)/10))) |= (((a)<=3?(a)+4:(a)==4?3:2)<<(((g)%10)*3))
+#define INP_GPIO(g)        *(gpio+((g)/10)) &= ~(7<<(((g)%10)*3))
+#define OUT_GPIO(g)        *(gpio+((g)/10)) |=  (1<<(((g)%10)*3))
+#define SET_GPIO_ALT(g,a)  *(gpio+(((g)/10))) |= (((a)<=3?(a)+4:(a)==4?3:2)<<(((g)%10)*3))
 
-#define GPIO_SET(g)       *(gpio+7) = (1<<(g))  // sets bits which are 1 ignores bits which are 0
-#define GPIO_CLR(g)       *(gpio+10) = (1<<(g)) // clears bits which are 1 ignores bits which are 0
-#define GPIO_READ(g)      (((*(gpio+13) & (1<<(g))) >> (g)) & 0x1)
+#define GPIO_SET(g)        *(gpio+7) = (1<<(g))  // sets bits which are 1 ignores bits which are 0
+#define GPIO_CLR(g)        *(gpio+10) = (1<<(g)) // clears bits which are 1 ignores bits which are 0
+#define GPIO_READ(g)       (((*(gpio+13) & (1<<(g))) >> (g)) & 0x1)
 
-#define PIN_NOTE_CLR(a, g)   a &= (~(1<<g))
-#define PIN_NOTE_SET(a, g)   a |= (1<<g)
-#define PIN_NOTE_GET(a, g)   ((a >> g) & 0x1)
+#define PIN_NOTE_CLR(a, g) a &= (~(1<<g))
+#define PIN_NOTE_SET(a, g) a |= (1<<g)
+#define PIN_NOTE_GET(a, g) ((a >> g) & 0x1)
 
   volatile unsigned *gpio;
 
