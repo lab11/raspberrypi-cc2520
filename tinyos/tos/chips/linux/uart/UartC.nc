@@ -7,6 +7,7 @@
 configuration UartC {
   provides {
     interface UartBuffer;
+    interface UartConfig;
   }
 }
 
@@ -22,4 +23,5 @@ implementation {
   UartP.UnixTime -> UnixTimeC.UnixTime;
 
   UartBuffer = UartP.UartBuffer;
+  UartConfig = UartP.UartConfig;
 }
