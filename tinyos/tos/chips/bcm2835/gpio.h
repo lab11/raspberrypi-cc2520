@@ -19,7 +19,12 @@ enum {
   RPI_V2_GPIO_P1_22 = 25,  // Version 2, Pin P1-22
   RPI_V2_GPIO_P1_23 = 11,  // Version 2, Pin P1-23, CLK when SPI0 in use
   RPI_V2_GPIO_P1_24 =  8,  // Version 2, Pin P1-24, CE0 when SPI0 in use
-  RPI_V2_GPIO_P1_26 =  7  // Version 2, Pin P1-26, CE1 when SPI0 in use
+  RPI_V2_GPIO_P1_26 =  7,  // Version 2, Pin P1-26, CE1 when SPI0 in use
+
+  RPI_V2_GPIO_P5_03  = 28, // Version 2, Pin P5-03
+  RPI_V2_GPIO_P5_04  = 29, // Version 2, Pin P5-04
+  RPI_V2_GPIO_P5_05  = 30, // Version 2, Pin P5-05
+  RPI_V2_GPIO_P5_06  = 31  // Version 2, Pin P5-06
 };
 
 #endif
