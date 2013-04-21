@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #define RPI_DEBUG 1
-#define CC2520RPI_DEBUG 1
+//#define CC2520RPI_DEBUG 1
 //#define CC2520RPI_KERNEL_DRIVER_DEBUG 1
 #define TUN_DEBUG 1
 //#define IOMANAGER_DEBUG 1
