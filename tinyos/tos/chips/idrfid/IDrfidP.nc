@@ -87,7 +87,7 @@ implementation {
     }
 
     convert_rfid(buf + 1, rfid_code);
-    chksum = verify_checksum(code, buf+11);
+    chksum = verify_checksum(rfid_code, buf+11);
     if (chksum) signal Notify.notify(rfid_code);
   }
 
