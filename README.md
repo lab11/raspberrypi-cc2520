@@ -64,11 +64,14 @@ this step unnecessary. Until then, you need to pull my changes to TinyOS in
 order to successfully compile.
 
     cd ~/git/tinyos-main
-	git remote add bradjc https://github.com/bradjc/tinyos-main.git
-	git fetch bradjc
-	git merge bradjc/blip_interface
-	git merge bradjc/blip_rpi
-	git merge bradjc/ds2411
+    git remote add bradjc https://github.com/bradjc/tinyos-main.git
+    git remote add lab11 https://github.com/lab11/tinyos-main.git
+    git fetch --all
+    git merge bradjc/blip_interface
+    git merge bradjc/blip_rpi
+    git merge bradjc/ds2411
+    git merge lab11/make-no-environ
+
 
 
 #### Supported TinyOS Features

@@ -1,4 +1,4 @@
-configuration HplDs2411C {
+configuration HplDs24x1C {
   provides {
     interface GeneralIO as Gpio;
   }
