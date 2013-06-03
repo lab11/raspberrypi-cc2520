@@ -3,7 +3,7 @@ COMPONENT=BorderRouterC
 PFLAGS += -DCC2520_DEF_CHANNEL=19
 
 # use rpl
-PFLAGS += -DRPL_ROUTING -DRPL_STORING_MODE -I$(LOWPAN_ROOT)/tos/lib/net/rpl
+PFLAGS += -DRPL_ROUTING -DRPL_STORING_MODE -I%T/lib/net/rpl
 # PFLAGS += -DRPL_OF_MRHOF
 
 # this works around fragmentation in the RX buffer pool
@@ -16,4 +16,5 @@ PFLAGS += -DPPP_HDLC_RX_FRAME_LIMIT=1 -DPPP_HDLC_TX_FRAME_LIMIT=8
 # derive short address from the dhcp address assignment, if possible
 #PFLAGS += -DBLIP_DERIVE_SHORTADDRS
 
-include $(MAKERULES)
+TINYOS_ROOT_DIR?=../..
+include $(TINYOS_ROOT_DIR)/Makefile.include

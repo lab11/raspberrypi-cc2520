@@ -1,0 +1,34 @@
+PFLAGS += -I%T/platforms/rpi
+PFLAGS += -I%T/platforms/rpi/chips/cc2520rpi
+PFLAGS += -I%T/platforms/rpi/chips/ds2411
+PFLAGS += -I%T/chips/cc2520rpi
+PFLAGS += -I%T/chips/cc2520rpiAM
+PFLAGS += -I%T/chips/bcm2835
+PFLAGS += -I%T/chips/bcm2835/gpio
+PFLAGS += -I%T/chips/bcm2835/interrupt
+PFLAGS += -I%T/chips/idrfid
+PFLAGS += -I%T/chips/linux
+PFLAGS += -I%T/chips/linux/time
+PFLAGS += -I%T/chips/linux/timer
+PFLAGS += -I%T/chips/linux/tun
+PFLAGS += -I%T/chips/linux/uart
+PFLAGS += -I%T/interfaces
+PFLAGS += -I%T/lib/net/blip
+
+PFLAGS += -I%T/../support/sdk/c/linux
+PFLAGS += %T/../support/sdk/c/linux/file_helpers.c
+PFLAGS += %T/platforms/rpi/signalWrapper.c
+
+PFLAGS += -I%T/chips/ds24x1
+PFLAGS += -I%T/lib/timer
+PFLAGS += -I%T/lib/serial
+PFLAGS += -I%T/lib/power
+PFLAGS += -I%T/lib/rfxlink/layers
+PFLAGS += -I%T/lib/rfxlink/util
+PFLAGS += -I%T/lib/onewire
+
+PFLAGS += -mcpu=arm1176jzf-s
+PFLAGS += -fnesc-target=env
+
+
+export NESC_MACHINE = structure_size_boundary=32, pointer=4,4 float=4,4 double=8,4 long_double=8,4 short=2,2 int=4,4 long=4,4 long_long=8,4 int1248_align=1,2,4,4 wchar_size_size=4,4 char_wchar_signed=false,true

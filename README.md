@@ -45,17 +45,15 @@ To setup my workflow,
 on your non-RPI computer you need a copy of the main TinyOS repository and the
 tinyos folder from this repo. You also need to install the dependencies for
 TinyOS. There are instructions here:
-[http://docs.tinyos.net/tinywiki/index.php/Installing_TinyOS_2.1.1]. If you want
+[http://docs.tinyos.net/tinywiki/index.php/Installing_TinyOS]. If you want
 the simple Linux install I use, look here:
 [http://energy.eecs.umich.edu/wiki/doku.php?id=tinyos_install]. The TinyOS
 applications are designed to be cross compiled for the RPI.
 
 In order for the TinyOS build system to figure out all the correct paths you
-need to help it along a bit. Add the following to your `.bashrc` file, in
-addition to the environment variables from the main TinyOS install:
+need to help it along a bit. Add the following to your `.bashrc` file:
 
-    export TOSROOTRPI=<path to git repo>/tinyos
-    export TOSMAKE_PATH="$TOSROOTRPI/support/make $TOSMAKE_PATH"
+    export TINYOS_ROOT_DIR_ADDITIONAL=<path to git repo>/raspberrypi-cc2520/tinyos:$TIYNOS_ROOT_DIR_ADDITIONAL
 
 
 You also need some changes to `tinyos-main` in order to compile the TinyOS RPi
@@ -72,7 +70,13 @@ order to successfully compile.
     git merge bradjc/ds2411
     git merge lab11/make-no-environ
 
+After merging those in you will need to recompile and install the tools.
 
+    cd tinyos-main/tools
+    ./Bootstrap
+    ./configure
+    make
+    sudo make install
 
 #### Supported TinyOS Features
 

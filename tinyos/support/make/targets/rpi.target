@@ -1,0 +1,11 @@
+#-*-Makefile-*- vim:syntax=make
+TARGET = rpi
+
+PFLAGS += -DPRINTFUART_ENABLED=1
+PFLAGS += -DLINUX_PRINTF=1
+
+$(call TOSMake_include_platform,rpi)
+$(call TOSMake_include_make_platform,rpi)
+
+rpi: $(BUILD_DEPS)
+	@:

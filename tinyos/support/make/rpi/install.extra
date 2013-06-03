@@ -1,11 +1,11 @@
-
+#-*-Makefile-*- vim:syntax=make
 # Adding 'install' to the command line will automatically scp the exe to an rpi
 
 ifndef INSTALL
-  $(warning No RPi target given. Cannot install.)
-  BUILD_DEPS = exe
+  $(warning $(shell echo -e '$(WARN_STRING) No RPi target given. Cannot install.'))
+  BUILD_DEPS = tinyos_image
 else
-  BUILD_DEPS = exe program
+  BUILD_DEPS = program
 endif
 
 # Check if a number was given or something else
@@ -17,3 +17,7 @@ ifeq ($(NUMBER_CHECK), number)
 else
   RPI_ID = $(INSTALL)
 endif
+
+program: setid FORCE
+	@echo -e '$(INFO_STRING) Installing rpi binary to $(RPI_ID)'
+	@scp $(TOSMAKE_BUILD_DIR)/main.exe $(RPI_ID):~/$(COMPONENT)

@@ -1,3 +1,2 @@
-TOSMAKE_PATH += ../../support/make
-TOSROOT=/home/bradjc/git/tinyos-main
-include $(TOSROOT)/support/make/Makerules
+TINYOS_ROOT_DIR=/home/bradjc/git/tinyos-main
+include $(TINYOS_ROOT_DIR)/Makefile.include
