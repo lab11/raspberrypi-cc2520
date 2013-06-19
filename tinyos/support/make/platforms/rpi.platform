@@ -1,3 +1,5 @@
+#-*-Makefile-*- vim:syntax=make
+
 PFLAGS += -I%T/platforms/rpi
 PFLAGS += -I%T/platforms/rpi/chips/cc2520rpi
 PFLAGS += -I%T/platforms/rpi/chips/ds2411
@@ -17,7 +19,6 @@ PFLAGS += -I%T/lib/net/blip
 
 PFLAGS += -I%T/../support/sdk/c/linux
 PFLAGS += %T/../support/sdk/c/linux/file_helpers.c
-PFLAGS += %T/platforms/rpi/signalWrapper.c
 
 PFLAGS += -I%T/chips/ds24x1
 PFLAGS += -I%T/lib/timer

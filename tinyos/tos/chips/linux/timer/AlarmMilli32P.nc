@@ -1,8 +1,6 @@
 #include <signal.h>
 #include <time.h>
 
-extern void signal_wrapper(int, void*);
-
 generic module AlarmMilli32P() {
   provides {
     interface Init;
@@ -30,7 +28,7 @@ implementation {
     t_ret = timer_create(CLOCK_MONOTONIC, NULL, &timerid);
 
     //sighandler_t brad_signal(int, sighandler_t);
-    signal_wrapper(SIGALRM, AlarmMilli32Fired);
+    __nesc_keyword_signal(SIGALRM, AlarmMilli32Fired);
 
     last_alarm = 0;
 

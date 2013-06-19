@@ -83,6 +83,10 @@ You will also need the correct cross compiler for the RPi:
 
     sudo apt-get install gcc-arm-linux-gnueabi
 
+#### NesC
+
+This code requires nesc version 1.3.5+.
+
 #### Supported TinyOS Features
 
   - Gpio

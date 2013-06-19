@@ -2,8 +2,6 @@
 #include "debug_printf.h"
 #include <signal.h>
 
-extern void signal_wrapper(int, void*);
-
 module PlatformP {
   provides {
     interface Init;
@@ -36,7 +34,7 @@ implementation {
     call InterruptInit.init();
 
     RPI_PRINTF("Setting SIGINT signal handler.\n");
-    signal_wrapper(SIGINT, sigint_handler);
+    __nesc_keyword_signal(SIGINT, sigint_handler);
 
     return SUCCESS;
   }
