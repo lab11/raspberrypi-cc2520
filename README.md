@@ -53,7 +53,7 @@ applications are designed to be cross compiled for the RPI.
 In order for the TinyOS build system to figure out all the correct paths you
 need to help it along a bit. Add the following to your `.bashrc` file:
 
-    export TINYOS_ROOT_DIR_ADDITIONAL=<path to git repo>/raspberrypi-cc2520/tinyos:$TIYNOS_ROOT_DIR_ADDITIONAL
+    export TINYOS_ROOT_DIR_ADDITIONAL=<path to git repo>/raspberrypi-cc2520/tinyos:$TINYOS_ROOT_DIR_ADDITIONAL
 
 
 You also need some changes to `tinyos-main` in order to compile the TinyOS RPi
@@ -77,6 +77,11 @@ After merging those in you will need to recompile and install the tools.
     ./configure
     make
     sudo make install
+
+You will also need the correct cross compiler for the RPi:
+`arm-linux-gnueabi-gcc`. On Ubuntu:
+
+    sudo apt-get install gcc-arm-linux-gnueabi
 
 #### Supported TinyOS Features
 
