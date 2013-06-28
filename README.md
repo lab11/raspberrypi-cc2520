@@ -39,7 +39,7 @@ This kernel module is designed to run on top of the Raspbian Linux distribution.
 
 Instead of compiling and installing the CC2520 kernel module yourself, you can
 download a pre-configured image of raspbian and put that on the sdcard instead.
-The [torrent](https://github.com/bradjc/raspberrypi-cc2520/blob/master/torrents/raspbian_cc2520_2013-06-27.img.torrent)
+The [torrent](https://github.com/bradjc/raspberrypi-cc2520/blob/master/torrents/raspbian_cc2520_2013-06-27.img.torrent?raw=true)
 file is in the repository.
 
 ### TinyOS
