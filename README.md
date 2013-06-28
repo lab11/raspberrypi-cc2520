@@ -75,7 +75,7 @@ order to successfully compile.
 Easy way:
 
     git clone https://github.com/lab11/tinyos-main.git
-    git co for-rpi
+    git checkout for-rpi
 
 Custom, more involved way:
 
