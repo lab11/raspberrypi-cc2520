@@ -72,6 +72,13 @@ code. Hopefully these will be merged into the main tinyos repo in order to make
 this step unnecessary. Until then, you need to pull my changes to TinyOS in
 order to successfully compile.
 
+Easy way:
+
+    git clone https://github.com/lab11/tinyos-main.git
+    git co for-rpi
+
+Custom, more involved way:
+
     cd ~/git/tinyos-main
     git remote add bradjc https://github.com/bradjc/tinyos-main.git
     git remote add lab11 https://github.com/lab11/tinyos-main.git
