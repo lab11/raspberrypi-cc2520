@@ -35,6 +35,13 @@ In order to support the CC2520
 you need the kernel module from https://github.com/ab500/linux-cc2520-driver.
 This kernel module is designed to run on top of the Raspbian Linux distribution.
 
+### Custom Version of Raspbian
+
+Instead of compiling and installing the CC2520 kernel module yourself, you can
+download a pre-configured image of raspbian and put that on the sdcard instead.
+The [torrent](https://github.com/bradjc/raspberrypi-cc2520/blob/master/torrents/raspbian_cc2520_2013-06-27.img.torrent)
+file is in the repository.
+
 ### TinyOS
 
 All of the code I have for the RPi/CC2520 is based on TinyOS. You can use the
