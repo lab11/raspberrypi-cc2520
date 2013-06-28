@@ -77,7 +77,6 @@ order to successfully compile.
     git remote add lab11 https://github.com/lab11/tinyos-main.git
     git fetch --all
     git merge bradjc/blip_interface
-    git merge bradjc/blip_rpi
     git merge bradjc/ds2411
     git merge lab11/make-no-environ
 

@@ -27,6 +27,7 @@ PFLAGS += -I%T/lib/power
 PFLAGS += -I%T/lib/rfxlink/layers
 PFLAGS += -I%T/lib/rfxlink/util
 PFLAGS += -I%T/lib/onewire
+PFLAGS += -I%T/lib/printf
 
 PFLAGS += -mcpu=arm1176jzf-s
 PFLAGS += -fnesc-target=env
