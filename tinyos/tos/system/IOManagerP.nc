@@ -31,7 +31,15 @@ implementation {
       memset(map, 0x01, sizeof(uint8_t) * N_FDS);
       is_init = TRUE;
     }
-    map[id] = file_descriptor;
+    atomic map[id] = file_descriptor;
+    return SUCCESS;
+  }
+
+  command error_t IO.unregisterFileDescriptor[uint8_t id] (int fd) {
+    IOMANAGER_PRINTF("unregistering file descriptor %i for %i.\n", id, fd);
+    if (!is_init) return EOFF;
+    // Set the file descriptor back to 1 to remove it
+    atomic map[id] = 1;
     return SUCCESS;
   }
 

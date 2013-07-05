@@ -10,6 +10,7 @@ PFLAGS += -I%T/chips/bcm2835/gpio
 PFLAGS += -I%T/chips/bcm2835/interrupt
 PFLAGS += -I%T/chips/idrfid
 PFLAGS += -I%T/chips/linux
+PFLAGS += -I%T/chips/linux/socket
 PFLAGS += -I%T/chips/linux/time
 PFLAGS += -I%T/chips/linux/timer
 PFLAGS += -I%T/chips/linux/tun
