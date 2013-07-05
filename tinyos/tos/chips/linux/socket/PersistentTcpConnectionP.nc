@@ -53,6 +53,8 @@ implementation {
       // Could not reconnect the socket to the remote host.
       // Try again later.
       call ReconnectTimer.startOneShot(RECONNECT_PERIOD);
+    } else {
+      PERSISTENT_TCP_PRINTF("Successfully reconnected to the remote server.\n");
     }
   }
 
@@ -110,8 +112,8 @@ implementation {
     // Connect to the socket
     error = connect(sock, strmSvr->ai_addr, strmSvr->ai_addrlen);
     if (error == -1) {
-      fprintf(stderr, "Could not connect to socket.\n");
-      fprintf(stderr, "%s\n", strerror(errno));
+    //  fprintf(stderr, "Could not connect to socket.\n");
+    //  fprintf(stderr, "%s\n", strerror(errno));
       return FAIL;
     }
 
@@ -200,6 +202,7 @@ implementation {
       }
     } else if (recv_len == 0) {
       // Socket was closed
+      PERSISTENT_TCP_PRINTF("Socket was closed. Try to reconnect.\n");
       post reconnect_task();
       return;
     }

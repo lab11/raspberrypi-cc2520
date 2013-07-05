@@ -12,6 +12,7 @@
 #define UART_DEBUG 1
 #define EUI64_DEBUG 1
 #define CMDLINE_DEBUG 1
+#define PERSISTENT_TCP_DEBUG 1
 
 
 #define DBG(...)\
@@ -80,6 +81,12 @@
 #define CMDLINE_PRINTF(...) DBG(__VA_ARGS__)
 #else
 #define CMDLINE_PRINTF(...)
+#endif
+
+#ifdef PERSISTENT_TCP_DEBUG
+#define PERSISTENT_TCP_PRINTF(...) DBG(__VA_ARGS__)
+#else
+#define PERSISTENT_TCP_PRINTF(...)
 #endif
 
 #endif
