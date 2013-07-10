@@ -64,6 +64,7 @@ applications are designed to be cross compiled for the RPI.
 In order for the TinyOS build system to figure out all the correct paths you
 need to help it along a bit. Add the following to your `.bashrc` file:
 
+    export TINYOS_ROOT_DIR=<path to git repo>/tinyos-main
     export TINYOS_ROOT_DIR_ADDITIONAL=<path to git repo>/raspberrypi-cc2520/tinyos:$TINYOS_ROOT_DIR_ADDITIONAL
 
 
