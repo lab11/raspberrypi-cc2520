@@ -4,7 +4,7 @@
 // Should be a part of the rfxlink library
 
 interface RadioAddress {
-  // Get the long address of the radio: set in hardware
+  // Get the long address (64 bits) of the radio
   command ieee_eui64_t getExtAddr();
 
   // Change the short address of the radio.

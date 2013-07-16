@@ -28,7 +28,7 @@ configuration CC2520RpiRadioC {
     interface Packet;
     interface LowPowerListening;
     interface PacketMetadata;
-    interface RadioAddress;
+    interface Ieee154Address;
   }
 }
 
@@ -52,5 +52,5 @@ implementation {
   Packet            = CC2520RpiRadioP.Packet;
   LowPowerListening = CC2520RpiRadioP.LowPowerListening;
   PacketMetadata    = CC2520RpiRadioP.PacketMetadata;
-  RadioAddress      = CC2520RpiRadioP.RadioAddress;
+  Ieee154Address    = CC2520RpiRadioP.Ieee154Address;
 }

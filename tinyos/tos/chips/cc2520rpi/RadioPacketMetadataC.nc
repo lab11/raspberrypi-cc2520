@@ -19,7 +19,6 @@ implementation {
   components RadioPacketMetadataP;
 
   RadioPacketMetadataP.PacketMetadata -> CC2520RpiRadioC.PacketMetadata;
-  RadioPacketMetadataP.RadioAddress -> CC2520RpiRadioC.RadioAddress;
 
   LowPowerListening = CC2520RpiRadioC.LowPowerListening;
   PacketLink = RadioPacketMetadataP.PacketLink;

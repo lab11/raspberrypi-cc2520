@@ -6,7 +6,6 @@ module RadioPacketMetadataP {
   }
   uses {
     interface PacketMetadata;
-    interface RadioAddress;
   }
 }
 

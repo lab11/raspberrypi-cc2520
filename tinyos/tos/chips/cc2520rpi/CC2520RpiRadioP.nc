@@ -15,7 +15,7 @@ module CC2520RpiRadioP {
     interface Packet;
     interface LowPowerListening;
     interface PacketMetadata;
-    interface RadioAddress;
+    interface Ieee154Address;
   }
   uses {
     interface BareSend as SubSend;
@@ -54,8 +54,10 @@ implementation {
   command error_t SplitControl.start () {
     uint8_t* ext_addr_ptr;
     int i;
+    uint16_t sum=0
 
     RADIO_PRINTF("Starting cc2520 driver.\n");
+    printf("Starting cc2520 driver.\n");
     cc2520_file = open("/dev/radio", O_RDWR);
     if (cc2520_file < 0) {
       ERROR("Failed to open /dev/radio.\n");
@@ -64,16 +66,21 @@ implementation {
     }
 
     // init the seq no
-    sequence_number = TOS_NODE_ID << 4;
+    sequence_number = TOS_NODE_ID << 3;
 
     // set up the addresses for this node
     addr_data.short_addr = TOS_NODE_ID;
-    ext_addr = call LocalIeeeEui64.getId();
+    do {
+      // Call get() until a valid id is returned
+      ext_addr = call LocalIeeeEui64.getId();
+      for (i=0; i<8; i++) {
+        sum += ext_addr.data[i];
+      }
+    } while (sum == 0);
     ext_addr_ptr = (uint8_t*) &addr_data.extended_addr;
     for (i=0; i<8; i++) {
       ext_addr_ptr[i] = ext_addr.data[7-i];
     }
-    //memcpy(&addr_data.extended_addr, &ext_addr.data, 8);
 
     // set properties
     ioctl(cc2520_file, CC2520_IO_RADIO_SET_CHANNEL, &chan_data);
@@ -208,32 +215,26 @@ implementation {
   }
 
 // ----------------- RadioAddress-----------------------
-  command ieee_eui64_t RadioAddress.getExtAddr () {
+  command ieee_eui64_t Ieee154Address.getExtAddr () {
     memcpy(&ext_addr.data, &addr_data.extended_addr, 8);
     return ext_addr;
   }
 
-  async command uint16_t RadioAddress.getShortAddr () {
+  command ieee154_saddr_t Ieee154Address.getShortAddr () {
     return addr_data.short_addr;
   }
 
-  command void RadioAddress.setShortAddr (uint16_t address) {
+  command error_t Ieee154Address.setShortAddr (ieee154_saddr_t address) {
  // temporary comment to avoid bug in spi driver on rpi
  //   addr_data.short_addr = address;
  //   ioctl(cc2520_file, CC2520_IO_RADIO_OFF, NULL);
  //   ioctl(cc2520_file, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
  //   ioctl(cc2520_file, CC2520_IO_RADIO_ON, NULL);
+    return SUCCESS;
   }
 
-  async command uint16_t RadioAddress.getPanAddr () {
+  command ieee154_panid_t Ieee154Address.getPanId () {
     return addr_data.pan_id;
-  }
-
-  command void RadioAddress.setPanAddr (uint16_t address) {
- //   addr_data.pan_id = address;
- //   ioctl(cc2520_file, CC2520_IO_RADIO_OFF, NULL);
- //   ioctl(cc2520_file, CC2520_IO_RADIO_SET_ADDRESS, &addr_data);
- //   ioctl(cc2520_file, CC2520_IO_RADIO_ON, NULL);
   }
 
 //----------- PacketMetadata ---
