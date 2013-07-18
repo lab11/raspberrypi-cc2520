@@ -6,7 +6,7 @@ CFLAGS += -DCC2420X_DEF_CHANNEL=19
 
 PFLAGS += -I$(TINYOS_ROOT_DIR)/tools/tinyos/c/blip/lib6lowpan
 
-PFLAGS += -DIN6_PREFIX="\"::\""
+PFLAGS += -DIN6_PREFIX="\"2001:470:1f11:131a::\""
 
 TINYOS_ROOT_DIR?=../..
 include $(TINYOS_ROOT_DIR)/Makefile.include

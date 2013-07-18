@@ -14,9 +14,9 @@ module BlipQuickPacketP {
 }
 implementation {
 
-#define RECEIVER "2001:470:1f10:131c::2"
-//#define PORT 4001
-uint16_t PORT = 0xf0AA;
+#define RECEIVER "2001:470:1f10:1320::2"
+#define PORT 4001
+//uint16_t PORT = 0xf0AA;
 
 #define ALL_ROUTERS "ff02::2"
 
@@ -41,7 +41,7 @@ uint16_t PORT = 0xf0AA;
     // Set the payload as the pkt data
     data = 0xCABEBEED;
 
-    err = call Udp.sendto(&dest, &data, 4);
+    err = call Udp.sendto(&dest, &data, 3);
     if (err != SUCCESS) {
     }
   }
