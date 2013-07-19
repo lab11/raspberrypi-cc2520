@@ -10,7 +10,7 @@
 
 #include "file_helpers.h"
 
-#define MAX_IPV6_PACKET_LEN 2048
+#define MAX_IPV6_PACKET_LEN 4096
 
 module TunP {
   provides {
@@ -19,6 +19,7 @@ module TunP {
   }
   uses {
     interface IO;
+    interface BRConfig;
   }
 }
 
@@ -41,7 +42,6 @@ implementation {
     signal IPForward.sendDone(&send_info_struct);
   }
 
-  // todo: add timer and sendDone
   command error_t IPForward.send (struct in6_addr *next_hop,
                                   struct ip6_packet *msg,
                                   void *data) {
@@ -51,7 +51,7 @@ implementation {
     // skip the frame header
     uint8_t* out_buf_start = out_buf;
 
-    TUN_PRINTF("send to interface\n");
+    TUN_PRINTF("Sending outgoing packet to TUN interface.\n");
 
     len = iov_len(msg->ip6_data) + sizeof(struct ip6_hdr);
 
@@ -67,21 +67,22 @@ implementation {
     ret = write(tun_file, out_buf, len + sizeof(struct tun_pi));
     if (ret < 0) {
       send_info_struct.failed = TRUE;
-      TUN_PRINTF("send failed\n");
+      ERROR("Sending packet to TUN failed.\n");
+      ERROR("%s\n", strerror(errno));
+      return FAIL;
     }
 
     post sendDone_task();
     return SUCCESS;
   }
 
+  // This tasked is posted when a packet comes in.
   task void receive_task () {
     // set up pointers and signal to the next layer
     iph = (struct ip6_hdr*) in_buf;
     payload = (iph + 1);
     signal IPForward.recv(iph, payload, NULL);
   }
-
-
 
   // There is a packet waiting on the tun interface. Read() it and post to
   // signal upper layers.
@@ -104,7 +105,7 @@ implementation {
       }
     }
 
-    TUN_PRINTF("got packet\n");
+    TUN_PRINTF("Successfully got a packet from the TUN interface.\n");
 
     memcpy(in_buf, buf, len);
 
@@ -114,6 +115,8 @@ implementation {
   command error_t SoftwareInit.init() {
     struct ifreq ifr;
     int err;
+    char cmdbuf[4096];
+    char ipaddrbuf[64];
 
     tun_file = open("/dev/net/tun", O_RDWR);
     if (tun_file < 0) {
@@ -134,18 +137,28 @@ implementation {
     if (err < 0) {
       ERROR("ioctl could not set up tun interface\n");
       close(tun_file);
+      exit(1);
     }
 
     // Make nonblocking in case select() gives us trouble
     make_nonblocking(tun_file);
 
     // Setup the IP Addresses
-    // Todo: this should be made nicer somehow (not use ifconfig, be flexible)
-    ssystem("ifconfig tun0 up");
-    ssystem("ifconfig tun0 mtu 1280");
-    ssystem("ip -6 route add 2001:470:1f11:131a::/64 dev tun0");
+    // ifconfig tun0 up
+    snprintf(cmdbuf, 4096, "ifconfig %s up", ifr.ifr_name);
+    ssystem(cmdbuf);
+    // ifconfig tun0 mtu 1280
+    snprintf(cmdbuf, 4906, "ifconfig %s mtu 1280", ifr.ifr_name);
+    ssystem(cmdbuf);
+    // ip -6 route add 2001:470:1f11:131a::/64 dev tun0
+    inet_ntop6(call BRConfig.getPrefixPtr(), ipaddrbuf, 64);
+    snprintf(cmdbuf, 4906, "ip -6 route add %s/64 dev %s", ipaddrbuf,
+      ifr.ifr_name);
+    ssystem(cmdbuf);
     // Dummy link local addr to make the dhcp server work
-    ssystem("ifconfig tun0 inet6 add fe80::212:aaaa:bbbb:ffff/64");
+    snprintf(cmdbuf, 4906, "ifconfig %s inet6 add fe80::212:aaaa:bbbb:ffff/64",
+      ifr.ifr_name);
+    ssystem(cmdbuf);
 
     // Register the file descriptor with the IO manager that will call select()
     call IO.registerFileDescriptor(tun_file);
@@ -165,4 +178,3 @@ implementation {
     return system(cmd);
   }
 }
-
