@@ -21,6 +21,9 @@ PFLAGS += -I%T/lib/net/blip
 PFLAGS += -I%T/../support/sdk/c/linux
 PFLAGS += %T/../support/sdk/c/linux/file_helpers.c
 
+PFLAGS += -I%T/../support/sdk/c/ini
+PFLAGS += %T/../support/sdk/c/ini/ini.c
+
 PFLAGS += -I%T/chips/ds2411
 PFLAGS += -I%T/lib/timer
 PFLAGS += -I%T/lib/serial

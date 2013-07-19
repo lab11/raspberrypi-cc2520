@@ -143,6 +143,9 @@ forwarding:
     sudo vim /etc/sysctl.conf
     uncomment the line: net.ipv6.conf.all.forwarding=1
 
+    sudo su
+    echo 2 > /proc/sys/net/ipv6/conf/eth0/accept_ra
+
 
 
 

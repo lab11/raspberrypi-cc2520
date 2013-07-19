@@ -75,7 +75,6 @@ implementation {
   event void UartBuffer.receive (uint8_t* buf,
                                  uint8_t len,
                                  uint64_t timestamp) {
-    int i;
     bool chksum;
 
     if (!active) {
