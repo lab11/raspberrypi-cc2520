@@ -1,5 +1,8 @@
+/*
+ * @author: Brad Campbell <bradjc@umich.edu>
+ */
 
-#define ROUTE_IFACE_BORDER 10
+#include "border.h"
 
 module BorderP {
   provides {
@@ -19,15 +22,18 @@ implementation {
    // struct in6_addr dhcp6_group;
 
     // add a default route through the linux network interface
-    call ForwardingTable.addRoute(NULL, 0, NULL, ROUTE_IFACE_BORDER);
+    call ForwardingTable.addRoute(NULL,
+                                  0,
+                                  NULL,
+                                  ROUTE_IFACE_TUN);
 
-    // Add a route for dhcp server requests. Without this the route will
+    // Add a route for dhcp server requests. Without this route the node will
     // broadcast these on the radio, and there is no dhcp server out there.
     inet_pton6("ff02::1:2", &dhcp_server);
     call ForwardingTable.addRoute(dhcp_server.s6_addr,
                                   128,
                                   NULL,
-                                  ROUTE_IFACE_BORDER);
+                                  ROUTE_IFACE_TUN);
 
     // Add a route for the link local address for the tun interface.
     // This is most useful for DHCP messages so we can unicast the response.
@@ -35,10 +41,9 @@ implementation {
     call ForwardingTable.addRoute(tun_ll.s6_addr,
                                   128,
                                   NULL,
-                                  ROUTE_IFACE_BORDER);
+                                  ROUTE_IFACE_TUN);
 
     return SUCCESS;
   }
 
 }
-
