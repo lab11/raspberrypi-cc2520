@@ -1,4 +1,5 @@
 #-*-Makefile-*- vim:syntax=make
 
+NODEID ?= $(REINSTALL)
 BUILD_DEPS = program
-NODEID ?= $(INSTALL)
+TOSMAKE_DO_REINSTALL = y
