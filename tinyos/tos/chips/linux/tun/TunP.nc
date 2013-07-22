@@ -159,6 +159,8 @@ implementation {
     snprintf(cmdbuf, 4906, "ifconfig %s inet6 add fe80::212:aaaa:bbbb:ffff/64",
       ifr.ifr_name);
     ssystem(cmdbuf);
+    snprintf(cmdbuf, 4906, "ifconfig %s inet6 add %s1/64", ifr.ifr_name, ipaddrbuf);
+    ssystem(cmdbuf);
 
     // Register the file descriptor with the IO manager that will call select()
     call IO.registerFileDescriptor(tun_file);
