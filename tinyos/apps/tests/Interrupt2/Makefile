@@ -1,4 +1,4 @@
-COMPONENT=InterruptC
+COMPONENT=Interrupt2C
 
 TINYOS_ROOT_DIR?=../..
 include $(TINYOS_ROOT_DIR)/Makefile.include

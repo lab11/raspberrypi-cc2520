@@ -4,21 +4,24 @@
  * @author: Brad Campbell <bradjc@umich.edu>
  */
 
-configuration InterruptC {
+configuration Interrupt2C {
 }
 
 implementation {
-  components InterruptP;
+  components Interrupt2P as InterruptP;
   components MainC;
   components LedsC;
 
   components Bcm2835InterruptC;
   components new TimerMilliC();
 
-  InterruptP.Int -> Bcm2835InterruptC.Port1_08;
+  InterruptP.Int -> Bcm2835InterruptC.Port1_26;
   InterruptP.Boot -> MainC.Boot;
   InterruptP.TimerMilliC -> TimerMilliC;
 
   InterruptP.Leds -> LedsC;
+
+  components HplBcm2835GeneralIOC as HplGpioC;
+  InterruptP.Pin -> HplGpioC.Port1_26;
 
 }
