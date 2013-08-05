@@ -24,7 +24,7 @@ LIBS = -lm -lrt -lpthread -lc
 
 INSTALL_BIN = $(MAIN_BIN).out$(if $(NODEID),-$(NODEID),)
 
-OPTFLAGS = -Os
+OPTFLAGS ?= -Os
 
 PFLAGS += -Wall -Wshadow
 PFLAGS += -finline-limit=100000

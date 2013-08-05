@@ -54,10 +54,9 @@ implementation {
   command error_t SplitControl.start () {
     uint8_t* ext_addr_ptr;
     int i;
-    uint16_t sum=0
+    uint16_t sum=0;
 
     RADIO_PRINTF("Starting cc2520 driver.\n");
-    printf("Starting cc2520 driver.\n");
     cc2520_file = open("/dev/radio", O_RDWR);
     if (cc2520_file < 0) {
       ERROR("Failed to open /dev/radio.\n");
