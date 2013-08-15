@@ -1,0 +1,31 @@
+#-*-Makefile-*- vim:syntax=make
+define RPI_HELP
+
+RPI extras:
+  None available at the moment.
+
+endef
+
+HELP += $(RPI_HELP)
+
+ARM_COMPILER = arm-linux-gnueabi
+#ARM_COMPILER = arm-none-eabi
+#ARM_COMPILER = arm-none-linux-gnueabi
+
+GCC = $(ARM_COMPILER)-gcc
+OBJCOPY = $(ARM_COMPILER)-objcopy
+OBJDUMP = $(ARM_COMPILER)-objdump
+SET_ID = tos-set-symbols
+SIZE = $(ARM_COMPILER)-size
+LIBS = -lm -lrt -lc
+
+INSTALL_BIN = $(MAIN_BIN).out$(if $(NODEID),-$(NODEID),)
+
+OPTFLAGS ?= -Os
+
+PFLAGS += -Wall -Wshadow
+PFLAGS += -finline-limit=100000
+
+TOSMAKE_BINARY_FORMAT = bin
+TOSMAKE_BINARY_IN = $(MAIN_BIN)
+TOSMAKE_BINARY_OUT = $(INSTALL_BIN)
