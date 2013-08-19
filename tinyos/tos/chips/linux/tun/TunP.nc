@@ -28,7 +28,6 @@ implementation {
   int ssystem(const char *fmt, ...);
 
   int tun_file;
-  pthread_t receive_thread;
   uint8_t in_buf[MAX_IPV6_PACKET_LEN];
   uint8_t out_buf[MAX_IPV6_PACKET_LEN];
 
