@@ -1,2 +1,2 @@
 
-OPTFLAGS = -O1 -g -fnesc-no-inline
+OPTFLAGS = -O1 -g -fnesc-no-inline -ggdb
