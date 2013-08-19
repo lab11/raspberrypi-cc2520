@@ -14,4 +14,5 @@ PFLAGS += -DIN6_PREFIX=\"2001:638:709:1234::fffe:\"
 # derive short address from the dhcp address assignment, if possible
 PFLAGS += -DBLIP_DERIVE_SHORTADDRS
 
-include $(MAKERULES)
+TINYOS_ROOT_DIR?=../..
+include $(TINYOS_ROOT_DIR)/Makefile.include
