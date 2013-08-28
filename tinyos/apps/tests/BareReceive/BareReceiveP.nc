@@ -1,6 +1,5 @@
-#include "message.h"
-#include "Ieee154.h"
-#include "ieee154_header.h"
+
+#include <unistd.h>
 
 module BareReceiveP {
 	uses {
@@ -14,11 +13,6 @@ module BareReceiveP {
   }
 }
 implementation {
-
-  message_t msg;
-  struct ieee154_frame_addr out_frame;
-  struct ieee154_frame_addr ack_frame;
-  uint8_t* payload_buf = (uint8_t*) &msg;
 
   event void Boot.booted() {
     call RadioControl.start();
