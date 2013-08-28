@@ -3,6 +3,8 @@
 
 #include "CC2520RpiRadio.h"
 
+#define TOSH_DATA_LENGTH 128
+
 typedef union message_header {
   cc2520packet_header_t cc2520;
 } message_header_t;
