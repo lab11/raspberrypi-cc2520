@@ -40,7 +40,7 @@ implementation {
 
     buf_ptr = pbuf;
     for (i = 0; i < len; i++) {
-      buf_ptr += sprintf(buf_ptr, " 0x%02X", buf[i]);
+      buf_ptr += sprintf(buf_ptr, "%02x", buf[i]);
     }
 
     *(buf_ptr) = '\0';
@@ -73,6 +73,7 @@ implementation {
       sam = (rx_msg_ptr[2] >> 6) & 0x3;
       dam = (rx_msg_ptr[2] >> 2) & 0x3;
       RADIO_PRINTF("Received a packet. len: %i\n", rx_msg_ptr[0]+1);
+      print_message(rx_msg_ptr, rx_msg_ptr[0]-1);
       printf("    to:   ");
       if (dam == 2) {
         // short address
