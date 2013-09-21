@@ -76,7 +76,7 @@ configuration CC2520RpiAmRadioC {
  //   interface PacketTimeStamp<TRadio, uint32_t> as PacketTimeStampRadio;
  //   interface PacketTimeStamp<TMilli, uint32_t> as PacketTimeStampMilli;
 
-    interface RadioAddress;
+   // interface RadioAddress;
   }
 }
 
@@ -106,7 +106,7 @@ implementation
 
   SplitControl = RadioP.SplitControl;
 
-  RadioAddress = RadioP.RadioAddress;
+ // RadioAddress = RadioP.RadioAddress;
 
   PacketLinkQuality = AmRadioP.PacketLinkQuality;
   PacketRSSI = AmRadioP.PacketRSSI;
