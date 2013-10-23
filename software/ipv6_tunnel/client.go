@@ -9,19 +9,10 @@ import (
 	"time"
 	"math/rand"
 	"strconv"
+	"code.google.com/p/gcfg"
 )
 
 
-
-const serverAddr = "localhost:14629"
-
-type ClientIdentifier struct {
-	Id string
-}
-
-type ClientPrefix struct {
-	Prefix string
-}
 
 func senddata (tcpc net.Conn, quitChan chan int) {
 
@@ -80,7 +71,14 @@ func main () {
 
 	quitChan := make(chan int)
 
-	c, err := net.Dial("tcp", serverAddr)
+	// Parse the config file
+	var cfg ConfigIni
+	err := gcfg.ReadFileInto(&cfg, "config.ini")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	c, err := net.Dial("tcp", cfg.Client.Remotehost + ":" + cfg.Client.Remoteport)
 	if err != nil {
 		log.Fatal(err)
 	}
