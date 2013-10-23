@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 	"log"
+	"sync"
+	"github.com/lab11/go-tuntap/tuntap"
 )
 
 type ClientIdentifier struct {
@@ -17,14 +19,55 @@ type ClientPrefix struct {
 
 const recvAddr = "localhost:14629"
 
+var prefix_map map[string]string
+var prefix_greatest string = "5"
+var prefix_map_lock sync.Mutex
+
 func getPrefix (id string) (prefix string) {
-	prefix = "a"
+	prefix_map_lock.Lock()
+
+	prefix, in := prefix_map[id]
+
+	if !in {
+		prefix_greatest += "0"
+		prefix_map[id] = prefix_greatest
+		prefix = prefix_greatest
+	}
+
+	prefix_map_lock.Unlock()
 	return
+}
+
+func clientTCP (tcpc net.Conn, tcp_ch chan []byte, quit_ch chan int) {
+
+	for {
+		buf := make([]byte, 4096)
+		rlen, err := tcpc.Read(buf)
+		if err != nil {
+			// Disconnect
+			quit_ch <- 1
+			break
+		}
+
+		tcp_ch <- buf[0:rlen]
+	}
+}
+
+func clientTUN (tun_ch chan []byte) {
+	var tun *tuntap.Interface
+	var err error
+
+	tun, err = tuntap.Open("tun0", tuntap.DevTun)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	tun.ReadPacket()
 }
 
 // Takes care of interacting with a client
 func handleClient (tcpc net.Conn) {
-	buf := make([]byte, 200)
+	buf := make([]byte, 4096)
 
 	var newclient ClientIdentifier
 
@@ -58,6 +101,30 @@ func handleClient (tcpc net.Conn) {
 	}
 	tcpc.Write(pbuf)
 
+	tcp_ch := make(chan []byte)
+	quit_tcp_ch := make(chan int)
+	go clientTCP(tcpc, tcp_ch, quit_tcp_ch)
+
+	tun_ch := make(chan []byte)
+	go clientTUN(tun_ch)
+
+	var newpkt []byte
+	var tunpkt []byte
+	var quit_tcp int
+	for {
+		select {
+		case newpkt = <- tcp_ch:
+			fmt.Println(newpkt)
+		case quit_tcp = <- quit_tcp_ch:
+			if quit_tcp == 1 {
+				fmt.Println("Client disconnected")
+				return
+			}
+		case tunpkt = <- tun_ch:
+			fmt.Println(tunpkt)
+		}
+	}
+
 
 }
 
@@ -80,6 +147,8 @@ func acceptTcp (tcpl net.Listener, tcp_quit chan int) {
 
 func main () {
 	tcp_quit := make(chan int)
+
+	prefix_map = make(map[string]string)
 
 	l, err := net.Listen("tcp", recvAddr)
 	if err != nil {

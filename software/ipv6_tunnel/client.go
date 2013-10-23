@@ -7,6 +7,8 @@ import (
 	"net"
 	"log"
 	"time"
+	"math/rand"
+	"strconv"
 )
 
 
@@ -26,13 +28,14 @@ func senddata (tcpc net.Conn, quitChan chan int) {
 
 	// Get our unique ID (should be mac address)
 	var unique_id ClientIdentifier
-	unique_id.Id = "123456"
+	rand.Seed(time.Now().Unix())
+	unique_id.Id = strconv.Itoa(rand.Int())
 
 	// Get a JSON blob of the id
 	idbuf, err := json.Marshal(unique_id)
 	if err != nil { log.Fatal(err) }
 
-	fmt.Println(idbuf)
+	fmt.Printf("%s\n%s\n", unique_id.Id,  idbuf)
 
 	// Send that blob
 	_, err = tcpc.Write(idbuf)
