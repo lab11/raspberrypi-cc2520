@@ -1,0 +1,6 @@
+include_rules
+
+: <objs> |> @(GCC) %<objs> $(LDFLAGS) -o %o |> client
+
+export GOPATH
+: server.go common.go prefix.go tunindex.go |> GOOS=@(GOOS) GOARCH=@(GOARCH) GOROOT=@(GOROOT) go build -o %o %f |> server

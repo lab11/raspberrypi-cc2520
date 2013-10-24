@@ -1,0 +1,11 @@
+ifndef GCC
+error Define a variant.
+endif
+
+
+CFLAGS = -Wall -Wextra -Werror
+CFLAGS += -I$(TUP_CWD)/lib
+
+: foreach *.c |> @(GCC) %f $(CFLAGS) -c -o %o |> %B.o $(TUP_CWD)/<objs>
+
+.gitignore
