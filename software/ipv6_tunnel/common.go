@@ -12,6 +12,8 @@ type ConfigIni struct {
 	Server struct {
 		Localhost string
 		Listenport string
+		Prefixrange string
+		Assignments string
 	}
 	Client struct {
 		Remotehost string

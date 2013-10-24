@@ -13,32 +13,16 @@ import (
 	"code.google.com/p/gcfg"
 )
 
-
-
-
-var prefix_map map[string]string
-var prefix_greatest int = 5
-var prefix_map_lock sync.Mutex
+var prefixes *PrefixManager
 
 var tun_id_set map[int]bool
 var tun_id_lock sync.Mutex
 const TUN_ID_MIN = 0
 const TUN_ID_MAX = 15
 
-func getPrefix (id string) (prefix string) {
-	prefix_map_lock.Lock()
 
-	prefix, in := prefix_map[id]
 
-	if !in {
-		prefix_greatest += 1
-		prefix_map[id] = strconv.Itoa(prefix_greatest) + "::"
-		prefix = prefix_map[id]
-	}
 
-	prefix_map_lock.Unlock()
-	return
-}
 
 // Returns tunX
 func getTunName () (tunid string) {
@@ -63,13 +47,11 @@ func getTunName () (tunid string) {
 func unsetTunName (tunid string) {
 	tun_id_lock.Lock()
 
-	var tunidint int
-	var aa string
-	aa = strings.TrimLeft(tunid, "tun")
-	fmt.Println(aa)
-	fmt.Println(tunid)
+	tunidstr := strings.TrimLeft(tunid, "tun")
+	fmt.Println(tunidstr)
 
-	//tunidint = strconv.Atoi(aa)
+	tunidint, _ := strconv.Atoi(tunidstr)
+	fmt.Println("removing tun", tunidint)
 
 	tun_id_set[tunidint] = false
 
@@ -90,15 +72,35 @@ func clientTCP (tcpc net.Conn, tcp_ch chan []byte, quit_ch chan int) {
 	}
 }
 
-func clientTUN (tun *tuntap.Interface, tun_ch chan []byte) {
+// Block on reading from the TUN device
+// After receiving data from the TUN device it checks to see if the client
+// has disconnected and if so quits.
+func clientTUN (tun *tuntap.Interface, tun_ch chan []byte, quit_ch chan int) {
+	for {
+		pkt, err := tun.ReadPacket()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(pkt.Packet)
 
+		// Check if there is data in the quit channel that tells us to stop
+		select {
+		case quit_tun := <- quit_ch:
+			if quit_tun == 1 {
+				return
+			}
+		default:
 
-	tun.ReadPacket()
+		}
+
+		tun_ch <- pkt.Packet
+	}
 }
 
 // Takes care of interacting with a client
 func handleClient (tcpc net.Conn) {
 	buf := make([]byte, 4096)
+	var err error
 
 	var newclient ClientIdentifier
 
@@ -122,7 +124,8 @@ func handleClient (tcpc net.Conn) {
 
 	// Get the unique prefix for this client
 	var prefix ClientPrefix
-	prefix.Prefix = getPrefix(newclient.Id)
+	prefix.Prefix, err = prefixes.getPrefix(newclient.Id)
+	if err != nil { log.Fatal(err) }
 	fmt.Println("Going to assign prefix: ", prefix.Prefix)
 
 	// Send the client the prefix
@@ -132,25 +135,41 @@ func handleClient (tcpc net.Conn) {
 	}
 	tcpc.Write(pbuf)
 
+	fmt.Println("before tun")
+
 	// Setup a tun interface
 	tunname := getTunName()
+	fmt.Println("trying to use tunname", tunname)
 	tun, err := tuntap.Open(tunname, tuntap.DevTun)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	fmt.Println(tunname)
+
+	// Remove the /64 portion
+	prefixbase := strings.Split(prefix.Prefix, "/")
+
+	// Enable the tun interface
+	exec.Command("ifconfig", tunname, "up").Run()
+	fmt.Println("up")
+
 	// Set an IP address for the tun interface
-	exec.Command("ifconfig", tunname, "inet6", prefix.Prefix + "2").Run()
+	exec.Command("ifconfig", tunname, "inet6", "add", prefixbase[0] + "2").Run()
+	fmt.Println("got ip for tun")
 
 	// Route all packets for that prefix to the tun interface
-	exec.Command("route", "add", "-inet6", prefix.Prefix + "/64", prefix.Prefix + "2").Run()
+	exec.Command("ip", "-6", "route", "add", prefix.Prefix, "dev",
+		tunname).Run()
+	fmt.Println("added route")
 
 	tcp_ch := make(chan []byte)
 	quit_tcp_ch := make(chan int)
 	go clientTCP(tcpc, tcp_ch, quit_tcp_ch)
 
 	tun_ch := make(chan []byte)
-	go clientTUN(tun, tun_ch)
+	tun_quit_ch := make(chan int)
+	go clientTUN(tun, tun_ch, tun_quit_ch)
 
 	var newpkt []byte
 	var tunpkt []byte
@@ -167,7 +186,10 @@ func handleClient (tcpc net.Conn) {
 		case quit_tcp = <- quit_tcp_ch:
 			if quit_tcp == 1 {
 				fmt.Println("Client disconnected")
-				tun.Close()
+				//exec.Command("ifconfig", tunname, "down").Run()
+				tun_quit_ch <- 1
+				err = tun.Close()
+				if (err != nil) { log.Fatal(err) }
 				unsetTunName(tunname)
 				return
 			}
@@ -201,7 +223,6 @@ func acceptTcp (tcpl net.Listener, client_quit chan int) {
 func main () {
 	client_quit := make(chan int)
 
-	prefix_map = make(map[string]string)
 	tun_id_set = make(map[int]bool)
 
 
@@ -212,6 +233,8 @@ func main () {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	prefixes = Create(cfg.Server.Assignments, cfg.Server.Prefixrange)
 
 
 
