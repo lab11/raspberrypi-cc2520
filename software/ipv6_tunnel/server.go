@@ -5,58 +5,31 @@ import (
 	"fmt"
 	"net"
 	"log"
-	"sync"
-	"strconv"
 	"strings"
 	"os/exec"
+	"sync"
 	"github.com/lab11/go-tuntap/tuntap"
 	"code.google.com/p/gcfg"
 )
 
 var prefixes *PrefixManager
-
-var tun_id_set map[int]bool
-var tun_id_lock sync.Mutex
-const TUN_ID_MIN = 0
-const TUN_ID_MAX = 15
+var tunids *TunManager
 
 
 
+var client_locks map[string]sync.Mutex
 
-
-// Returns tunX
-func getTunName () (tunid string) {
-	tun_id_lock.Lock()
-
-	var tunidint int
-
-	for i:=TUN_ID_MIN; i<=TUN_ID_MAX; i++ {
-		if !tun_id_set[i] {
-			tun_id_set[i] = true
-			tunidint = i
-			break
-		}
-	}
-
-	tunid = "tun" + strconv.Itoa(tunidint)
-
-	tun_id_lock.Unlock()
-	return
+func lockClient (id string) {
+	a := client_locks[id]
+	a.Lock()
+	client_locks[id] = a
+}
+func unlockClient (id string) {
+	a := client_locks[id]
+	a.Unlock()
+	client_locks[id] = a
 }
 
-func unsetTunName (tunid string) {
-	tun_id_lock.Lock()
-
-	tunidstr := strings.TrimLeft(tunid, "tun")
-	fmt.Println(tunidstr)
-
-	tunidint, _ := strconv.Atoi(tunidstr)
-	fmt.Println("removing tun", tunidint)
-
-	tun_id_set[tunidint] = false
-
-	tun_id_lock.Unlock()
-}
 
 func clientTCP (tcpc net.Conn, tcp_ch chan []byte, quit_ch chan int) {
 	for {
@@ -75,7 +48,8 @@ func clientTCP (tcpc net.Conn, tcp_ch chan []byte, quit_ch chan int) {
 // Block on reading from the TUN device
 // After receiving data from the TUN device it checks to see if the client
 // has disconnected and if so quits.
-func clientTUN (tun *tuntap.Interface, tun_ch chan []byte, quit_ch chan int) {
+func clientTUN (tun *tuntap.Interface, tun_ch chan []byte, quit_ch chan int,
+	quit_ch2 chan int) {
 	for {
 		pkt, err := tun.ReadPacket()
 		if err != nil {
@@ -87,6 +61,9 @@ func clientTUN (tun *tuntap.Interface, tun_ch chan []byte, quit_ch chan int) {
 		select {
 		case quit_tun := <- quit_ch:
 			if quit_tun == 1 {
+				tun.Close()
+				<- quit_ch2
+				fmt.Println("tun gone")
 				return
 			}
 		default:
@@ -122,6 +99,8 @@ func handleClient (tcpc net.Conn) {
 		break
 	}
 
+	lockClient(newclient.Id)
+
 	// Get the unique prefix for this client
 	var prefix ClientPrefix
 	prefix.Prefix, err = prefixes.getPrefix(newclient.Id)
@@ -135,77 +114,80 @@ func handleClient (tcpc net.Conn) {
 	}
 	tcpc.Write(pbuf)
 
-	fmt.Println("before tun")
-
 	// Setup a tun interface
-	tunname := getTunName()
-	fmt.Println("trying to use tunname", tunname)
+	tunname := tunids.getNewTunName()
 	tun, err := tuntap.Open(tunname, tuntap.DevTun)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(tunname)
+	fmt.Println("lies")
+	if err != nil { log.Fatal(err) }
 
 	// Remove the /64 portion
 	prefixbase := strings.Split(prefix.Prefix, "/")
 
 	// Enable the tun interface
 	exec.Command("ifconfig", tunname, "up").Run()
-	fmt.Println("up")
 
 	// Set an IP address for the tun interface
-	exec.Command("ifconfig", tunname, "inet6", "add", prefixbase[0] + "2").Run()
-	fmt.Println("got ip for tun")
+	exec.Command("ifconfig", tunname, "inet6", "add", prefixbase[0] + "1").Run()
 
 	// Route all packets for that prefix to the tun interface
 	exec.Command("ip", "-6", "route", "add", prefix.Prefix, "dev",
 		tunname).Run()
-	fmt.Println("added route")
-
+fmt.Println("sdfs")
+	// Setup and run the goroutines that will handle interaction with the client
 	tcp_ch := make(chan []byte)
 	quit_tcp_ch := make(chan int)
 	go clientTCP(tcpc, tcp_ch, quit_tcp_ch)
 
 	tun_ch := make(chan []byte)
-	tun_quit_ch := make(chan int)
-	go clientTUN(tun, tun_ch, tun_quit_ch)
+	tun_quit_ch := make(chan int, 10)
+	tun_quit_ch2 := make(chan int)
+	go clientTUN(tun, tun_ch, tun_quit_ch, tun_quit_ch2)
 
-	var newpkt []byte
-	var tunpkt []byte
-	var quit_tcp int
+	// Loop while shuffling packets around
 	for {
 		select {
-		case newpkt = <- tcp_ch:
-			fmt.Println(newpkt)
-
+		case newpkt := <- tcp_ch:
+			// Received a packet from the client via the TCP connection
+			// Send it to the TUN device
 			var tuntappkt tuntap.Packet
 			tuntappkt.Packet = newpkt
 			tun.WritePacket(&tuntappkt)
 
-		case quit_tcp = <- quit_tcp_ch:
+		case tunpkt := <- tun_ch:
+			// Got a packet from the TUN device, destined for the client
+			// Write it into the TCP connection
+			tcpc.Write(tunpkt)
+
+		case quit_tcp := <- quit_tcp_ch:
+			// Got a quit signal from the TCP listener, this means that the
+			// client disconnected.
+			// Shut everything down
 			if quit_tcp == 1 {
 				fmt.Println("Client disconnected")
-				//exec.Command("ifconfig", tunname, "down").Run()
+				// Send a quit message to the TUN listener. This will block
+				// until the TUN listener gets it, which will only happen
+				// once a packet is routed to the now disconnected client.
 				tun_quit_ch <- 1
-				err = tun.Close()
-				if (err != nil) { log.Fatal(err) }
-				unsetTunName(tunname)
+				fmt.Println("sent shutdown")
+				// Now send a UDP packet to get the TUN listener to wake it up
+				serverAddr, _ := net.ResolveUDPAddr("udp6", "[" + prefixbase[0] + "3]:8765")
+				con, _ := net.DialUDP("udp6", nil, serverAddr)
+				con.Write([]byte("1"))
+				con.Close()
+
+				fmt.Println("sent udp")
+
+				tun_quit_ch2 <- 1
+				tunids.unsetTunName(tunname)
+				unlockClient(newclient.Id)
 				return
 			}
-
-		case tunpkt = <- tun_ch:
-			fmt.Println(tunpkt)
-			tcpc.Write(tunpkt)
 		}
 	}
-
-
 }
 
-func acceptTcp (tcpl net.Listener, client_quit chan int) {
-
-
+// Sit in a loop accepting TCP connections from tunnel clients
+func acceptTcp (tcpl net.Listener) {
 	for {
 		c, err := tcpl.Accept()
 		if err != nil {
@@ -213,19 +195,16 @@ func acceptTcp (tcpl net.Listener, client_quit chan int) {
 		}
 		go handleClient(c)
 	}
-
-
-
-
 }
 
 
 func main () {
-	client_quit := make(chan int)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile)
 
-	tun_id_set = make(map[int]bool)
+	// Dummy channel that keeps this application alive
+	main_quit := make(chan int)
 
-
+	client_locks = make(map[string]sync.Mutex)
 
 	// Parse the config file
 	var cfg ConfigIni
@@ -235,22 +214,17 @@ func main () {
 	}
 
 	prefixes = Create(cfg.Server.Assignments, cfg.Server.Prefixrange)
+	tunids = CreateTunIds()
 
-
-
-
+	// Start the TCP listener
 	l, err := net.Listen("tcp", cfg.Server.Localhost + ":" + cfg.Server.Listenport)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	go acceptTcp(l, client_quit)
+	go acceptTcp(l)
 
 	// Wait on the accept tcp goroutine
 	// This keeps the application from exiting
-	<- client_quit
-
-
-
+	<- main_quit
 }
-
