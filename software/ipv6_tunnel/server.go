@@ -79,6 +79,8 @@ func handleClient (tcpc net.Conn) {
 	buf := make([]byte, 4096)
 	var err error
 
+	fmt.Println("got client")
+
 	var newclient ClientIdentifier
 
 	for {
