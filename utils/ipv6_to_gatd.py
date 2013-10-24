@@ -12,11 +12,16 @@ import sys
 
 try:
 	import dpkt
-except:
+except ImportError:
 	print('Need dpkt.')
 	print('sudo apt-get install python-dpkt')
 	sys.exit(1)
-import pytun
+try:
+	import pytun
+except ImportError:
+	print('Need pytun')
+	print('sudo pip install python-pytun')
+	sys.exit(1)
 from sh import ifconfig
 from sh import ip
 
