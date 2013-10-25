@@ -109,4 +109,13 @@ A config.ini file is used to control the operation of the server and client.
     client
     sudo ./client
 
+### On Boot
+
+    server:
+    sudo cp ipv6tuns /etc/init.d/
+    sudo update-rc.d ipv6tuns defaults
+
+    client:
+    sudo cp ipv6tunc /etc/init.d/
+    sudo update-rc.d ipv6tunc defaults
 
