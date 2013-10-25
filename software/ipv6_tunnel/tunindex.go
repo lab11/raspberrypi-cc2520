@@ -1,12 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 	"sync"
 )
-
 
 const TUN_ID_MIN = 0
 const TUN_ID_MAX = 15
@@ -41,11 +39,7 @@ func (t *TunManager) unsetTunName (tunid string) {
 	t.lock.Lock()
 
 	tunidstr := strings.TrimLeft(tunid, "tun")
-	fmt.Println(tunidstr)
-
 	tunidint, _ := strconv.Atoi(tunidstr)
-	fmt.Println("removing tun", tunidint)
-
 	t.tunset[tunidint] = false
 
 	t.lock.Unlock()

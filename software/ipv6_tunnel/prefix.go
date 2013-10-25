@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"net"
 	"os"
@@ -17,10 +16,9 @@ type PrefixManager struct {
 	prefixfile *os.File // the file to store the prefix assignments in
 	prefixes map[string]string // map of id -> prefix
 	inuse map[string]bool // map of prefix -> bool; marks prefixes as used
-	prefixcidr *net.IPNet
-	prefixstart uint64
-	lock sync.Mutex
-
+	prefixcidr *net.IPNet // the range of available prefixes
+	prefixstart uint64 // first prefix in integer form
+	lock sync.Mutex // only one client can get a prefix at a time
 }
 
 // When a client connects retrieve the prefix they should use.
@@ -39,7 +37,6 @@ func (pm *PrefixManager) getPrefix (id string) (prefix string, err error) {
 			binary.BigEndian.PutUint64(ipb[0:8], i)
 			binary.BigEndian.PutUint64(ipb[8:16], 0)
 			possible_prefix := net.IP(ipb).String() + "/64"
-			fmt.Println(possible_prefix)
 
 			if pm.prefixcidr.Contains(ipb) {
 				taken, in := pm.inuse[possible_prefix]
@@ -94,16 +91,11 @@ func Create (filename string, prefixrange string) (*PrefixManager) {
 	pm.prefixstart = binary.BigEndian.Uint64(prefixip)
 	// Now mask only those bits in the prefix
 	prefixlen, _ := strconv.Atoi(prefixstrings[1])
-	fmt.Println(pm.prefixstart)
 	prefixlenu64 := uint64(prefixlen)
 	pm.prefixstart = ((pm.prefixstart >> (64 - prefixlenu64)) << (64 - prefixlenu64))
 
 
-	fmt.Println(prefixlenu64)
-	fmt.Println(pm.prefixstart)
-
 	return &pm
-
 }
 
 

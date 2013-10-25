@@ -17,9 +17,10 @@
 #include "ini/ini.h"
 #include "jsmn/jsmn.h"
 
-
-
-
+/* Connects to a server over TCP in order to create an IPv4 over v4 tunnel.
+ *
+ * @author Brad Campbell <bradjc@umich.edu>
+ */
 
 typedef struct {
 	const char* remotehost;
@@ -28,22 +29,20 @@ typedef struct {
 
 #define MAC_ADDR_FILE "/sys/class/net/eth0/address"
 
-config_ini_t cfg;
+// Holds the parsed values from the config.ini file
+config_ini_t cfg = {NULL, 0};
 
+// Holding arrays for client specific information
 char json_id[] = "{\"Id\":\"00:11:22:33:44:55\"}";
-
 char prefix[48] = {'\0'};
-
 char macbuf[128];
 
+// Sockets for two of our tunnel endpoints
 int tcp_socket = -1;
 int tun_file = -1;
 
-fd_set rfds;
-uint8_t nfds = 0;
 
-// Runs a command on the local system using
-// the kernel command interpreter.
+// Runs a command on the local system using the kernel command interpreter.
 int ssystem(const char *fmt, ...) {
 	char cmd[128];
 	va_list ap;
@@ -53,6 +52,23 @@ int ssystem(const char *fmt, ...) {
 	return system(cmd);
 }
 
+// Makes the given file descriptor non-blocking.
+// Returns 1 on success, 0 on failure.
+int make_nonblocking (int fd) {
+  int flags, ret;
+
+  flags = fcntl(fd, F_GETFL, 0);
+  if (flags == -1) {
+    return 0;
+  }
+  // Set the nonblocking flag.
+  flags |= O_NONBLOCK;
+  ret = fcntl(fd, F_SETFL, flags);
+
+  return ret != -1;
+}
+
+// Functions parses the config.ini for the options we care about
 static int config_handler(void* user, const char* section, const char* name,
                           const char* value) {
 	config_ini_t* cfg = (config_ini_t*) user;
@@ -67,16 +83,12 @@ static int config_handler(void* user, const char* section, const char* name,
 	return 1;
 }
 
-
-
+// Creates a TCP connection to the IPv6 tunnel server
 int connect_tcp () {
 	int ret;
 	struct addrinfo hints;
     struct addrinfo *strmSvr;
     char port_str[6];
-
-
-	// Start the connection process
 
 	// Tell getaddrinfo() that we only want a TCP connection
 	memset(&hints, 0, sizeof(struct addrinfo));
@@ -104,24 +116,27 @@ int connect_tcp () {
 		return -1;
 	}
 
+	// Loop until we establish a connection.
+	// This is where reconnects happen
 	while (1) {
 		// Connect to the socket
 		ret = connect(tcp_socket, strmSvr->ai_addr, strmSvr->ai_addrlen);
 		if (ret < 0) {
-			fprintf(stderr, "Could not connect to socket.\n");
-			fprintf(stderr, "%s\n", strerror(errno));
+			// Unable to connect
+			sleep(2);
 		} else {
 			break;
 		}
-		printf("sleeeeeeeping\n");
-		sleep(2);
 	}
+
+	//make_nonblocking(tcp_socket);
 
 	freeaddrinfo(strmSvr);
 
 	return 0;
 }
 
+// Communicate with the IPv6 tunnel server to get a prefix to use for wsn
 int get_prefix () {
 	int ret;
 	ssize_t sent_len, read_len;
@@ -141,12 +156,14 @@ int get_prefix () {
 		fprintf(stderr, "Error sending MAC address via TCP\n");
 		return -1;
 	}
-	printf("send %i bytes\n", (int) strlen(json_id));
 
+	// Read the prefix response
 	read_len = recv(tcp_socket, buf, 4095, 0);
-	printf("read: %s\n", buf);
-
-
+	if (read_len < 0) {
+		fprintf(stderr, "Did not receive a prefix\n");
+		fprintf(stderr, "%s\n", strerror(errno));
+		return -1;
+	}
 	// Parse the JSON response
 	jsmn_init(&p);
 	buf[read_len] = '\0';
@@ -162,7 +179,6 @@ int get_prefix () {
 
 	for (i=0; i<9; i++) {
 		if (TOKEN_STRING((char*) buf, tok[i], "Prefix")) {
-			printf("gounf prefix %i %i\n", tok[i+1].start, tok[i+1].end-tok[i+1].start);
 			memcpy(prefix, buf+tok[i+1].start, tok[i+1].end-tok[i+1].start);
 			break;
 		}
@@ -176,6 +192,7 @@ int get_prefix () {
 	return 0;
 }
 
+// Simple function that calls the functions needed to reconnect
 int reconnect () {
 	int ret;
 
@@ -188,30 +205,25 @@ int reconnect () {
 	return 0;
 }
 
-
-
-
-
 int main () {
 
+	// Used to setup the tunnel
     struct ifreq ifr;
+    uint8_t cmdbuf[4096];
+
+    int macfile;
+
+    // Used for the select
+	fd_set rfds;
+	uint8_t nfds = 0;
 
     ssize_t read_len;
-    ssize_t sent;
+    ssize_t sent_len;
     uint8_t buf[4096];
-    uint8_t cmdbuf[4096];
-    int macfile;
+
     int ret;
-    int i;
 
-
-
-
-
-
-	// Parse a config file
-	cfg.remotehost = NULL;
-	cfg.remoteport = 0;
+	// Parse the config file
 	ret = ini_parse("config.ini", config_handler, &cfg);
 	if (ret < 0) {
 		fprintf(stderr, "Could not open config.ini\n");
@@ -224,7 +236,6 @@ int main () {
 	}
 
 	// Create the TUN interface
-
 	tun_file = open("/dev/net/tun", O_RDWR);
 	if (tun_file < 0) {
 		// error
@@ -250,6 +261,17 @@ int main () {
 		return -1;
 	}
 
+	// Make the tun interface file descriptor non blocking
+	make_nonblocking(tun_file);
+
+	// Configure the tun device
+	snprintf((char*) cmdbuf, 4096, "ifconfig %s up", ifr.ifr_name);
+	ssystem((char*) cmdbuf);
+
+	snprintf((char*) cmdbuf, 4906,
+		"ip -6 route add default via fe80::1 dev %s", ifr.ifr_name);
+	ssystem((char*) cmdbuf);
+
 	// Get our MAC address
 	macfile = open(MAC_ADDR_FILE, O_RDONLY);
 	if (macfile < 0) {
@@ -258,7 +280,6 @@ int main () {
 		return -1;
 	}
 
-	// Get the MAC address
 	read_len = read(macfile, macbuf, 128);
 	if (read_len < 0) {
 		fprintf(stderr, "Could not read MAC address file.\n");
@@ -266,47 +287,20 @@ int main () {
 	}
 	close(macfile);
 
-
-
-	reconnect();
-
-
-
-	printf("prefix: %s\n", prefix);
-
-	snprintf((char*) cmdbuf, 4096, "ifconfig %s up", ifr.ifr_name);
-	ssystem((char*) cmdbuf);
-
-	{
-		char tun_ip_addr[48];
-		strncpy(tun_ip_addr, prefix, 48);
-		for (i=0; i<47; i++) {
-			if (tun_ip_addr[i] == '/') {
-				printf("found slash\n");
-				tun_ip_addr[i] = 'f';
-				tun_ip_addr[i+1] = '\0';
-				break;
-			}
-		}
-
-
-		snprintf((char*) cmdbuf, 4906, "ifconfig %s inet6 add %s", ifr.ifr_name, tun_ip_addr);
-		printf("running %s\n", cmdbuf);
-		ssystem((char*) cmdbuf);
+	// Create the connection to the IPv6 tunnel server
+	ret = reconnect();
+	if (ret < 0) {
+		fprintf(stderr, "Could not connect to server\n");
+		return -1;
 	}
 
-	snprintf((char*) cmdbuf, 4906, "ip -6 route add default via fe80::1 dev %s", ifr.ifr_name);
-    ssystem((char*) cmdbuf);
+	// Now that everything is setup, block on the two reads and shuttle some
+	// data.
 
-
-
-
-    // Now that everything is setup, block on the two reads and shuttle some
-    // data.
-
-    while (1) {
-	    // Clear the struct and set all fd that aren't 1
+	while (1) {
+		// Clear the struct and set all fd that aren't 1
 		FD_ZERO(&rfds);
+		// Reset these each time in case tcp_socket changes after a reconnect
 		FD_SET(tcp_socket, &rfds);
 		nfds = tcp_socket + 1;
 		FD_SET(tun_file, &rfds);
@@ -341,7 +335,6 @@ int main () {
 							// errant wakeup, just loop
 							break;
 						default:
-							fprintf(stderr, "Error occurred with reading TCP\n");
 							reconnect();
 					}
 				} else {
@@ -352,38 +345,24 @@ int main () {
 			if (FD_ISSET(tun_file, &rfds)) {
 				// read from tun
 				read_len = read(tun_file, buf, 4906);
-				printf("got from tun 0x");
-				for (i=0;i<read_len; i++) {
-					printf("%02x", buf[i]);
-				}
-				printf("\n");
 				if (read_len < 0) {
 					switch (errno) {
 						case EAGAIN:
 							// errant wakeup, just loop
 							break;
 						default:
-							fprintf(stderr, "Error occurred with reading TUN\n");
+							fprintf(stderr, "Error occurred reading TUN\n");
 							return -1;
 					}
 				} else {
-					sent = send(tcp_socket, buf, read_len, 0);
-					printf("sent %i bytes\n", (int) sent);
-					if (sent < 0) {
+					sent_len = send(tcp_socket, buf, read_len, 0);
+					if (sent_len < 0) {
 						reconnect();
 					}
 				}
 			}
-
-
 		}
 	}
 
-
-
-
-
 	return 0;
 }
-
-

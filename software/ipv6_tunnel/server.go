@@ -19,37 +19,44 @@ type mutexWrap struct {
 	lock *sync.Mutex
 }
 
+// Map of locks that prevent the same client from having two sessions
+// at the same time.
 var client_locks map[string]*mutexWrap
+// Lock protects the non-threadsafe lock map
+var client_locks_lock sync.Mutex
+
 
 func lockClient (id string) {
-	var mw *mutexWrap
+	client_locks_lock.Lock()
 
-	mw = client_locks[id]
+	mw := client_locks[id]
+	// On first sighting of this client create a new lock
 	if mw == nil {
 		mw = &mutexWrap{lock: new(sync.Mutex)}
 	}
 	client_locks[id] = mw
-	fmt.Println(mw)
 	mw.lock.Lock()
+
+	client_locks_lock.Unlock()
 }
+
 func unlockClient (id string) {
-	fmt.Println("unlocking")
+	client_locks_lock.Lock()
 	mw := client_locks[id]
 	mw.lock.Unlock()
+	client_locks_lock.Unlock()
 }
 
-
+// Block on the TCP socket waiting for the client to tunnel us IPv6 packets.
 func clientTCP (tcpc net.Conn, tcp_ch chan []byte, quit_ch chan int) {
 	for {
 		buf := make([]byte, 4096)
 		rlen, err := tcpc.Read(buf)
-		fmt.Println("got data from TCP")
 		if err != nil {
 			// Disconnect
 			quit_ch <- 1
 			break
 		}
-
 		tcp_ch <- buf[0:rlen]
 	}
 }
@@ -64,8 +71,6 @@ func clientTUN (tun *tuntap.Interface, tun_ch chan []byte, quit_ch chan int,
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println("GOT TUN PACKET")
-		fmt.Println(pkt.Packet)
 
 		// Check if there is data in the quit channel that tells us to stop
 		select {
@@ -73,11 +78,9 @@ func clientTUN (tun *tuntap.Interface, tun_ch chan []byte, quit_ch chan int,
 			if quit_tun == 1 {
 				tun.Close()
 				<- quit_ch2
-				fmt.Println("tun gone")
 				return
 			}
 		default:
-
 		}
 
 		tun_ch <- pkt.Packet
@@ -88,8 +91,6 @@ func clientTUN (tun *tuntap.Interface, tun_ch chan []byte, quit_ch chan int,
 func handleClient (tcpc net.Conn) {
 	buf := make([]byte, 4096)
 	var err error
-
-	fmt.Println("got client")
 
 	var newclient ClientIdentifier
 
@@ -107,34 +108,29 @@ func handleClient (tcpc net.Conn) {
 			continue
 		}
 
-		fmt.Println(newclient)
 		break
 	}
 
-
-
+	fmt.Println("Client connected", newclient.Id)
 
 	lockClient(newclient.Id)
-
-	fmt.Println("got client lock")
 
 	// Get the unique prefix for this client
 	var prefix ClientPrefix
 	prefix.Prefix, err = prefixes.getPrefix(newclient.Id)
 	if err != nil { log.Fatal(err) }
-	fmt.Println("Going to assign prefix: ", prefix.Prefix)
 
 	// Send the client the prefix
 	pbuf, err := json.Marshal(prefix)
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println(prefix, pbuf)
 	tcpc.Write(pbuf)
 
 	// Setup a tun interface
 	tunname := tunids.getNewTunName()
 	tun, err := tuntap.Open(tunname, tuntap.DevTun)
-	fmt.Println("lies")
 	if err != nil { log.Fatal(err) }
 
 	// Remove the /64 portion
@@ -143,14 +139,10 @@ func handleClient (tcpc net.Conn) {
 	// Enable the tun interface
 	exec.Command("ifconfig", tunname, "up").Run()
 
-	// Set an IP address for the tun interface
-	//exec.Command("ifconfig", tunname, "inet6", "add", prefixbase[0] + "1").Run()
-	exec.Command("ifconfig", tunname, "inet6", "add", "fe80::212:cccc:dddd:ffff/64").Run()
-
 	// Route all packets for that prefix to the tun interface
 	exec.Command("ip", "-6", "route", "add", prefix.Prefix, "dev",
 		tunname).Run()
-fmt.Println("sdfs")
+
 	// Setup and run the goroutines that will handle interaction with the client
 	tcp_ch := make(chan []byte)
 	quit_tcp_ch := make(chan int)
@@ -167,7 +159,6 @@ fmt.Println("sdfs")
 		case newpkt := <- tcp_ch:
 			// Received a packet from the client via the TCP connection
 			// Send it to the TUN device
-			fmt.Println(newpkt)
 			var tuntappkt tuntap.Packet
 			tuntappkt.Packet = newpkt
 			tun.WritePacket(&tuntappkt)
@@ -182,27 +173,21 @@ fmt.Println("sdfs")
 			// client disconnected.
 			// Shut everything down
 			if quit_tcp == 1 {
-				fmt.Println("Client disconnected")
+				fmt.Println("Client disconnected", newclient.Id)
 				// Send a quit message to the TUN listener. This will block
 				// until the TUN listener gets it, which will only happen
 				// once a packet is routed to the now disconnected client.
 				tun_quit_ch <- 1
-				fmt.Println("sent shutdown")
 				// Now send a UDP packet to get the TUN listener to wake it up
 				serverAddr, _ := net.ResolveUDPAddr("udp6", "[" + prefixbase[0] + "3]:8765")
 				con, _ := net.DialUDP("udp6", nil, serverAddr)
 				con.Write([]byte("1"))
 				con.Close()
-
-				fmt.Println("sent udp")
-
+				// Block until the tun thread has received the UDP packet
 				tun_quit_ch2 <- 1
-
-				fmt.Println("unset tunnnn ")
+				// Finish up
 				tunids.unsetTunName(tunname)
-				fmt.Println("done with that tun")
 				unlockClient(newclient.Id)
-				fmt.Println("unlocked clients ")
 				return
 			}
 		}
@@ -219,7 +204,6 @@ func acceptTcp (tcpl net.Listener) {
 		go handleClient(c)
 	}
 }
-
 
 func main () {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds | log.Lshortfile)
