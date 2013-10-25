@@ -15,19 +15,27 @@ import (
 var prefixes *PrefixManager
 var tunids *TunManager
 
+type mutexWrap struct {
+	lock *sync.Mutex
+}
 
-
-var client_locks map[string]sync.Mutex
+var client_locks map[string]*mutexWrap
 
 func lockClient (id string) {
-	a := client_locks[id]
-	a.Lock()
-	client_locks[id] = a
+	var mw *mutexWrap
+
+	mw = client_locks[id]
+	if mw == nil {
+		mw = &mutexWrap{lock: new(sync.Mutex)}
+	}
+	client_locks[id] = mw
+	fmt.Println(mw)
+	mw.lock.Lock()
 }
 func unlockClient (id string) {
-	a := client_locks[id]
-	a.Unlock()
-	client_locks[id] = a
+	fmt.Println("unlocking")
+	mw := client_locks[id]
+	mw.lock.Unlock()
 }
 
 
@@ -35,6 +43,7 @@ func clientTCP (tcpc net.Conn, tcp_ch chan []byte, quit_ch chan int) {
 	for {
 		buf := make([]byte, 4096)
 		rlen, err := tcpc.Read(buf)
+		fmt.Println("got data from TCP")
 		if err != nil {
 			// Disconnect
 			quit_ch <- 1
@@ -55,6 +64,7 @@ func clientTUN (tun *tuntap.Interface, tun_ch chan []byte, quit_ch chan int,
 		if err != nil {
 			log.Fatal(err)
 		}
+		fmt.Println("GOT TUN PACKET")
 		fmt.Println(pkt.Packet)
 
 		// Check if there is data in the quit channel that tells us to stop
@@ -101,7 +111,12 @@ func handleClient (tcpc net.Conn) {
 		break
 	}
 
+
+
+
 	lockClient(newclient.Id)
+
+	fmt.Println("got client lock")
 
 	// Get the unique prefix for this client
 	var prefix ClientPrefix
@@ -129,7 +144,8 @@ func handleClient (tcpc net.Conn) {
 	exec.Command("ifconfig", tunname, "up").Run()
 
 	// Set an IP address for the tun interface
-	exec.Command("ifconfig", tunname, "inet6", "add", prefixbase[0] + "1").Run()
+	//exec.Command("ifconfig", tunname, "inet6", "add", prefixbase[0] + "1").Run()
+	exec.Command("ifconfig", tunname, "inet6", "add", "fe80::212:cccc:dddd:ffff/64").Run()
 
 	// Route all packets for that prefix to the tun interface
 	exec.Command("ip", "-6", "route", "add", prefix.Prefix, "dev",
@@ -151,6 +167,7 @@ fmt.Println("sdfs")
 		case newpkt := <- tcp_ch:
 			// Received a packet from the client via the TCP connection
 			// Send it to the TUN device
+			fmt.Println(newpkt)
 			var tuntappkt tuntap.Packet
 			tuntappkt.Packet = newpkt
 			tun.WritePacket(&tuntappkt)
@@ -180,8 +197,12 @@ fmt.Println("sdfs")
 				fmt.Println("sent udp")
 
 				tun_quit_ch2 <- 1
+
+				fmt.Println("unset tunnnn ")
 				tunids.unsetTunName(tunname)
+				fmt.Println("done with that tun")
 				unlockClient(newclient.Id)
+				fmt.Println("unlocked clients ")
 				return
 			}
 		}
@@ -206,7 +227,7 @@ func main () {
 	// Dummy channel that keeps this application alive
 	main_quit := make(chan int)
 
-	client_locks = make(map[string]sync.Mutex)
+	client_locks = make(map[string]*mutexWrap)
 
 	// Parse the config file
 	var cfg ConfigIni

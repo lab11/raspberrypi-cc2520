@@ -28,9 +28,13 @@ typedef struct {
 
 #define MAC_ADDR_FILE "/sys/class/net/eth0/address"
 
+config_ini_t cfg;
+
 char json_id[] = "{\"Id\":\"00:11:22:33:44:55\"}";
 
 char prefix[48] = {'\0'};
+
+char macbuf[128];
 
 int tcp_socket = -1;
 int tun_file = -1;
@@ -64,12 +68,134 @@ static int config_handler(void* user, const char* section, const char* name,
 }
 
 
-int main () {
+
+int connect_tcp () {
+	int ret;
 	struct addrinfo hints;
     struct addrinfo *strmSvr;
     char port_str[6];
+
+
+	// Start the connection process
+
+	// Tell getaddrinfo() that we only want a TCP connection
+	memset(&hints, 0, sizeof(struct addrinfo));
+	hints.ai_socktype = SOCK_STREAM;
+
+	// Convert port number to a string
+	snprintf(port_str, 6, "%d", cfg.remoteport);
+
+	// Resolve the HOST to an IP address
+	ret = getaddrinfo(cfg.remotehost, port_str, &hints, &strmSvr);
+	if (ret < 0) {
+		fprintf(stderr, "Could not resolve the host/port address: %s:%s\n",
+			cfg.remotehost, port_str);
+		fprintf(stderr, "%s", gai_strerror(ret));
+		return -1;
+	}
+
+	// Create a TCP connection
+	tcp_socket = socket(strmSvr->ai_family,
+	                    strmSvr->ai_socktype,
+	                    strmSvr->ai_protocol);
+	if (tcp_socket < 0) {
+		fprintf(stderr, "Could not create a socket.\n");
+		fprintf(stderr, "%s\n", strerror(errno));
+		return -1;
+	}
+
+	while (1) {
+		// Connect to the socket
+		ret = connect(tcp_socket, strmSvr->ai_addr, strmSvr->ai_addrlen);
+		if (ret < 0) {
+			fprintf(stderr, "Could not connect to socket.\n");
+			fprintf(stderr, "%s\n", strerror(errno));
+		} else {
+			break;
+		}
+		printf("sleeeeeeeping\n");
+		sleep(2);
+	}
+
+	freeaddrinfo(strmSvr);
+
+	return 0;
+}
+
+int get_prefix () {
+	int ret;
+	ssize_t sent_len, read_len;
+	uint8_t buf[4096];
+
+	jsmn_parser p;
+	jsmntok_t tok[10];
+
+	int i;
+
+	// Copy the mac address into the json blob
+	memcpy(json_id+7, macbuf, 11);
+
+	// Transmit the ID to the server
+	sent_len = send(tcp_socket, json_id, strlen(json_id), 0);
+	if (sent_len == -1) {
+		fprintf(stderr, "Error sending MAC address via TCP\n");
+		return -1;
+	}
+	printf("send %i bytes\n", (int) strlen(json_id));
+
+	read_len = recv(tcp_socket, buf, 4095, 0);
+	printf("read: %s\n", buf);
+
+
+	// Parse the JSON response
+	jsmn_init(&p);
+	buf[read_len] = '\0';
+	ret = jsmn_parse(&p, (char*) buf, tok, 10);
+	if (ret != JSMN_SUCCESS) {
+		fprintf(stderr, "Could not parse prefix value\n");
+		return -1;
+	}
+
+#define TOKEN_STRING(js, t, s) \
+	(strncmp(js+(t).start, s, (t).end - (t).start) == 0 \
+	 && strlen(s) == (t).end - (t).start)
+
+	for (i=0; i<9; i++) {
+		if (TOKEN_STRING((char*) buf, tok[i], "Prefix")) {
+			printf("gounf prefix %i %i\n", tok[i+1].start, tok[i+1].end-tok[i+1].start);
+			memcpy(prefix, buf+tok[i+1].start, tok[i+1].end-tok[i+1].start);
+			break;
+		}
+	}
+
+	if (prefix[0] == '\0') {
+		fprintf(stderr, "Could not decipher the prefix\n");
+		return -1;
+	}
+
+	return 0;
+}
+
+int reconnect () {
+	int ret;
+
+	ret = connect_tcp();
+	if (ret < 0) return ret;
+
+	ret = get_prefix();
+	if (ret < 0) return ret;
+
+	return 0;
+}
+
+
+
+
+
+int main () {
+
     struct ifreq ifr;
-    char macbuf[128];
+
     ssize_t read_len;
     ssize_t sent;
     uint8_t buf[4096];
@@ -78,9 +204,8 @@ int main () {
     int ret;
     int i;
 
-	config_ini_t cfg;
-	jsmn_parser p;
-	jsmntok_t tok[10];
+
+
 
 
 
@@ -125,46 +250,6 @@ int main () {
 		return -1;
 	}
 
-	// Start the connection process
-
-	// Tell getaddrinfo() that we only want a TCP connection
-	memset(&hints, 0, sizeof(struct addrinfo));
-	hints.ai_socktype = SOCK_STREAM;
-
-	// Convert port number to a string
-	snprintf(port_str, 6, "%d", cfg.remoteport);
-
-	// Resolve the HOST to an IP address
-	ret = getaddrinfo(cfg.remotehost, port_str, &hints, &strmSvr);
-	if (ret < 0) {
-		fprintf(stderr, "Could not resolve the host/port address: %s:%s\n",
-			cfg.remotehost, port_str);
-		fprintf(stderr, "%s", gai_strerror(ret));
-		return -1;
-	}
-
-	// Create a TCP connection
-	tcp_socket = socket(strmSvr->ai_family,
-	                    strmSvr->ai_socktype,
-	                    strmSvr->ai_protocol);
-	if (tcp_socket < 0) {
-		fprintf(stderr, "Could not create a socket.\n");
-		fprintf(stderr, "%s\n", strerror(errno));
-		return -1;
-	}
-
-	// Connect to the socket
-	ret = connect(tcp_socket, strmSvr->ai_addr, strmSvr->ai_addrlen);
-	if (ret < 0) {
-		fprintf(stderr, "Could not connect to socket.\n");
-		fprintf(stderr, "%s\n", strerror(errno));
-		return -1;
-	}
-
-	freeaddrinfo(strmSvr);
-
-	printf("host: %s %i\n", cfg.remotehost, cfg.remoteport);
-
 	// Get our MAC address
 	macfile = open(MAC_ADDR_FILE, O_RDONLY);
 	if (macfile < 0) {
@@ -173,8 +258,7 @@ int main () {
 		return -1;
 	}
 
-
-
+	// Get the MAC address
 	read_len = read(macfile, macbuf, 128);
 	if (read_len < 0) {
 		fprintf(stderr, "Could not read MAC address file.\n");
@@ -184,49 +268,9 @@ int main () {
 
 
 
-	// Copy the mac address into the json blob
-	memcpy(json_id+7, macbuf, 11);
+	reconnect();
 
 
-	// Transmit the ID to the server
-	sent = send(tcp_socket, json_id, strlen(json_id), 0);
-	printf("here\n");
-	if (sent == -1) {
-		fprintf(stderr, "Error sending MAC address via TCP\n");
-		return -1;
-	}
-	printf("here\n");
-	printf("send %i bytes\n", (int) strlen(json_id));
-
-	read_len = recv(tcp_socket, buf, 4095, 0);
-	printf("read: %s\n", buf);
-
-
-	// Parse the JSON response
-	jsmn_init(&p);
-	buf[read_len] = '\0';
-	ret = jsmn_parse(&p, (char*) buf, tok, 10);
-	if (ret != JSMN_SUCCESS) {
-		fprintf(stderr, "Could not parse prefix value\n");
-		return -1;
-	}
-
-#define TOKEN_STRING(js, t, s) \
-	(strncmp(js+(t).start, s, (t).end - (t).start) == 0 \
-	 && strlen(s) == (t).end - (t).start)
-
-	for (i=0; i<9; i++) {
-		if (TOKEN_STRING((char*) buf, tok[i], "Prefix")) {
-			printf("gounf prefix %i %i\n", tok[i+1].start, tok[i+1].end-tok[i+1].start);
-			memcpy(prefix, buf+tok[i+1].start, tok[i+1].end-tok[i+1].start);
-			break;
-		}
-	}
-
-	if (prefix[0] == '\0') {
-		fprintf(stderr, "Could not decipher the prefix\n");
-		return -1;
-	}
 
 	printf("prefix: %s\n", prefix);
 
@@ -239,7 +283,7 @@ int main () {
 		for (i=0; i<47; i++) {
 			if (tun_ip_addr[i] == '/') {
 				printf("found slash\n");
-				tun_ip_addr[i] = '1';
+				tun_ip_addr[i] = 'f';
 				tun_ip_addr[i+1] = '\0';
 				break;
 			}
@@ -290,7 +334,7 @@ int main () {
 
 				read_len = recv(tcp_socket, buf, 4096, 0);
 				if (read_len == 0) {
-					// need to reconnect
+					reconnect();
 				} else if (read_len < 0) {
 					switch (errno) {
 						case EAGAIN:
@@ -298,7 +342,7 @@ int main () {
 							break;
 						default:
 							fprintf(stderr, "Error occurred with reading TCP\n");
-							return -1;
+							reconnect();
 					}
 				} else {
 					ret = write(tun_file, buf, read_len);
@@ -308,6 +352,11 @@ int main () {
 			if (FD_ISSET(tun_file, &rfds)) {
 				// read from tun
 				read_len = read(tun_file, buf, 4906);
+				printf("got from tun 0x");
+				for (i=0;i<read_len; i++) {
+					printf("%02x", buf[i]);
+				}
+				printf("\n");
 				if (read_len < 0) {
 					switch (errno) {
 						case EAGAIN:
@@ -319,8 +368,9 @@ int main () {
 					}
 				} else {
 					sent = send(tcp_socket, buf, read_len, 0);
+					printf("sent %i bytes\n", (int) sent);
 					if (sent < 0) {
-						// need to reconnect
+						reconnect();
 					}
 				}
 			}
