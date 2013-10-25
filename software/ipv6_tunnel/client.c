@@ -222,6 +222,7 @@ int main () {
     uint8_t buf[4096];
 
     int ret;
+    int i;
 
 	// Parse the config file
 	ret = ini_parse("config.ini", config_handler, &cfg);
@@ -293,6 +294,20 @@ int main () {
 		fprintf(stderr, "Could not connect to server\n");
 		return -1;
 	}
+
+	// Add an IP address to the interface so that packets go out with
+	// full addresses and not link-local addresses.
+	snprintf((char*) cmdbuf, 4096, "ifconfig %s inet6 add %s", ifr.ifr_name, prefix);
+	for (i=0; i<4094; i++) {
+		if (cmdbuf[i] == '/') {
+			// set the /64 part to "1  "
+			cmdbuf[i] = '1';
+			cmdbuf[i+1] = ' ';
+			cmdbuf[i+2] = ' ';
+			break;
+		}
+	}
+	ssystem((char*) cmdbuf);
 
 	// Now that everything is setup, block on the two reads and shuttle some
 	// data.
