@@ -115,6 +115,7 @@ func handleClient (tcpc net.Conn) {
 
 	lockClient(newclient.Id)
 
+
 	// Get the unique prefix for this client
 	var prefix ClientPrefix
 	prefix.Prefix, err = prefixes.getPrefix(newclient.Id)
@@ -125,12 +126,11 @@ func handleClient (tcpc net.Conn) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(prefix, pbuf)
 	tcpc.Write(pbuf)
 
 	// Setup a tun interface
 	tunname := tunids.getNewTunName()
-	tun, err := tuntap.Open(tunname, tuntap.DevTun)
+	tun, err := tuntap.Open(tunname, tuntap.DevTun, false)
 	if err != nil { log.Fatal(err) }
 
 	// Remove the /64 portion
