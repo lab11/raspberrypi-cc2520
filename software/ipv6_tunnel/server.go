@@ -187,11 +187,12 @@ func handleClient (tcpc net.Conn) {
 				tun_quit_ch2 <- 1
 				// Finish up
 				tunids.unsetTunName(tunname)
-				unlockClient(newclient.Id)
-				return
+				break
 			}
 		}
 	}
+
+	unlockClient(newclient.Id)
 }
 
 // Sit in a loop accepting TCP connections from tunnel clients
