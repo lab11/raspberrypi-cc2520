@@ -53,6 +53,11 @@ func clientTCP (tcpc net.Conn, tcp_ch chan []byte, quit_ch chan int) {
 		buf := make([]byte, 4096)
 		rlen, err := tcpc.Read(buf)
 		if err != nil {
+			// Some sort of error
+			quit_ch <- 1
+			break
+		}
+		if rlen == 0 {
 			// Disconnect
 			quit_ch <- 1
 			break
@@ -98,8 +103,10 @@ func handleClient (tcpc net.Conn) {
 		// Read in a message
 		// This should be a JSON blob
 		rlen, err := tcpc.Read(buf)
-		if err != nil {
-			log.Fatal(err)
+		if err != nil || rlen == 0 {
+			fmt.Println(`Client connected but disconnected before we could
+get a unique id.`)
+			return
 		}
 
 		// Parse the JSON blob into a ClientIdentifer
@@ -115,7 +122,6 @@ func handleClient (tcpc net.Conn) {
 
 	lockClient(newclient.Id)
 
-
 	// Get the unique prefix for this client
 	var prefix ClientPrefix
 	prefix.Prefix, err = prefixes.getPrefix(newclient.Id)
@@ -126,7 +132,14 @@ func handleClient (tcpc net.Conn) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	tcpc.Write(pbuf)
+	wlen, err := tcpc.Write(pbuf)
+	if err != nil || wlen == 0 {
+		// Client disconnected
+		fmt.Println("Client disconnected before we could send prefix. ",
+			newclient.Id)
+		unlockClient(newclient.Id)
+		return
+	}
 
 	// Setup a tun interface
 	tunname := tunids.getNewTunName()
@@ -154,6 +167,7 @@ func handleClient (tcpc net.Conn) {
 	go clientTUN(tun, tun_ch, tun_quit_ch, tun_quit_ch2)
 
 	// Loop while shuffling packets around
+handle_loop:
 	for {
 		select {
 		case newpkt := <- tcp_ch:
@@ -187,7 +201,7 @@ func handleClient (tcpc net.Conn) {
 				tun_quit_ch2 <- 1
 				// Finish up
 				tunids.unsetTunName(tunname)
-				break
+				break handle_loop
 			}
 		}
 	}
