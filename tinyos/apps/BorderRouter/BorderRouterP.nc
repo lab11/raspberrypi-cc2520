@@ -1,15 +1,9 @@
-#include <stdio.h>
-
-#include <lib6lowpan/lib6lowpan.h>
-#include <lib6lowpan/ip.h>
 
 module BorderRouterP @safe() {
   uses {
     interface Boot;
-    interface Leds;
 
     interface SplitControl as RadioControl;
-
     interface RootControl;
   }
 }

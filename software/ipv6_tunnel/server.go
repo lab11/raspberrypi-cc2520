@@ -8,6 +8,7 @@ import (
 	"strings"
 	"os/exec"
 	"sync"
+	"os"
 	"github.com/lab11/go-tuntap/tuntap"
 	"code.google.com/p/gcfg"
 )
@@ -48,7 +49,7 @@ func unlockClient (id string) {
 }
 
 // Block on the TCP socket waiting for the client to tunnel us IPv6 packets.
-func clientTCP (tcpc net.Conn, tcp_ch chan []byte, quit_ch chan int) {
+func clientTCP (tcpc *net.TCPConn, tcp_ch chan []byte, quit_ch chan int) {
 	for {
 		buf := make([]byte, 4096)
 		rlen, err := tcpc.Read(buf)
@@ -93,7 +94,7 @@ func clientTUN (tun *tuntap.Interface, tun_ch chan []byte, quit_ch chan int,
 }
 
 // Takes care of interacting with a client
-func handleClient (tcpc net.Conn) {
+func handleClient (tcpc *net.TCPConn) {
 	buf := make([]byte, 4096)
 	var err error
 
@@ -121,6 +122,9 @@ get a unique id.`)
 	fmt.Println("Client connected", newclient.Id)
 
 	lockClient(newclient.Id)
+
+	// Use keep-alives so we know if a client suddenly disconnects
+	tcpc.SetKeepAlive(true)
 
 	// Get the unique prefix for this client
 	var prefix ClientPrefix
@@ -210,9 +214,9 @@ handle_loop:
 }
 
 // Sit in a loop accepting TCP connections from tunnel clients
-func acceptTcp (tcpl net.Listener) {
+func acceptTcp (tcpl *net.TCPListener) {
 	for {
-		c, err := tcpl.Accept()
+		c, err := tcpl.AcceptTCP()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -238,8 +242,24 @@ func main () {
 	prefixes = Create(cfg.Server.Assignments, cfg.Server.Prefixrange)
 	tunids = CreateTunIds()
 
+	// Setup the keep alive linux settings because frankly we don't want
+	// to wait 2 hours like linux wants us to
+	kaf, err := os.OpenFile("/proc/sys/net/ipv4/tcp_keepalive_time", os.O_WRONLY, 0)
+	kaf.WriteString("60") // Wait 60 seconds after data to send keep alive
+	kaf.Close()
+
+	kaf, err = os.OpenFile("/proc/sys/net/ipv4/tcp_keepalive_intvl", os.O_WRONLY, 0)
+	kaf.WriteString("20") // Wait 20 seconds between keep alive tries
+	kaf.Close()
+
+	kaf, err = os.OpenFile("/proc/sys/net/ipv4/tcp_keepalive_probes", os.O_WRONLY, 0)
+	kaf.WriteString("3") // Wait for 3 fails to close the socket
+	kaf.Close()
+
 	// Start the TCP listener
-	l, err := net.Listen("tcp", cfg.Server.Localhost + ":" + cfg.Server.Listenport)
+	tcpaddr, err := net.ResolveTCPAddr("tcp4", cfg.Server.Localhost + ":" +
+		cfg.Server.Listenport)
+	l, err := net.ListenTCP("tcp4", tcpaddr)
 	if err != nil {
 		log.Fatal(err)
 	}
