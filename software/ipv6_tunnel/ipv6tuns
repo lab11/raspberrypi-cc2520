@@ -5,11 +5,11 @@ case "$1" in
 start)
 echo "Starting IPv6 Tunnel Server."
 cd /home/bradjc
-sudo /home/bradjc/server
+sudo /home/bradjc/ipv6tunnel-server
 ;;
 stop)
 echo "Stopping IPv6 Tunnel Server."
-sudo pkill -9 server
+sudo pkill -9 ipv6tunnel-server
 ;;
 
 *)

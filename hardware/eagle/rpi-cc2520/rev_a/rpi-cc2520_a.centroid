@@ -1,7 +1,11 @@
 # SMD component position file.
 # Created by centroid_smd.ulp 1.3.0.
 
+<<<<<<< HEAD
 # Centroid Data for pc board: "rpi-cc2520_a.brd" as of: 1/9/14 12:16 AM
+=======
+# Centroid Data for pc board: "rpi-cc2520_a.brd" as of: 12/30/13 1:04 AM
+>>>>>>> 2446e36909c50613084ff1ce758806e6b2feee4e
 # Measurements are in inches.
 # Comma delimited.
 # Only surface mount components included.

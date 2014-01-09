@@ -1,0 +1,11 @@
+# SMD component position file.
+# Created by centroid_smd.ulp 1.3.0.
+
+# Centroid Data for pc board: "interface_a.brd" as of: 12/30/13 1:10 AM
+# Measurements are in inches.
+# Comma delimited.
+# Only surface mount components included.
+
+RefDes,Layer,LocationX,LocationY,Rotation
+J1,Bottom,0.25000,0.86000,90
+J2,Top,0.25000,0.86000,90
