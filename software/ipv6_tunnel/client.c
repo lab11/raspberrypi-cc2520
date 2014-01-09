@@ -90,6 +90,8 @@ int connect_tcp () {
     struct addrinfo *strmSvr;
     char port_str[6];
 
+	printf("Attempting to connect to %s:%d\n", cfg.remotehost, cfg.remoteport);
+
 	// Tell getaddrinfo() that we only want a TCP connection
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_socktype = SOCK_STREAM;
@@ -105,7 +107,7 @@ int connect_tcp () {
 		fprintf(stderr, "%s", gai_strerror(ret));
 		return -1;
 	}
-
+	
 	// Create a TCP connection
 	tcp_socket = socket(strmSvr->ai_family,
 	                    strmSvr->ai_socktype,
@@ -132,6 +134,8 @@ int connect_tcp () {
 	//make_nonblocking(tcp_socket);
 
 	freeaddrinfo(strmSvr);
+
+	printf("Connected to server.\n");
 
 	return 0;
 }
@@ -188,6 +192,8 @@ int get_prefix () {
 		fprintf(stderr, "Could not decipher the prefix\n");
 		return -1;
 	}
+
+	printf("Got prefix %s\n", prefix);
 
 	return 0;
 }
