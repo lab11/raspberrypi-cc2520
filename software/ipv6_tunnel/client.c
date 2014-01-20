@@ -83,7 +83,10 @@ static int config_handler(void* user, const char* section, const char* name,
 	return 1;
 }
 
-// Creates a TCP connection to the IPv6 tunnel server
+// Creates a TCP connection to the IPv6 tunnel server.
+// This function can fail if the client has no Internet (and therefore can't
+// resolve DNS). If the client has Internet but the server is down, this
+// function will spin until the server comes back.
 int connect_tcp () {
 	int ret;
 	struct addrinfo hints;
@@ -117,7 +120,7 @@ int connect_tcp () {
 	}
 
 	// Loop until we establish a connection.
-	// This is where reconnects happen
+	// This is where reconnects happen if the server goes down
 	while (1) {
 		// Connect to the socket
 		ret = connect(tcp_socket, strmSvr->ai_addr, strmSvr->ai_addrlen);
@@ -193,11 +196,13 @@ int get_prefix () {
 }
 
 // Simple function that calls the functions needed to reconnect
-int reconnect () {
+void reconnect () {
 	int ret;
 
-	ret = connect_tcp();
-	if (ret < 0) return ret;
+	// Sit an spin until this works
+	while (connect_tcp() < 0) {
+		sleep(2);
+	}
 
 	ret = get_prefix();
 	if (ret < 0) return ret;
