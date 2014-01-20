@@ -9,8 +9,6 @@ endef
 HELP += $(RPI_HELP)
 
 ARM_COMPILER = arm-linux-gnueabi
-#ARM_COMPILER = arm-none-eabi
-#ARM_COMPILER = arm-none-linux-gnueabi
 
 GCC = $(ARM_COMPILER)-gcc
 OBJCOPY = $(ARM_COMPILER)-objcopy

@@ -100,6 +100,8 @@ func handleClient (tcpc *net.TCPConn) {
 
 	var newclient ClientIdentifier
 
+	fmt.Println("New client connecting")
+
 	for {
 		// Read in a message
 		// This should be a JSON blob

@@ -1,2 +1,6 @@
-rev: A
 title: RPi + CC2520
+author: Brad Campbell
+rev: A
+description: CC2520 shield for the Raspberry Pi. Includes three LEDs and the DS2411 ID chip.
+revision: a
+github: http://github.com/lab11/raspberrypi-cc2520
