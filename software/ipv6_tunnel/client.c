@@ -203,17 +203,15 @@ int get_prefix () {
 
 // Simple function that calls the functions needed to reconnect
 void reconnect () {
-	int ret;
 
 	// Sit an spin until this works
 	while (connect_tcp() < 0) {
 		sleep(2);
 	}
 
-	ret = get_prefix();
-	if (ret < 0) return ret;
-
-	return 0;
+	while(get_prefix() < 0) {
+		sleep(2);
+	}
 }
 
 int main () {
@@ -300,11 +298,7 @@ int main () {
 	close(macfile);
 
 	// Create the connection to the IPv6 tunnel server
-	ret = reconnect();
-	if (ret < 0) {
-		fprintf(stderr, "Could not connect to server\n");
-		return -1;
-	}
+	reconnect();
 
 	// Add an IP address to the interface so that packets go out with
 	// full addresses and not link-local addresses.
