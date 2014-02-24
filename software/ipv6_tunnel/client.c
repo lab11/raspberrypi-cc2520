@@ -110,7 +110,7 @@ int connect_tcp () {
 		fprintf(stderr, "%s", gai_strerror(ret));
 		return -1;
 	}
-	
+
 	// Create a TCP connection
 	tcp_socket = socket(strmSvr->ai_family,
 	                    strmSvr->ai_socktype,
@@ -155,7 +155,7 @@ int get_prefix () {
 	int i;
 
 	// Copy the mac address into the json blob
-	memcpy(json_id+7, macbuf, 11);
+	memcpy(json_id+7, macbuf, 17);
 
 	// Transmit the ID to the server
 	sent_len = send(tcp_socket, json_id, strlen(json_id), 0);
