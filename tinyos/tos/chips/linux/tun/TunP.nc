@@ -19,11 +19,14 @@ module TunP {
   }
   uses {
     interface IO;
-    interface BRConfig;
+    interface IPAddress;
+    interface TunName;
   }
 }
 
 implementation {
+
+#define MAX_TUN_NAME_LEN 100
 
   int ssystem(const char *fmt, ...);
 
@@ -36,6 +39,9 @@ implementation {
 
   // Send related state variables
   struct send_info send_info_struct = {NULL, 1, 1, 1, FALSE, 0};
+
+  // Name of the TUN device in case we need to update it
+  char tun_name[MAX_TUN_NAME_LEN];
 
   task void sendDone_task() {
     signal IPForward.sendDone(&send_info_struct);
@@ -111,6 +117,35 @@ implementation {
     post receive_task();
   }
 
+  event void IPAddress.changed (bool valid) {
+    char cmdbuf[4096];
+    struct in6_addr addr;
+
+    if (!valid) {
+      // The IP address of this node was removed. Remove all addresses
+      // from the interface.
+      // TODO
+    } else {
+      char astr[64];
+
+      printf("here\n");
+
+      call IPAddress.getGlobalAddr(&addr);
+      inet_ntop6(&addr, astr, 64);
+
+      printf("got address %s\n", astr);
+
+      // Set a route for the prefix the border router is routing through
+      // this tun device.
+      snprintf(cmdbuf, 4906, "ip -6 route add %s/64 dev %s", astr, tun_name);
+      ssystem(cmdbuf);
+
+      // Add the border router's ip address to this tun device
+      snprintf(cmdbuf, 4906, "ifconfig %s inet6 add %s1/64", tun_name, astr);
+      ssystem(cmdbuf);
+    }
+  }
+
   command error_t SoftwareInit.init() {
     struct ifreq ifr;
     int err;
@@ -128,6 +163,9 @@ implementation {
     // Clear the ifr struct
     memset(&ifr, 0, sizeof(ifr));
 
+    // Set the TUN name
+    strncpy(ifr.ifr_name, call TunName.getTunName(), IFNAMSIZ);
+
     // Select a TUN device
     ifr.ifr_flags = IFF_TUN | IFF_NO_PI;
 
@@ -142,23 +180,15 @@ implementation {
     // Make nonblocking in case select() gives us trouble
     make_nonblocking(tun_file);
 
+    // Save the name of the tun interface
+    strncpy(tun_name, ifr.ifr_name, MAX_TUN_NAME_LEN);
+
     // Setup the IP Addresses
     // ifconfig tun0 up
     snprintf(cmdbuf, 4096, "ifconfig %s up", ifr.ifr_name);
     ssystem(cmdbuf);
     // ifconfig tun0 mtu 1280
     snprintf(cmdbuf, 4906, "ifconfig %s mtu 1280", ifr.ifr_name);
-    ssystem(cmdbuf);
-    // ip -6 route add 2001:470:1f11:131a::/64 dev tun0
-    inet_ntop6(call BRConfig.getPrefixPtr(), ipaddrbuf, 64);
-    snprintf(cmdbuf, 4906, "ip -6 route add %s/64 dev %s", ipaddrbuf,
-      ifr.ifr_name);
-    ssystem(cmdbuf);
-    // Dummy link local addr to make the dhcp server work
-    snprintf(cmdbuf, 4906, "ifconfig %s inet6 add fe80::212:aaaa:bbbb:ffff/64",
-      ifr.ifr_name);
-    ssystem(cmdbuf);
-    snprintf(cmdbuf, 4906, "ifconfig %s inet6 add %s1/64", ifr.ifr_name, ipaddrbuf);
     ssystem(cmdbuf);
 
     // Register the file descriptor with the IO manager that will call select()

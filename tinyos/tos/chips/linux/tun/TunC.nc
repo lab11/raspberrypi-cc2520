@@ -21,10 +21,16 @@ implementation {
   components TunP;
   components MainC;
   components new IOFileC();
-  components BRConfigC;
+  components IPAddressC;
+  components TunNameC;
 
   TunP.IO -> IOFileC.IO;
-  TunP.BRConfig -> BRConfigC.BRConfig;
+
+  // Anytime the IP address of the border router changes we need to know.
+  // This will let us update the route to and ipv6 address of the TUN device.
+  TunP.IPAddress -> IPAddressC.IPAddress;
+
+  TunP.TunName -> TunNameC.TunName;
 
   MainC.SoftwareInit -> TunP.SoftwareInit;
 
