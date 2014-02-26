@@ -11,14 +11,14 @@ implementation {
   App.Leds -> LedsC;
   App.MilliTimer -> TimerMilliC;
 
-
   // Radio
   components IPStackC;
   components new UdpSocketC() as UDPService;
   App.RadioControl -> IPStackC.SplitControl;
   App.UDPService   -> UDPService.UDP;
-  App.ForwardingTable -> IPStackC.ForwardingTable;
+
+#ifdef RPL_ROUTING
+  components RPLRoutingC;
+#endif
 
 }
-
-
