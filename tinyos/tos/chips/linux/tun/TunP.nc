@@ -141,7 +141,7 @@ implementation {
       ssystem(cmdbuf);
 
       // Add the border router's ip address to this tun device
-      snprintf(cmdbuf, 4906, "ifconfig %s inet6 add %s1/64", tun_name, astr);
+      snprintf(cmdbuf, 4906, "ifconfig %s inet6 add %s/64", tun_name, astr);
       ssystem(cmdbuf);
     }
   }
@@ -150,7 +150,6 @@ implementation {
     struct ifreq ifr;
     int err;
     char cmdbuf[4096];
-    char ipaddrbuf[64];
 
     tun_file = open("/dev/net/tun", O_RDWR);
     if (tun_file < 0) {
@@ -189,6 +188,10 @@ implementation {
     ssystem(cmdbuf);
     // ifconfig tun0 mtu 1280
     snprintf(cmdbuf, 4906, "ifconfig %s mtu 1280", ifr.ifr_name);
+    ssystem(cmdbuf);
+    // dummy link-local
+    snprintf(cmdbuf, 4906, "ifconfig %s inet6 add fe80::212:aaaa:bbbb:ffff/64",
+      ifr.ifr_name);
     ssystem(cmdbuf);
 
     // Register the file descriptor with the IO manager that will call select()
