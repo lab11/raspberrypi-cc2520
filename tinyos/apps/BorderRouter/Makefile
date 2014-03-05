@@ -7,7 +7,6 @@ PFLAGS += -DCC2520_DEF_CHANNEL=21
 ###
 
 # Use IN6_PREFIX with static addressing modes
-#PFLAGS += -DIN6_PREFIX="\"::\""
 # Use BLIP Neighbor Discovery to autoconfigure an address
 PFLAGS += -DBLIP_ADDR_AUTOCONF=1
 # Use RPL and prefix information in DIO messages to autoconfigure an address

@@ -17,10 +17,10 @@ implementation {
 
   components BorderC;
 
-  // Choose the addressing scheme
-  // This is still not ideal, but will work for now.
+  // If we want to use static addressing
 //  components StaticIPAddressC;
-//  components StaticIPAddressTosIdC;
+
+  // Uncomment to use DHCP
 //  components Dhcp6C;
 
 
