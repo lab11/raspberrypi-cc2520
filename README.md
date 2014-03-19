@@ -136,22 +136,18 @@ To use IPv6 you need to enable IPV6 on the RPI:
 
 By default, Linux will not forward packets between interfaces. This
 functionality is critical, however, if you want the RPi to act as a border
-router for a  wireless network. To enable interface forwarding you need to do
+router for a  wireless network. Once interface forwarding is enabled, Linux
+considers the machine to be a
+router. This causes it to no longer receive IPv6 router advertisements, because
+routers are typically statically configured. In most cases we'd rather not deal
+with that, so we would like Linux to both accept router advertisements and to
+forward packets.
+To enable these you need to do
 the following:
 
     sudo vim /etc/sysctl.conf
     uncomment the line: net.ipv6.conf.all.forwarding=1
-
-Once interface forwarding is enabled, Linux considers the machine to be a
-router. This causes it to no longer receive IPv6 router advertisements, because
-routers are typically statically configured. In most cases we'd rather not deal
-with that, so we would like Linux to both accept router advertisements and to
-forward packets. To enable that run the following command. This sets a
-configuration bool to the magical value of "2".
-
-    sudo su
-    echo 2 > /proc/sys/net/ipv6/conf/eth0/accept_ra
-
+    add the line: net.ipv6.conf.eth0.accept_ra=2
 
 
 
