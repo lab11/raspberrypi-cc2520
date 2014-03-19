@@ -234,9 +234,9 @@ int main () {
     int i;
 
 	// Parse the config file
-	ret = ini_parse("config.ini", config_handler, &cfg);
+	ret = ini_parse("ipv6tunnel-client.ini", config_handler, &cfg);
 	if (ret < 0) {
-		fprintf(stderr, "Could not open config.ini\n");
+		fprintf(stderr, "Could not open ipv6tunnel-client.ini\n");
 		fprintf(stderr, "The configuration file is required.\n");
 		return -1;
 	}
