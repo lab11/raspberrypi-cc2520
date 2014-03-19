@@ -12,10 +12,12 @@ from sh import sudo
 import IPy
 import time
 import subprocess
-
+import os
 
 IPV6TUNNEL_INTERFACE = 'ipv6-umich'
 BORDERROUTER_INTERFACE = 'tun-br'
+
+HOMEDIR = os.path.split(os.path.abspath(__file__))[0]
 
 def is_ipv6_tunnel ():
 	try:
@@ -68,7 +70,7 @@ if not is_ipv6_tunnel():
 	## If the tunnel is not there, run the tunnel application
 	print('IPv6 Tunnel not found.')
 	print('Starting ipv6tunnel-client.')	
-	subprocess.call(["screen", "-d", "-m", "-S", "ipv6-tunnel", "sudo", "./ipv6tunnel-client"])
+	subprocess.call(["screen", "-d", "-m", "-S", "ipv6-tunnel", "sudo", HOMEDIR+"/ipv6tunnel-client"])
 
 
 ## Step 3
@@ -86,11 +88,11 @@ while True:
 ## Step 4
 ## Configure radvd to use that prefix
 print('Creating radvd.conf')
-with open('radvd.conf.in') as fin:
+with open(HOMEDIR+'/radvd.conf.in') as fin:
 	conf = fin.read()
 	confout = conf.replace('%PREFIX%', prefix)
 	confout = confout.replace('%INTERFACE%', BORDERROUTER_INTERFACE)
-	with open('radvd.conf', 'w') as fout:
+	with open(HOMEDIR+'/radvd.conf', 'w') as fout:
 		fout.write(confout)
 
 ## Step 5
@@ -105,10 +107,7 @@ except Exception:
 	# Nothing was found
 	pass
 print('Starting radvd.')
-#subprocess.call(["sudo", "./radvd", "-C", "./radvd.conf"])
-print(subprocess.check_output(["screen", "-d", "-m", "-S", "radvd", "sudo", "./radvd", "-C", "./radvd.conf", "--nodaemon"]))
-#print(subprocess.check_output("sudo ./radvd -C ./radvd.conf", shell=True))
-#sudo('./radvd', '-C', './radvd.conf')
+subprocess.call(["screen", "-d", "-m", "-S", "radvd", "sudo", HOMEDIR+"/radvd", "-C", HOMEDIR+"/radvd.conf", "--nodaemon"])
 
 ## Step 6
 ## Run the BorderRouter
@@ -120,5 +119,5 @@ try:
 except Exception:
 	pass
 print('Starting Border Router.')
-subprocess.call(["screen", "-d", "-m", "-S", "border-router", "sudo", "./BorderRouterC", '-i', BORDERROUTER_INTERFACE])
+subprocess.call(["screen", "-d", "-m", "-S", "border-router", "sudo", HOMEDIR+"/BorderRouterC", '-i', BORDERROUTER_INTERFACE])
 
