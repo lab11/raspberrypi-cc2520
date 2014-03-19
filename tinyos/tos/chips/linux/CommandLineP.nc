@@ -1,7 +1,6 @@
 
 module CommandLineP {
   provides {
-    interface Init as SoftwareInit @exactlyonce();
     interface CommandLineArgs;
   }
 }
@@ -16,7 +15,9 @@ implementation {
 
   uint8_t num_args = 0;
 
-  command error_t SoftwareInit.init() {
+  bool inited = FALSE;
+
+  error_t init() {
     int cmdline_fd;
     char fn_buf[100];
     pid_t process_id;
@@ -24,6 +25,7 @@ implementation {
     uint8_t arg_buf[(MAX_ARGS*MAX_ARG_LEN) + 1];
     int i;
 
+    if (inited) return SUCCESS;
 
     // Get the filename to the cmdline file that contains the arguments
     process_id = getpid();
@@ -92,14 +94,20 @@ implementation {
       CMDLINE_PRINTF("arg%02i: %s\n", i, args[i]);
     }
 
+    inited = TRUE;
+
     return SUCCESS;
   }
 
   command uint8_t CommandLineArgs.count () {
+    init();
+
     return num_args;
   }
 
   command char* CommandLineArgs.getArg (uint8_t arg_idx) {
+    init();
+
     if (arg_idx >= num_args) {
       return NULL;
     }

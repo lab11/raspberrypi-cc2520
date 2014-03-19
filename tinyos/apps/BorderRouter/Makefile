@@ -1,20 +1,71 @@
 COMPONENT=BorderRouterC
 
-PFLAGS += -DCC2520_DEF_CHANNEL=19
+PFLAGS += -DCC2520_DEF_CHANNEL=21
 
-# use rpl
-PFLAGS += -DRPL_ROUTING -DRPL_STORING_MODE -I%T/lib/net/rpl
-# PFLAGS += -DRPL_OF_MRHOF
+###
+### Set the addressing scheme
+###
 
-# this works around fragmentation in the RX buffer pool
-PFLAGS += -DPPP_HDLC_RX_FRAME_LIMIT=1 -DPPP_HDLC_TX_FRAME_LIMIT=8
+# Use IN6_PREFIX with static addressing modes
+# Use BLIP Neighbor Discovery to autoconfigure an address
+PFLAGS += -DBLIP_ADDR_AUTOCONF=1
+# Use RPL and prefix information in DIO messages to autoconfigure an address
+PFLAGS += -DRPL_ADDR_AUTOCONF=0
 
-# if you set this, the stack won't use dhcp to assign addresses -- it
-# will use this prefix combined with TOS_NODE_ID
-PFLAGS += -DIN6_PREFIX="\"::\""
+###
+### Configure BLIP
+###
 
-# derive short address from the dhcp address assignment, if possible
-#PFLAGS += -DBLIP_DERIVE_SHORTADDRS
+# Configure the Neighbor Discovery mechanism
+PFLAGS += -DBLIP_SEND_ROUTER_SOLICITATIONS=1
+PFLAGS += -DBLIP_SEND_ROUTER_ADVERTISEMENTS=1
+
+# Configure the number of times BLIP tries to send a packet and how long it
+# waits between attempts
+#PFLAGS += -DBLIP_L2_RETRIES=5
+#PFLAGS += -DBLIP_L2_DELAY=103
+
+# Configure how many of the 6LoWPAN headers we support
+#PFLAGS += -DLIB6LOWPAN_FULL=1
+
+# Configure the header compression for 6LoWPAN
+PFLAGS += -DLIB6LOWPAN_HC_VERSION=6
+
+# Keep statistics about various BLIP/IPv6 parameters. See BlipStatistics.h
+#PFLAGS += -DBLIP_STATS
+#PFLAGS += -DBLIP_STATS_IP_MEM
+
+###
+### Configure RPL
+###
+
+# Include the RPL layer if set to 1
+PFLAGS += -DRPL_ROUTING=1
+
+# If set keep routing information in each node. If not the root must keep all
+# routing information.
+PFLAGS += -DRPL_STORING_MODE=1
+
+# Choose the objective function RPL should use
+PFLAGS += -DRPL_OF_0=1
+PFLAGS += -DRPL_OF_MRHOF=0
+
+###
+### Configure LPL
+###
+
+#PFLAGS += -DLOW_POWER_LISTENING
+#PFLAGS += -DLPL_SLEEP_INTERVAL=512
+#PFLAGS += -DLPL_DEF_LOCAL_WAKEUP=512
+#PFLAGS += -DLPL_DEF_REMOTE_WAKEUP=512
+
+###
+### Configure printf() output
+###
+
+#PFLAGS += -DPRINTFUART_ENABLED
+
+GOALS += blip rpl
 
 TINYOS_ROOT_DIR?=../..
 include $(TINYOS_ROOT_DIR)/Makefile.include

@@ -124,11 +124,10 @@ Setup
 -----
 
 Once you have an RPi setup with Raspbian, there are various changes you may
-need to make depending on what you want to do.
+need to make to the Raspbian install depending on what you want to do.
 
 ### Use IPv6
-To use IPv6
-you need to enable IPV6 on the RPI:
+To use IPv6 you need to enable IPV6 on the RPI:
 
     $ sudo vim /etc/modules
     add ipv6 on a newline
@@ -137,22 +136,18 @@ you need to enable IPV6 on the RPI:
 
 By default, Linux will not forward packets between interfaces. This
 functionality is critical, however, if you want the RPi to act as a border
-router for a  wireless network. To enable interface forwarding you need to do
+router for a  wireless network. Once interface forwarding is enabled, Linux
+considers the machine to be a
+router. This causes it to no longer receive IPv6 router advertisements, because
+routers are typically statically configured. In most cases we'd rather not deal
+with that, so we would like Linux to both accept router advertisements and to
+forward packets.
+To enable these you need to do
 the following:
 
     sudo vim /etc/sysctl.conf
     uncomment the line: net.ipv6.conf.all.forwarding=1
-
-Once interface forwarding is enabled, Linux considers the machine to be a
-router. This causes it to no longer receive IPv6 router advertisements, because
-routers are typically statically configured. In most cases we'd rather not deal
-with that, so we would like Linux to both accept router advertisements and to
-forward packets. To enable that run the following command. This sets a
-configuration bool to the magical value of "2".
-
-    sudo su
-    echo 2 > /proc/sys/net/ipv6/conf/eth0/accept_ra
-
+    add the line: net.ipv6.conf.eth0.accept_ra=2
 
 
 
@@ -219,17 +214,31 @@ Hurricane Electric conveniently provides every tunnel it creates a /64 prefix
 that they route to the end of the tunnel. This is perfect for the BorderRouter
 application as the WSN nodes can use IP addresses in this range.
 
-### Setting Up the RPI
+### Setting Up the Border Router
 
-The RPi will be running the BorderRouter app and a DHCPv6 server.
+The RPi will be running the BorderRouter app.
+The border router is required to determine the 64 bit IPv6 prefix that the
+network uses. How this prefix is assigned can be handled in several ways:
+IPv6 Neighbor Discovery, DHCP, or static configuration.
 
-#### Configure the BorderRouter App Address
+#### Addressing: IPv6 Neighbor Discovery
 
-The RPI acts as a router for a range of IP addresses for the connected wireless
-motes. You will need to change `brconfig.ini` with the prefix information you
-were assigned from Hurricane Electric.
+To use router solicitations and router advertisements to assign a prefix
+for the network, set `BLIP_ADDR_AUTOCONF=1` in the Makefile, as well
+as `BLIP_SEND_ROUTER_SOLICITATIONS=1`. This will cause the border router
+to send a router solicitation in order to receive a router solicitation
+and then use the prefix that it receives from the router advertisement as the
+network prefix.
 
-#### DHCP
+The next step is something must respond to the router solicitations. To do
+this, setup [radvd](https://github.com/reubenhwk/radvd) to respond to router
+solictitations on the interface that the border router creates. To configure
+the name of the TUN device the border router creates, run the border router
+app like this:
+
+    sudo ./BorderRouterC -i tunname
+
+#### Addressing: DHCP
 
 Blip supports both static and dynamic IP addresses. If you wish to reduce your
 burden when flashing nodes and use dynamic addresses, you need to be
@@ -271,17 +280,20 @@ located at `/etc/dibbler/server.conf`. Here is mine:
      }
     }
 
+#### Addressing: Static
 
+To assign a static prefix, uncomment `components StaticIPAddressC;` from `BorderRouterC.nc`
+and update the prefix in `brconfig.ini`.
 
-### Setting Up the Computer
+### Compile and Install
 
-The computer can act as a source of packets or a receiver of packets. I do this
-by setting up another tunnel with Hurricane Electric. This way the computer has
-an IPv6 address.
+In `/tinyos/apps/BorderRouter`:
+    
+    make rpi install scp.<ip address of rpi>
 
+### Operation
 
-
-
-
-
+Once running the BorderRouter application will forward all IPv6 packets that are not destined
+for a node in the network to the TUN interface, and then Linux can route those packets
+to the Internet.
 

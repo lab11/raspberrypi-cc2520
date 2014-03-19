@@ -10,7 +10,7 @@ module BorderRouterP @safe() {
 implementation {
 
   event void Boot.booted() {
-#ifdef RPL_ROUTING
+#if RPL_ROUTING
     call RootControl.setRoot();
 #endif
     call RadioControl.start();

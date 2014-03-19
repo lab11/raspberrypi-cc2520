@@ -21,4 +21,4 @@ endif
 
 program: setid FORCE
 	@echo -e '$(INFO_STRING) Installing rpi binary to $(RPI_ID)'
-	@scp $(TOSMAKE_BUILD_DIR)/main.exe $(RPI_ID):~/$(COMPONENT)
+	@scp $(TOSMAKE_BUILD_DIR)/main.exe $(RPI_ID):~/$(notdir $(COMPONENT))

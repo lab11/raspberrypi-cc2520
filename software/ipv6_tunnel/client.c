@@ -83,7 +83,10 @@ static int config_handler(void* user, const char* section, const char* name,
 	return 1;
 }
 
-// Creates a TCP connection to the IPv6 tunnel server
+// Creates a TCP connection to the IPv6 tunnel server.
+// This function can fail if the client has no Internet (and therefore can't
+// resolve DNS). If the client has Internet but the server is down, this
+// function will spin until the server comes back.
 int connect_tcp () {
 	int ret;
 	struct addrinfo hints;
@@ -107,7 +110,7 @@ int connect_tcp () {
 		fprintf(stderr, "%s", gai_strerror(ret));
 		return -1;
 	}
-	
+
 	// Create a TCP connection
 	tcp_socket = socket(strmSvr->ai_family,
 	                    strmSvr->ai_socktype,
@@ -119,7 +122,7 @@ int connect_tcp () {
 	}
 
 	// Loop until we establish a connection.
-	// This is where reconnects happen
+	// This is where reconnects happen if the server goes down
 	while (1) {
 		// Connect to the socket
 		ret = connect(tcp_socket, strmSvr->ai_addr, strmSvr->ai_addrlen);
@@ -152,7 +155,7 @@ int get_prefix () {
 	int i;
 
 	// Copy the mac address into the json blob
-	memcpy(json_id+7, macbuf, 11);
+	memcpy(json_id+7, macbuf, 17);
 
 	// Transmit the ID to the server
 	sent_len = send(tcp_socket, json_id, strlen(json_id), 0);
@@ -199,16 +202,16 @@ int get_prefix () {
 }
 
 // Simple function that calls the functions needed to reconnect
-int reconnect () {
-	int ret;
+void reconnect () {
 
-	ret = connect_tcp();
-	if (ret < 0) return ret;
+	// Sit an spin until this works
+	while (connect_tcp() < 0) {
+		sleep(2);
+	}
 
-	ret = get_prefix();
-	if (ret < 0) return ret;
-
-	return 0;
+	while(get_prefix() < 0) {
+		sleep(2);
+	}
 }
 
 int main () {
@@ -231,9 +234,9 @@ int main () {
     int i;
 
 	// Parse the config file
-	ret = ini_parse("config.ini", config_handler, &cfg);
+	ret = ini_parse("ipv6tunnel-client.ini", config_handler, &cfg);
 	if (ret < 0) {
-		fprintf(stderr, "Could not open config.ini\n");
+		fprintf(stderr, "Could not open ipv6tunnel-client.ini\n");
 		fprintf(stderr, "The configuration file is required.\n");
 		return -1;
 	}
@@ -295,11 +298,7 @@ int main () {
 	close(macfile);
 
 	// Create the connection to the IPv6 tunnel server
-	ret = reconnect();
-	if (ret < 0) {
-		fprintf(stderr, "Could not connect to server\n");
-		return -1;
-	}
+	reconnect();
 
 	// Add an IP address to the interface so that packets go out with
 	// full addresses and not link-local addresses.

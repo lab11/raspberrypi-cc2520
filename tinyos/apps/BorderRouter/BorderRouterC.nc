@@ -17,13 +17,12 @@ implementation {
 
   components BorderC;
 
-  // Choose the addressing scheme based on whether or not we have a prefix.
-  // This is still not ideal, but will work for now.
-#ifdef IN6_PREFIX
-  components StaticIPAddressC;
-#else
-  components Dhcp6C;
-#endif
+  // If we want to use static addressing
+//  components StaticIPAddressC;
+
+  // Uncomment to use DHCP
+//  components Dhcp6C;
+
 
 #ifdef RPL_ROUTING
   components RPLRoutingC;

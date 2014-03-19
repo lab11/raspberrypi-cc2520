@@ -15,6 +15,7 @@ module BorderP {
 
 implementation {
 
+  struct in6_addr all_routers;
   struct in6_addr dhcp_server;
   struct in6_addr tun_ll;
 
@@ -26,6 +27,14 @@ implementation {
                                   0,
                                   NULL,
                                   ROUTE_IFACE_TUN);
+
+    // Add a route for all routers address.
+    inet_pton6("ff02::2", &all_routers);
+    call ForwardingTable.addRoute(all_routers.s6_addr,
+                                  128,
+                                  NULL,
+                                  ROUTE_IFACE_TUN);
+
 
     // Add a route for dhcp server requests. Without this route the node will
     // broadcast these on the radio, and there is no dhcp server out there.
