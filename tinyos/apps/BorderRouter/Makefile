@@ -1,20 +1,21 @@
 COMPONENT=BorderRouterC
 
-PFLAGS += -DCC2520_DEF_CHANNEL=21
+PFLAGS += -DCC2520_DEF_CHANNEL=19
 
-###
+################################################################################
 ### Set the addressing scheme
-###
+################################################################################
 
 # Use IN6_PREFIX with static addressing modes
+#PFLAGS += -DIN6_PREFIX=\"fec0::\"
 # Use BLIP Neighbor Discovery to autoconfigure an address
 PFLAGS += -DBLIP_ADDR_AUTOCONF=1
 # Use RPL and prefix information in DIO messages to autoconfigure an address
 PFLAGS += -DRPL_ADDR_AUTOCONF=0
 
-###
+################################################################################
 ### Configure BLIP
-###
+################################################################################
 
 # Configure the Neighbor Discovery mechanism
 PFLAGS += -DBLIP_SEND_ROUTER_SOLICITATIONS=1
@@ -35,9 +36,9 @@ PFLAGS += -DLIB6LOWPAN_HC_VERSION=6
 #PFLAGS += -DBLIP_STATS
 #PFLAGS += -DBLIP_STATS_IP_MEM
 
-###
+################################################################################
 ### Configure RPL
-###
+################################################################################
 
 # Include the RPL layer if set to 1
 PFLAGS += -DRPL_ROUTING=1
@@ -50,18 +51,18 @@ PFLAGS += -DRPL_STORING_MODE=1
 PFLAGS += -DRPL_OF_0=1
 PFLAGS += -DRPL_OF_MRHOF=0
 
-###
+################################################################################
 ### Configure LPL
-###
+################################################################################
 
 #PFLAGS += -DLOW_POWER_LISTENING
 #PFLAGS += -DLPL_SLEEP_INTERVAL=512
 #PFLAGS += -DLPL_DEF_LOCAL_WAKEUP=512
 #PFLAGS += -DLPL_DEF_REMOTE_WAKEUP=512
 
-###
+################################################################################
 ### Configure printf() output
-###
+################################################################################
 
 #PFLAGS += -DPRINTFUART_ENABLED
 

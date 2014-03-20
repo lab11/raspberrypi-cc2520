@@ -9,9 +9,12 @@ import (
 	"os/exec"
 	"sync"
 	"os"
+	"flag"
 	"github.com/lab11/go-tuntap/tuntap"
 	"code.google.com/p/gcfg"
 )
+
+var verbose bool
 
 var prefixes *PrefixManager
 var tunids *TunManager
@@ -36,16 +39,18 @@ func lockClient (id string) {
 		mw = &mutexWrap{lock: new(sync.Mutex)}
 	}
 	client_locks[id] = mw
-	mw.lock.Lock()
 
 	client_locks_lock.Unlock()
+
+	mw.lock.Lock()
 }
 
 func unlockClient (id string) {
 	client_locks_lock.Lock()
 	mw := client_locks[id]
-	mw.lock.Unlock()
 	client_locks_lock.Unlock()
+
+	mw.lock.Unlock()
 }
 
 // Block on the TCP socket waiting for the client to tunnel us IPv6 packets.
@@ -125,6 +130,8 @@ get a unique id.`)
 
 	lockClient(newclient.Id)
 
+	if verbose { fmt.Println("Client lock acquired", newclient.Id) }
+
 	// Use keep-alives so we know if a client suddenly disconnects
 	tcpc.SetKeepAlive(true)
 
@@ -151,6 +158,7 @@ get a unique id.`)
 	tunname := tunids.getNewTunName()
 	tun, err := tuntap.Open(tunname, tuntap.DevTun, false)
 	if err != nil { log.Fatal(err) }
+	if verbose { fmt.Println("Got TUN name", newclient.Id, tunname) }
 
 	// Remove the /64 portion
 	prefixbase := strings.Split(prefix.Prefix, "/")
@@ -212,6 +220,8 @@ handle_loop:
 		}
 	}
 
+	if verbose { fmt.Println("Unlocking client", newclient.Id) }
+
 	unlockClient(newclient.Id)
 }
 
@@ -233,6 +243,10 @@ func main () {
 	main_quit := make(chan int)
 
 	client_locks = make(map[string]*mutexWrap)
+
+	// Get command line arguments
+	flag.BoolVar(&verbose, "verbose", false, "Run with verbose mode printing")
+	flag.Parse()
 
 	// Parse the config file
 	var cfg ConfigIni
