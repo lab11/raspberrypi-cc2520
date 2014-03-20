@@ -95,7 +95,22 @@ with open(HOMEDIR+'/radvd.conf.in') as fin:
 	with open(HOMEDIR+'/radvd.conf', 'w') as fout:
 		fout.write(confout)
 
+
 ## Step 5
+## Run the BorderRouter
+try:
+	out = grep(ps('-A'), 'BorderRouterC')
+	print('BorderRouter already running.')
+	print('Killing BorderRouter...')
+	sudo.pkill('-9', 'BorderRouterC')
+except Exception:
+	pass
+print('Starting Border Router.')
+subprocess.call(["screen", "-d", "-m", "-S", "border-router", "sudo", HOMEDIR+"/BorderRouterC", '-i', BORDERROUTER_INTERFACE])
+
+time.sleep(5)
+
+## Step 6
 ## Run radvd
 try:
 	out = grep(ps('-A'), 'radvd')
@@ -108,16 +123,3 @@ except Exception:
 	pass
 print('Starting radvd.')
 subprocess.call(["screen", "-d", "-m", "-S", "radvd", "sudo", HOMEDIR+"/radvd", "-C", HOMEDIR+"/radvd.conf", "--nodaemon"])
-
-## Step 6
-## Run the BorderRouter
-try:
-	out = grep(ps('-A'), 'BorderRouterC')
-	print('BorderRouter already running.')
-	print('Killing BorderRouter...')
-	sudo.pkill('-9', 'BorderRouterC')
-except Exception:
-	pass
-print('Starting Border Router.')
-subprocess.call(["screen", "-d", "-m", "-S", "border-router", "sudo", HOMEDIR+"/BorderRouterC", '-i', BORDERROUTER_INTERFACE])
-
