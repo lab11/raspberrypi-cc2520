@@ -95,6 +95,10 @@ int connect_tcp () {
 
 	printf("Attempting to connect to %s:%d\n", cfg.remotehost, cfg.remoteport);
 
+	// Close tcp_socket just in case. Likely this won't be valid, but if
+	// we need to reconnect make sure this socket is closed.
+	close(tcp_socket);
+
 	// Tell getaddrinfo() that we only want a TCP connection
 	memset(&hints, 0, sizeof(struct addrinfo));
 	hints.ai_socktype = SOCK_STREAM;
@@ -205,11 +209,15 @@ int get_prefix () {
 void reconnect () {
 
 	// Sit an spin until this works
-	while (connect_tcp() < 0) {
-		sleep(2);
-	}
-
-	while(get_prefix() < 0) {
+	while (1) {
+		if (connect_tcp() < 0) {
+			goto loop;
+		}
+		if (get_prefix() < 0) {
+			goto loop;
+		}
+		break;
+loop:
 		sleep(2);
 	}
 }
