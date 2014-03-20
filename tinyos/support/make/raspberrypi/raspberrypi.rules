@@ -8,13 +8,19 @@ endef
 
 HELP += $(RPI_HELP)
 
-ARM_COMPILER = arm-linux-gnueabi
+SHELL=/bin/bash
 
-GCC = $(ARM_COMPILER)-gcc
-OBJCOPY = $(ARM_COMPILER)-objcopy
-OBJDUMP = $(ARM_COMPILER)-objdump
+ARM_COMPILER_PREFIX=$(shell if `hash arm-linux-gnueabi-gcc >& /dev/null`; then echo arm-linux-gnueabi; elif `hash arm-linux-gnu-gcc >& /dev/null`; then echo arm-linux-gnu; elif `hash arm-none-linux-gnueabi-gcc >& /dev/null`; then echo arm-none-linux-gnueabi; elif `hash arm-none-eabi-gcc >& /dev/null`; then echo arm-none-eabi; else echo -n ""; fi)
+
+ifeq (,$(ARM_COMPILER_PREFIX))
+  $(error "No cross compiler found. Have you installed an ARM toolchain?")
+endif
+
+GCC = $(ARM_COMPILER_PREFIX)-gcc
+OBJCOPY = $(ARM_COMPILER_PREFIX)-objcopy
+OBJDUMP = $(ARM_COMPILER_PREFIX)-objdump
 SET_ID = tos-set-symbols
-SIZE = $(ARM_COMPILER)-size
+SIZE = $(ARM_COMPILER_PREFIX)-size
 LIBS = -lm -lrt -lc
 
 INSTALL_BIN = $(MAIN_BIN).out$(if $(NODEID),-$(NODEID),)
