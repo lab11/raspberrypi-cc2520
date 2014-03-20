@@ -10,7 +10,7 @@ HELP += $(RPI_HELP)
 
 SHELL=/bin/bash
 
-ARM_COMPILER_PREFIX=$(shell if `hash arm-linux-gnueabi-gcc >& /dev/null`; then echo arm-linux-gnueabi; elif `hash arm-linux-gnu-gcc >& /dev/null`; then echo arm-linux-gnu; elif `hash arm-none-linux-gnueabi-gcc >& /dev/null`; then echo arm-none-linux-gnueabi; elif `hash arm-none-eabi-gcc >& /dev/null`; then echo arm-none-eabi; else echo -n ""; fi)
+ARM_COMPILER_PREFIX=$(shell if `hash arm-linux-gnueabi-gcc >& /dev/null`; then echo arm-linux-gnueabi; elif `hash arm-unknown-linux-gnueabi-gcc >& /dev/null`; then echo arm-unknown-linux-gnueabi; elif `hash arm-none-linux-gnueabi-gcc >& /dev/null`; then echo arm-none-linux-gnueabi; elif `hash arm-none-eabi-gcc >& /dev/null`; then echo arm-none-eabi; else echo -n ""; fi)
 
 ifeq (,$(ARM_COMPILER_PREFIX))
   $(error "No cross compiler found. Have you installed an ARM toolchain?")
