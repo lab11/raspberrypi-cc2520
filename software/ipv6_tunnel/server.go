@@ -39,16 +39,18 @@ func lockClient (id string) {
 		mw = &mutexWrap{lock: new(sync.Mutex)}
 	}
 	client_locks[id] = mw
-	mw.lock.Lock()
 
 	client_locks_lock.Unlock()
+
+	mw.lock.Lock()
 }
 
 func unlockClient (id string) {
 	client_locks_lock.Lock()
 	mw := client_locks[id]
-	mw.lock.Unlock()
 	client_locks_lock.Unlock()
+
+	mw.lock.Unlock()
 }
 
 // Block on the TCP socket waiting for the client to tunnel us IPv6 packets.
