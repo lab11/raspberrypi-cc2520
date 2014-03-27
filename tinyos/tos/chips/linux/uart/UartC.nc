@@ -16,11 +16,13 @@ implementation {
   components MainC;
   components new IOFileC();
   components UnixTimeC;
+  components HplBcm2835GeneralIOC;
 
   MainC.SoftwareInit -> UartP.SoftwareInit;
 
   UartP.IO -> IOFileC.IO;
   UartP.UnixTime -> UnixTimeC.UnixTime;
+  UartP.RXPin -> HplBcm2835GeneralIOC.Port1_10;
 
   UartBuffer = UartP.UartBuffer;
   UartConfig = UartP.UartConfig;

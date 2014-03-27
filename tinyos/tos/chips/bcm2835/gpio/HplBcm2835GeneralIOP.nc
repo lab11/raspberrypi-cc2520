@@ -15,13 +15,21 @@ implementation {
 #define BCM2708_PERI_BASE 0x20000000
 #define GPIO_BASE         (BCM2708_PERI_BASE + 0x200000) // GPIO controller
 
+// Values to use with SET_GPIO_ALT for the various alternate functions of GPIOs
+#define FSEL_ALTERNATE_0 4
+#define FSEL_ALTERNATE_1 5
+#define FSEL_ALTERNATE_2 6
+#define FSEL_ALTERNATE_3 7
+#define FSEL_ALTERNATE_4 3
+#define FSEL_ALTERNATE_5 2
+
 #define PAGE_SIZE (4*1024)
 #define BLOCK_SIZE (4*1024)
 
 // GPIO setup macros. Always use INP_GPIO(x) before using OUT_GPIO(x) or SET_GPIO_ALT(x,y)
 #define INP_GPIO(g)        *(gpio+((g)/10)) &= ~(7<<(((g)%10)*3))
 #define OUT_GPIO(g)        *(gpio+((g)/10)) |=  (1<<(((g)%10)*3))
-#define SET_GPIO_ALT(g,a)  *(gpio+(((g)/10))) |= (((a)<=3?(a)+4:(a)==4?3:2)<<(((g)%10)*3))
+#define SET_GPIO_ALT(g,a)  *(gpio+((g)/10)) |=  (a<<(((g)%10)*3))
 
 #define GPIO_SET(g)        *(gpio+7) = (1<<(g))  // sets bits which are 1 ignores bits which are 0
 #define GPIO_CLR(g)        *(gpio+10) = (1<<(g)) // clears bits which are 1 ignores bits which are 0
@@ -37,6 +45,7 @@ implementation {
   // toggle() easy to implement.
   unsigned int pin_level = 0;
   unsigned int pin_output = 0;
+  unsigned int pin_alt = 0;
 
 
   command error_t Init.init() {
@@ -111,7 +120,13 @@ implementation {
   }
 
   async command bool Gpio.isInput[uint8_t bcm_pin]() {
-    atomic return PIN_NOTE_GET(pin_output, bcm_pin) == 0;
+    atomic {
+      if (PIN_NOTE_GET(pin_output, bcm_pin) == 0 &&
+          PIN_NOTE_GET(pin_alt, bcm_pin) == 0) {
+        return TRUE;
+      }
+      return FALSE;
+    }
   }
 
   async command void Gpio.makeOutput[uint8_t bcm_pin]() {
@@ -122,5 +137,16 @@ implementation {
 
   async command bool Gpio.isOutput[uint8_t bcm_pin]() {
     atomic return PIN_NOTE_GET(pin_output, bcm_pin) == 1;
+  }
+
+  async command void Gpio.selectModuleFunc[uint8_t bcm_pin]() {
+    INP_GPIO(bcm_pin);
+    SET_GPIO_ALT(bcm_pin, FSEL_ALTERNATE_0);
+    atomic PIN_NOTE_CLR(pin_output, bcm_pin);
+    atomic PIN_NOTE_SET(pin_alt, bcm_pin);
+  }
+
+  async command bool Gpio.isModuleFunc[uint8_t bcm_pin]() {
+    atomic return PIN_NOTE_GET(pin_alt, bcm_pin) == 1;
   }
 }
