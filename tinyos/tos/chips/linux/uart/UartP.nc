@@ -17,6 +17,7 @@ module UartP {
   uses {
     interface IO;
     interface UnixTime;
+    interface HplBcm2835GeneralIO as RXPin;
   }
 }
 
@@ -26,7 +27,6 @@ implementation {
   uint8_t uart_buf[1024];
   uint32_t last_uart_len;
 
-  //struct serial_struct serinfo;
   struct termios tty_settings;
 
   task void uart_recv_task () {
@@ -47,22 +47,10 @@ implementation {
     UART_PRINTF("setting serial options:\n");
     UART_PRINTF("    baud_rate: %i\n", config->baud_rate);
     UART_PRINTF("    min_bytes: %i\n", config->min_return);
-/*
-    serinfo.baud_base = config->baud_rate;
 
-    // low latency
-    serinfo.flags &= ~ASYNC_LOW_LATENCY;
-    if (config->low_latency) serinfo.flags |= ASYNC_LOW_LATENCY;
-
-
-    // Set the settings
-    ret = ioctl(uart_fd, TIOCSSERIAL, &serinfo);
-    if (ret < 0) {
-      ERROR("Cannot store serial settings.\n");
-      ERROR("%s\n", strerror(errno));
-      return FAIL;
-    }
-*/
+    // Make sure the RX pin is set to the UART function.
+    UART_PRINTF("configuring RX pin for UART\n");
+    call RXPin.selectModuleFunc();
 
     switch (config->baud_rate) {
       case 0: spd = B0; break;
@@ -120,12 +108,6 @@ implementation {
     }
 
     // Get the current configuration of the serial port.
-  //  ret = ioctl(uart_fd, TIOCGSERIAL, &serinfo);
-  //  if (ret < 0) {
-  //    ERROR("Cannot access serial info.\n");
-  //    ERROR("%s\n", strerror(errno));
-  //    exit(1);
-  //  }
     ret = tcgetattr(uart_fd, &tty_settings);
     if (ret == -1) {
       ERROR("Cannot access serial settings.\n");

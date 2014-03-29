@@ -58,9 +58,9 @@ interface HplBcm2835GeneralIO
   /**
    * Set pin for module specific functionality.
    */
-//  async command void selectModuleFunc();
+  async command void selectModuleFunc();
 
-//  async command bool isModuleFunc();
+  async command bool isModuleFunc();
 
   /**
    * Set pin for I/O functionality.
