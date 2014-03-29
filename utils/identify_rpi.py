@@ -18,5 +18,8 @@ for i in range(0,10):
 	r = requests.post(POST_URL,
 		data={"time":time.time(), "macaddr":macfmt, "ipaddr":ipaddr})
 
+	if r.status_code == 200:
+		break
+
 	time.sleep(10)
 
