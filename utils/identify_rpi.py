@@ -12,8 +12,8 @@ for i in range(0,10):
 	macfmt = ':'.join([mactem[i:i+2] for i in range(0, 12, 2)])
 
 	s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(('www.google.com', 0))
-    ipaddr = s.getsockname()[0]
+	s.connect(('www.google.com', 0))
+	ipaddr = s.getsockname()[0]
 
 	r = requests.post(POST_URL,
 		data={"time":time.time(), "macaddr":macfmt, "ipaddr":ipaddr})
