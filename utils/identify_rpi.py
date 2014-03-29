@@ -2,7 +2,7 @@ import requests, time
 from uuid import getnode as get_mac
 import socket
 
-POST_URL = 'https://www.runscope.com/stream/gbns1w57rtvk'
+POST_URL = 'https://rpi-disc-gbns1w57rtvk.runscope.net'
 
 for i in range(0,10):
 
