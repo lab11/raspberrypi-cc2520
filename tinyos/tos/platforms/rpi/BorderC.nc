@@ -22,7 +22,7 @@ implementation {
   components IPStackC;
   BorderP.ForwardingTable -> IPStackC.ForwardingTable;
 
-#ifdef RPL_ROUTING
+#if RPL_ROUTING
   components RplBorderRouterP, IPPacketC;
   RplBorderRouterP.ForwardingEvents -> IPStackC.ForwardingEvents[ROUTE_IFACE_TUN];
   RplBorderRouterP.IPPacket -> IPPacketC.IPPacket;
