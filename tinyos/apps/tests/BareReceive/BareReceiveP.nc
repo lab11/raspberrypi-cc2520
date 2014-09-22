@@ -14,6 +14,8 @@ module BareReceiveP {
 }
 implementation {
 
+uint32_t count = 0;
+
   event void Boot.booted() {
     call RadioControl.start();
   }
@@ -28,7 +30,7 @@ implementation {
                                         void* payload, uint8_t len) {
 
     int i;
-    printf("got packet (%i): 0x", len);
+    printf("%05i got packet (%i): 0x", count++, len);
     for (i=0; i<len; i++) {
       printf("%02x", ((uint8_t*) payload)[i]);
     }
