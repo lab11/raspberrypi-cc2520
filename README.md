@@ -68,31 +68,6 @@ need to help it along a bit. Add the following to your `.bashrc` file:
     export TINYOS_ROOT_DIR_ADDITIONAL=<path to git repo>/raspberrypi-cc2520/tinyos:$TINYOS_ROOT_DIR_ADDITIONAL
 
 
-You also need some changes to `tinyos-main` in order to compile the TinyOS RPi
-code. Hopefully these will be merged into the main tinyos repo in order to make
-this step unnecessary. Until then, you need to pull my changes to TinyOS in
-order to successfully compile.
-
-Easy way:
-
-    git clone https://github.com/lab11/tinyos-main.git
-    git checkout for-rpi
-
-Custom, more involved way:
-
-    cd ~/git/tinyos-main
-    git remote add lab11 https://github.com/lab11/tinyos-main.git
-    git fetch --all
-    git merge lab11/make-no-environ
-
-After merging those in you will need to recompile and install the tools.
-
-    cd tinyos-main/tools
-    ./Bootstrap
-    ./configure
-    make
-    sudo make install
-
 You will also need the correct cross compiler for the RPi:
 `arm-linux-gnueabi-gcc`. On Ubuntu:
 
