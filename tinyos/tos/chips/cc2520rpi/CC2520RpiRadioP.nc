@@ -30,7 +30,7 @@ implementation {
 //----------- SplitControl ---
   int cc2520_file = -1;
   struct cc2520_set_channel_data chan_data = {CC2520_DEF_CHANNEL};
-  struct cc2520_set_address_data addr_data = {0, 0, DEFINED_TOS_AM_GROUP};
+  struct cc2520_set_address_data addr_data = {0, 0, IEEE802154_PANID};
   //struct cc2520_set_ack_data ack_data = {SOFTWAREACK_TIMEOUT};
   struct cc2520_set_ack_data ack_data = {5000};
   struct cc2520_set_txpower_data txpower_data = {CC2520_DEF_RFPOWER};

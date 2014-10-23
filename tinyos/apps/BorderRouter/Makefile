@@ -46,6 +46,7 @@ PFLAGS += -DRPL_ROUTING=1
 # If set keep routing information in each node. If not the root must keep all
 # routing information.
 PFLAGS += -DRPL_STORING_MODE=1
+PFLAGS += -DROUTE_TABLE_SZ=100
 
 # Choose the objective function RPL should use
 PFLAGS += -DRPL_OF_0=1

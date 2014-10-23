@@ -1,0 +1,3 @@
+#ifndef IEEE802154_PANID
+#define IEEE802154_PANID 0x22
+#endif
