@@ -1,0 +1,10 @@
+#-*-Makefile-*- vim:syntax=make
+TARGET = gap
+
+PFLAGS += -DPRINTFUART_ENABLED=1
+
+$(call TOSMake_include_platform,gap)
+$(call TOSMake_include_make_platform,arm-linux)
+
+$(TARGET): $(BUILD_DEPS)
+	@:
