@@ -16,12 +16,12 @@ ifeq (,$(ARM_COMPILER_PREFIX))
   $(error "No cross compiler found. Have you installed an ARM toolchain?")
 endif
 
-GCC = $(ARM_COMPILER_PREFIX)-gcc
+GCC     = $(ARM_COMPILER_PREFIX)-gcc
 OBJCOPY = $(ARM_COMPILER_PREFIX)-objcopy
 OBJDUMP = $(ARM_COMPILER_PREFIX)-objdump
-SET_ID = tos-set-symbols
-SIZE = $(ARM_COMPILER_PREFIX)-size
-LIBS = -lm -lrt -lc
+SET_ID  = tos-set-symbols
+SIZE    = $(ARM_COMPILER_PREFIX)-size
+LIBS    = -lm -lrt -lc
 
 INSTALL_BIN = $(MAIN_BIN).out$(if $(NODEID),-$(NODEID),)
 
