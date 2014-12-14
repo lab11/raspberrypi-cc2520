@@ -4,14 +4,13 @@
 
 #include "file_helpers.h"
 
-
 #define PACKET_BUFFER_LEN 256
 
 /* This is the low level receive module that gets packets from the CC2520 kernel
  * module.
  */
 
-module CC2520RpiReceiveP {
+generic module CC2520LinuxReceiveP (const char* char_dev_path) {
   provides {
     interface Init as SoftwareInit @exactlyonce();
     interface BareReceive;
@@ -148,9 +147,9 @@ implementation {
 
     rx_msg_ptr = (uint8_t*) &rx_msg_buf;
 
-    cc2520_file = open("/dev/radio", O_RDWR);
+    cc2520_file = open(char_dev_path, O_RDWR);
     if (cc2520_file < 0) {
-      ERROR("Could not open radio.\n");
+      ERROR("Could not open radio (%s).\n", char_dev_path);
       exit(1);
     }
 

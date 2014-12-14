@@ -16,11 +16,11 @@ configuration Ieee154BareC {
 }
 
 implementation {
-  components CC2520RpiRadioC;
+  components CC2520LinuxRadioC;
 
-  SplitControl = CC2520RpiRadioC.SplitControl;
+  SplitControl = CC2520LinuxRadioC.SplitControl;
 
-  BarePacket = CC2520RpiRadioC.Packet;
-  BareSend = CC2520RpiRadioC.Send;
-  BareReceive = CC2520RpiRadioC.Receive;
+  BarePacket = CC2520LinuxRadioC.Packet;
+  BareSend = CC2520LinuxRadioC.Send;
+  BareReceive = CC2520LinuxRadioC.Receive;
 }

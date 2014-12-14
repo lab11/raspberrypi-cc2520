@@ -37,8 +37,8 @@
  * Author: JeongGil Ko (Security Header Added)
  */
 
-#ifndef __CC2520RPIRADIO_H__
-#define __CC2520RPIRADIO_H__
+#ifndef __CC2520LINUXRADIO_H__
+#define __CC2520LINUXRADIO_H__
 
 #include <TinyosNetworkLayer.h>
 #include <Ieee154PacketLayer.h>

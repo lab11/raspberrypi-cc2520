@@ -1,8 +1,7 @@
-#include "CC2520RpiDriver.h"
-
+#include "CC2520LinuxDriver.h"
 #include "file_helpers.h"
 
-module CC2520RpiSendP {
+generic module CC2520LinuxSendP (const char* char_dev_path) {
   provides {
     interface Init as SoftwareInit @exactlyonce();
     interface BareSend;
@@ -82,9 +81,9 @@ implementation {
     int ret;
 
     // Open the character device for the CC2520
-    cc2520_file = open("/dev/radio", O_RDWR);
+    cc2520_file = open(char_dev_path, O_RDWR);
     if (cc2520_file < 0) {
-      ERROR("Could not open radio.\n");
+      ERROR("Could not open radio (%s).\n", char_dev_path);
       exit(1);
     }
 

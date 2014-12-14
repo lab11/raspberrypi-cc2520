@@ -15,12 +15,12 @@ configuration RadioPacketMetadataC {
 }
 
 implementation {
-  components CC2520RpiRadioC;
+  components CC2520LinuxRadioC;
   components RadioPacketMetadataP;
 
-  RadioPacketMetadataP.PacketMetadata -> CC2520RpiRadioC.PacketMetadata;
+  RadioPacketMetadataP.PacketMetadata -> CC2520LinuxRadioC.PacketMetadata;
 
-  LowPowerListening = CC2520RpiRadioC.LowPowerListening;
+  LowPowerListening = CC2520LinuxRadioC.LowPowerListening;
   PacketLink = RadioPacketMetadataP.PacketLink;
   PacketAcknowledgements = RadioPacketMetadataP.PacketAcknowledgements;
 }

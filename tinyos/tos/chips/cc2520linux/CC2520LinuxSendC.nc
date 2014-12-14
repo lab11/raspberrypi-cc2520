@@ -1,20 +1,23 @@
 
-configuration CC2520RpiSendC {
+generic configuration CC2520LinuxSendC (const char* char_dev_path) {
   provides {
     interface BareSend;
+  }
+  uses {
+    interface PacketMetadata;
   }
 }
 
 implementation {
-  components CC2520RpiSendP as SendP;
-  components CC2520RpiRadioP as RadioP;
   components MainC;
+
+  components new CC2520LinuxSendP(char_dev_path) as SendP;
   components new IOFileC();
 
   MainC.SoftwareInit -> SendP.SoftwareInit;
 
-  SendP.PacketMetadata -> RadioP.PacketMetadata;
   SendP.IO -> IOFileC.IO;
+  SendP.PacketMetadata = PacketMetadata;
 
   BareSend = SendP.BareSend;
 }

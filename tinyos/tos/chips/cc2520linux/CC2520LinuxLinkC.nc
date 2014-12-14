@@ -1,21 +1,22 @@
 
-configuration CC2520RpiLinkC {
+generic configuration CC2520LinuxLinkC () {
   provides {
     interface BareSend as Send;
   }
   uses {
     interface BareSend as SubSend;
+    interface PacketMetadata;
   }
 }
 
 implementation {
-  components CC2520RpiLinkP as LinkP;
-  components CC2520RpiRadioC;
+  components new CC2520RpiLinkP() as LinkP;
   components new TimerMilliC();
 
-  SubSend = LinkP.SubSend;
-  LinkP.PacketMetadata -> CC2520RpiRadioC.PacketMetadata;
   LinkP.DelayTimer -> TimerMilliC;
+
+  LinkP.SubSend = SubSend;
+  LinkP.PacketMetadata = PacketMetadata;
 
   Send = LinkP.Send;
 }

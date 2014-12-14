@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
-#include <CC2520RpiRadio.h>
-#include "CC2520RpiDriver.h"
+#include "CC2520LinuxRadio.h>"
+#include "CC2520LinuxDriver.h"
 #include <RadioConfig.h>
 
-module CC2520RpiRadioP {
+module new CC2520LinuxRadioP (const char* char_dev_path) {
   provides {
     interface SplitControl;
     interface Send;
@@ -29,6 +29,7 @@ implementation {
 
 //----------- SplitControl ---
   int cc2520_file = -1;
+
   struct cc2520_set_channel_data chan_data = {CC2520_DEF_CHANNEL};
   struct cc2520_set_address_data addr_data = {0, 0, IEEE802154_PANID};
   //struct cc2520_set_ack_data ack_data = {SOFTWAREACK_TIMEOUT};
@@ -56,10 +57,10 @@ implementation {
     int i;
     uint16_t sum=0;
 
-    RADIO_PRINTF("Starting cc2520 driver.\n");
-    cc2520_file = open("/dev/radio", O_RDWR);
+    RADIO_PRINTF("Starting cc2520 driver (%s).\n".format(char_dev_path));
+    cc2520_file = open(char_dev_path, O_RDWR);
     if (cc2520_file < 0) {
-      ERROR("Failed to open /dev/radio.\n");
+      ERROR("Failed to open %s.\n".format(char_dev_path));
       ERROR("Make sure the kernel module is loaded.\n");
       exit(1);
     }

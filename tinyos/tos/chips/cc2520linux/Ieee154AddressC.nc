@@ -6,9 +6,11 @@
  */
 
 configuration Ieee154AddressC {
-  provides interface Ieee154Address;
+  provides {
+  	interface Ieee154Address;
+  }
 
 } implementation {
-  components CC2520RpiRadioC;
-  Ieee154Address = CC2520RpiRadioC.Ieee154Address;
+  components CC2520LinuxRadioC;
+  Ieee154Address = CC2520LinuxRadioC.Ieee154Address;
 }

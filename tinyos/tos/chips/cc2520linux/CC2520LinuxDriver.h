@@ -1,5 +1,5 @@
-#ifndef __CC2520RPIDRIVER_H__
-#define __CC2520RPIDRIVER_H__
+#ifndef __CC2520LINUXDRIVER_H__
+#define __CC2520LINUXDRIVER_H__
 
 #include <asm/ioctl.h>
 #include <linux/types.h>
