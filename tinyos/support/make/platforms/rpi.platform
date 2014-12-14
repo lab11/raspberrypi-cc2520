@@ -1,5 +1,6 @@
 #-*-Makefile-*- vim:syntax=make
 
+PFLAGS += -I%T/platforms/armlinux
 PFLAGS += -I%T/platforms/rpi
 PFLAGS += -I%T/platforms/rpi/chips/cc2520linux
 PFLAGS += -I%T/platforms/rpi/chips/ds2411
