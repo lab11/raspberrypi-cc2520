@@ -18,7 +18,8 @@ implementation {
   components BorderC;
 
   // If we want to use static addressing
-//  components StaticIPAddressC;
+  components StaticIPAddressC;
+
 
   // Uncomment to use DHCP
 //  components Dhcp6C;

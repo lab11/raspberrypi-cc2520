@@ -1,15 +1,15 @@
 COMPONENT=TSDemo2014BorderRouterC
 
-PFLAGS += -DCC2520_DEF_CHANNEL=19
+PFLAGS += -DCC2520_DEF_CHANNEL=18
 
 ################################################################################
 ### Set the addressing scheme
 ################################################################################
 
 # Use IN6_PREFIX with static addressing modes
-#PFLAGS += -DIN6_PREFIX=\"fec0::\"
+PFLAGS += -DIN6_PREFIX=\"fec0::\"
 # Use BLIP Neighbor Discovery to autoconfigure an address
-PFLAGS += -DBLIP_ADDR_AUTOCONF=1
+PFLAGS += -DBLIP_ADDR_AUTOCONF=0
 # Use RPL and prefix information in DIO messages to autoconfigure an address
 PFLAGS += -DRPL_ADDR_AUTOCONF=0
 
@@ -18,8 +18,8 @@ PFLAGS += -DRPL_ADDR_AUTOCONF=0
 ################################################################################
 
 # Configure the Neighbor Discovery mechanism
-PFLAGS += -DBLIP_SEND_ROUTER_SOLICITATIONS=1
-PFLAGS += -DBLIP_SEND_ROUTER_ADVERTISEMENTS=1
+PFLAGS += -DBLIP_SEND_ROUTER_SOLICITATIONS=0
+PFLAGS += -DBLIP_SEND_ROUTER_ADVERTISEMENTS=0
 
 # Configure the number of times BLIP tries to send a packet and how long it
 # waits between attempts

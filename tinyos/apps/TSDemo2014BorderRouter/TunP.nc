@@ -290,7 +290,7 @@ implementation {
 
 // FOR TS DEMO 2014
 {
-    mkfifo("/tmp/lowpan_fifo", 0666);
+    mkfifo("/tmp/rpl_fifo", 0666);
     __nesc_keyword_signal(SIGPIPE, SIG_IGN);
 }
 
