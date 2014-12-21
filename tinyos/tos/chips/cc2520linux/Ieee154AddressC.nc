@@ -11,6 +11,6 @@ configuration Ieee154AddressC {
   }
 
 } implementation {
-  components CC2520LinuxRadioC;
-  Ieee154Address = CC2520LinuxRadioC.Ieee154Address;
+  components RadioSelectC;
+  Ieee154Address = RadioSelectC.Ieee154Address;
 }

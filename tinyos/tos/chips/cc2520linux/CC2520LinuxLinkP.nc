@@ -4,7 +4,7 @@
  * Author: Brad Campbell
  */
 
-generic module CC2520RpiLinkP () {
+generic module CC2520LinuxLinkP () {
   provides {
     interface BareSend as Send;
   }

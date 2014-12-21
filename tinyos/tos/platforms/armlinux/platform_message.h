@@ -1,7 +1,7 @@
 #ifndef PLATFORM_MESSAGE_H
 #define PLATFORM_MESSAGE_H
 
-#include "CC2520RpiRadio.h"
+#include "CC2520LinuxRadio.h"
 
 #define TOSH_DATA_LENGTH 128
 

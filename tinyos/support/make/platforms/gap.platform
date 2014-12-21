@@ -2,7 +2,7 @@
 
 PFLAGS += -I%T/platforms/armlinux
 PFLAGS += -I%T/platforms/gap
-PFLAGS += -I%T/platforms/rpi/chips/cc2520linux
+PFLAGS += -I%T/platforms/gap/chips/cc2520linux
 PFLAGS += -I%T/chips/cc2520linux
 PFLAGS += -I%T/chips/linux
 PFLAGS += -I%T/chips/linux/socket

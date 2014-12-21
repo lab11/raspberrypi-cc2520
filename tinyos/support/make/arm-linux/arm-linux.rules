@@ -21,6 +21,7 @@ OBJCOPY = $(ARM_COMPILER_PREFIX)-objcopy
 OBJDUMP = $(ARM_COMPILER_PREFIX)-objdump
 SET_ID  = tos-set-symbols
 SIZE    = $(ARM_COMPILER_PREFIX)-size
+NM      = $(ARM_COMPILER_PREFIX)-nm
 LIBS    = -lm -lrt -lc
 
 INSTALL_BIN = $(MAIN_BIN).out$(if $(NODEID),-$(NODEID),)

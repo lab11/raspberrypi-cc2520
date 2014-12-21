@@ -19,7 +19,7 @@
  *    SendP      ReceiveP
  */
 
-generic configuration CC2520LinuxRadioC (const char* char_dev_path) {
+generic configuration CC2520LinuxRadioC (char char_dev_path[]) {
   provides {
     interface SplitControl;
 

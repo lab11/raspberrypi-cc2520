@@ -7,7 +7,7 @@ module PlatformP {
     interface Init;
   }
   uses {
-    interface Init as GpioInit;
+    //interface Init as GpioInit;
     interface Init as LedsInit;
     interface Init as InterruptInit;
     interface Leds;
@@ -29,7 +29,7 @@ implementation {
     setvbuf(stdout, NULL, _IONBF, 0);
 
     RPI_PRINTF("Bringing system online.\n");
-    call GpioInit.init();
+    //call GpioInit.init();
     call LedsInit.init();
     call InterruptInit.init();
 

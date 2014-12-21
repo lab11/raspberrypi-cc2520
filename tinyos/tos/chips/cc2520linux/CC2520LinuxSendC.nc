@@ -1,5 +1,5 @@
 
-generic configuration CC2520LinuxSendC (const char* char_dev_path) {
+generic configuration CC2520LinuxSendC (char char_dev_path[]) {
   provides {
     interface BareSend;
   }

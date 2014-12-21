@@ -10,7 +10,7 @@
  * module.
  */
 
-generic module CC2520LinuxReceiveP (const char* char_dev_path) {
+generic module CC2520LinuxReceiveP (char char_dev_path[]) {
   provides {
     interface Init as SoftwareInit @exactlyonce();
     interface BareReceive;

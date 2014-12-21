@@ -4,7 +4,7 @@
  * @author: Brad Campbell <bradjc@umich.edu>
  */
 
-generic configuration CC2520LinuxReceiveC (const char* char_dev_path) {
+generic configuration CC2520LinuxReceiveC (char char_dev_path[]) {
   provides {
     interface BareReceive;
   }

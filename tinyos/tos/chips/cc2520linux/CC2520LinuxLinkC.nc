@@ -10,7 +10,7 @@ generic configuration CC2520LinuxLinkC () {
 }
 
 implementation {
-  components new CC2520RpiLinkP() as LinkP;
+  components new CC2520LinuxLinkP() as LinkP;
   components new TimerMilliC();
 
   LinkP.DelayTimer -> TimerMilliC;

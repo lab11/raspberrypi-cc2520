@@ -1,7 +1,7 @@
 #include "CC2520LinuxDriver.h"
 #include "file_helpers.h"
 
-generic module CC2520LinuxSendP (const char* char_dev_path) {
+generic module CC2520LinuxSendP (char char_dev_path[]) {
   provides {
     interface Init as SoftwareInit @exactlyonce();
     interface BareSend;

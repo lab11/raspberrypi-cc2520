@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
-#include "CC2520LinuxRadio.h>"
+#include "CC2520LinuxRadio.h"
 #include "CC2520LinuxDriver.h"
 #include <RadioConfig.h>
 
-module new CC2520LinuxRadioP (const char* char_dev_path) {
+generic module CC2520LinuxRadioP (char char_dev_path[]) {
   provides {
     interface SplitControl;
     interface Send;
@@ -60,7 +60,7 @@ implementation {
     RADIO_PRINTF("Starting cc2520 driver (%s).\n".format(char_dev_path));
     cc2520_file = open(char_dev_path, O_RDWR);
     if (cc2520_file < 0) {
-      ERROR("Failed to open %s.\n".format(char_dev_path));
+      ERROR("Failed to open %s.\n", char_dev_path);
       ERROR("Make sure the kernel module is loaded.\n");
       exit(1);
     }
