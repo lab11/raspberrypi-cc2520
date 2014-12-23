@@ -23,6 +23,9 @@
     funlockfile(stdout);\
   } while (0)
 
+
+// fprintf(stderr, "%s:%d\t%s:\t", __FILE__, __LINE__, __func__);
+
 #define ERROR(...)\
   do {\
     flockfile(stderr);\
@@ -46,8 +49,10 @@
 
 #ifdef TUN_DEBUG
 #define TUN_PRINTF(...) DBG(__VA_ARGS__)
+#define TUN_PRINTF_IN6ADDR(...) printf_in6addr(__VA_ARGS__)
 #else
 #define TUN_PRINTF(...)
+#define TUN_PRINTF_IN6ADDR(...)
 #endif
 
 #ifdef IOMANAGER_DEBUG
