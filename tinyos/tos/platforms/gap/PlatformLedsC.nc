@@ -15,9 +15,9 @@ implementation {
   components PlatformP;
   Init = PlatformP.LedsInit;
 
-  components new LinuxLedP("aa") as l0;
-  components new LinuxLedP("bb") as l1;
-  components new LinuxLedP("cc") as l2;
+  components new LinuxLedP("gap:red:usr1") as l1;
+  components new LinuxLedP("gap:green:usr0") as l0;
+  components new LinuxLedP("gap:blue:usr2") as l2;
 
   Led0 = l0.GeneralIO;
   Led1 = l1.GeneralIO;
