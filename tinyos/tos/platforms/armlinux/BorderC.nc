@@ -21,6 +21,10 @@ implementation {
 
   components IPStackC;
   BorderP.ForwardingTable -> IPStackC.ForwardingTable;
+  BorderP.ForwardingNoLoop -> IPStackC.ForwardingEvents[ROUTE_IFACE_TUN];
+
+  components IPNeighborDiscoveryC;
+  BorderP.NeighborDiscovery -> IPNeighborDiscoveryC.NeighborDiscovery;
 
 #if RPL_ROUTING
   components RplBorderRouterP, IPPacketC;
