@@ -10,44 +10,38 @@ generic module LinuxLedP (char led_name[]) {
 
 implementation {
 
-  int led_file;
+  char filename[256];
 
   // We use makeOutput as the init function.
   // Using GeneralIO for a linux led is dumb as it is.
   async command void GeneralIO.makeOutput () {
-    char filename[256];
     snprintf(filename, 256, "/sys/class/leds/%s/brightness", led_name);
-    led_file = open(filename, O_WRONLY);
   }
 
   async command void GeneralIO.set () {
-    int f;
-    atomic f = led_file;
-    write(f, "1", 1);
+    int led_file = open(filename, O_RDWR);
+    write(led_file, "1", 1);
   }
 
   async command void GeneralIO.clr () {
-    int f;
-    atomic f = led_file;
-    write(f, "0", 1);
+    int led_file = open(filename, O_RDWR);
+    write(led_file, "0", 1);
   }
 
   async command void GeneralIO.toggle () {
-    int f;
-    atomic f = led_file;
+    int led_file = open(filename, O_RDWR);
     if (call GeneralIO.get()) {
-      write(f, "0", 1);
+      write(led_file, "0", 1);
     } else {
-      write(f, "1", 1);
+      write(led_file, "1", 1);
     }
   }
 
   async command bool GeneralIO.get () {
     char buffer[10];
-    int f;
-    atomic f = led_file;
+    int led_file = open(filename, O_RDWR);
 
-    read(f, buffer, 1);
+    read(led_file, buffer, 1);
     if (strncmp(buffer, "1", 1) == 0) {
       return TRUE;
     }
