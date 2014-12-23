@@ -95,11 +95,13 @@ implementation {
     payload = (iph + 1);
 
     TUN_PRINTF("TUN: Received IPv6 Packet\n");
-    TUN_PRINTF(  "  source:    ");
+    TUN_PRINTF("  source:    ");
     TUN_PRINTF_IN6ADDR(&iph->ip6_src);
-    TUN_PRINTF("\n  dest:      ");
+    TUN_PRINTF_NEWL();
+    TUN_PRINTF("  dest:      ");
     TUN_PRINTF_IN6ADDR(&iph->ip6_dst);
-    TUN_PRINTF("\n  hop limit: %i\n", iph->ip6_hlim);
+    TUN_PRINTF_NEWL();
+    TUN_PRINTF("  hop limit: %i\n", iph->ip6_hlim);
 
     signal IPForward.recv(iph, payload, NULL);
   }

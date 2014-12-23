@@ -50,9 +50,11 @@
 #ifdef TUN_DEBUG
 #define TUN_PRINTF(...) DBG(__VA_ARGS__)
 #define TUN_PRINTF_IN6ADDR(...) printf_in6addr(__VA_ARGS__)
+#define TUN_PRINTF_NEWL() printf("\n")
 #else
 #define TUN_PRINTF(...)
 #define TUN_PRINTF_IN6ADDR(...)
+#define TUN_PRINTF_NEWL()
 #endif
 
 #ifdef IOMANAGER_DEBUG
