@@ -1,4 +1,4 @@
-/* Use this module to choose which radio on GAP to use.
+/* Use this module to choose which radio on RPi to use.
  */
 configuration RadioSelectC {
   provides {
