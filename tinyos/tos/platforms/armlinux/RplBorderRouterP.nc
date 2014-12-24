@@ -17,6 +17,7 @@ module RplBorderRouterP {
   uses {
     interface ForwardingEvents;
     interface IPPacket;
+    interface NeighborDiscovery;
   }
 }
 
@@ -33,6 +34,25 @@ implementation {
     uint8_t nxt = IPV6_HOP;
     if (pkt->ip6_inputif == ROUTE_IFACE_PPP)
       return FALSE;
+
+    {
+      struct in6_addr* prefix = call NeighborDiscovery.getPrefix();
+      struct in6_addr  null_addr;
+
+      if (prefix != NULL) {
+        memset(null_addr.s6_addr, 0, 16);
+
+        if (memcmp(next_hop->s6_addr, null_addr.s6_addr, 16) == 0) {
+          // The next hop is the default route
+
+          if (memcmp(pkt->ip6_hdr.ip6_dst.s6_addr, prefix->s6_addr, 8) == 0) {
+            // The prefix of the destination matches our prefix.
+            // Drop the packet because the packet will come right back to us.
+            return FALSE;
+          }
+        }
+      }
+    }
 
     /* remove any RPL options in the hop-by-hop header by converting
        them to a PadN option */

@@ -1,6 +1,7 @@
 COMPONENT=BorderRouterC
 
 PFLAGS += -DCC2520_DEF_CHANNEL=19
+PFLAGS += -DIEEE802154_PANID=0x689a
 
 ################################################################################
 ### Set the addressing scheme
@@ -49,8 +50,8 @@ PFLAGS += -DRPL_STORING_MODE=1
 PFLAGS += -DROUTE_TABLE_SZ=100
 
 # Choose the objective function RPL should use
-PFLAGS += -DRPL_OF_0=1
-PFLAGS += -DRPL_OF_MRHOF=0
+PFLAGS += -DRPL_OF_0=0
+PFLAGS += -DRPL_OF_MRHOF=1
 
 ################################################################################
 ### Configure LPL
@@ -66,6 +67,12 @@ PFLAGS += -DRPL_OF_MRHOF=0
 ################################################################################
 
 #PFLAGS += -DPRINTFUART_ENABLED
+
+################################################################################
+### Configure GAP Radios
+################################################################################
+
+PFLAGS += -DGAP_RADIO_SELECT=1
 
 GOALS += blip rpl
 
