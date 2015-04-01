@@ -38,9 +38,10 @@ This kernel module is designed to run on top of the Raspbian Linux distribution.
 ### Custom Version of Raspbian
 
 Instead of compiling and installing the CC2520 kernel module yourself, you can
-download a pre-configured image of raspbian and put that on the sdcard instead.
-The [torrent](https://github.com/bradjc/raspberrypi-cc2520/blob/master/torrents/raspbian_cc2520_2013-06-27.img.torrent?raw=true)
-file is in the repository. Download the torrent and then install it to an SD
+download a pre-configured
+[image](http://nuclear.eecs.umich.edu/public/raspbian_cc2520_2013-09-18.zip)
+of raspbian and put that on the sdcard instead.
+Download the img and then install it to an SD
 card ([here](http://elinux.org/RPi_Easy_SD_Card_Setup) is a helpful guide). For
 reference, I use:
 
