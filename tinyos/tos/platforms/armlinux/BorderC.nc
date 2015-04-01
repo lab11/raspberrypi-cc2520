@@ -32,4 +32,9 @@ implementation {
   RplBorderRouterP.ForwardingEvents -> IPStackC.ForwardingEvents[ROUTE_IFACE_TUN];
   RplBorderRouterP.IPPacket -> IPPacketC.IPPacket;
 #endif
+
+  components DumpHopHopP;
+  DumpHopHopP.NeighborDiscovery -> IPNeighborDiscoveryC.NeighborDiscovery;
+  DumpHopHopP.ForwardingEvents -> IPStackC.ForwardingEvents[ROUTE_IFACE_154];
+  DumpHopHopP.IPPacket -> IPPacketC.IPPacket;
 }

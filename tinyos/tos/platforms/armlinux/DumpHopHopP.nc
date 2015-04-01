@@ -1,19 +1,8 @@
 
-/**
- * When packets leave a RPL domain, we're need to remove and RPL
- * headers which have been inserted and/or reencapsulate the packet.
- * This component hooks into the forwarding path to do this by
- * converting any RPL TLV options in IPv6 hop-by-hop options header to
- * PadN options.
- *
- * @author Stephen Dawson-Haggerty <stevedh@eecs.berkeley.edu>
- */
-
 #include <lib6lowpan/ip.h>
 #include <iprouting.h>
-#include <RPL.h>
 
-module RplBorderRouterP {
+module DumpHopHopP {
   uses {
     interface ForwardingEvents;
     interface IPPacket;
@@ -32,42 +21,17 @@ implementation {
                                       struct in6_addr *next_hop) {
     int off;
     uint8_t nxt = IPV6_HOP;
-    if (pkt->ip6_inputif == ROUTE_IFACE_PPP)
-      return FALSE;
 
-    {
-      struct in6_addr* prefix = call NeighborDiscovery.getPrefix();
-      struct in6_addr  null_addr;
+    printf("DUMP HOP HOP HOP\n");
 
-      if (prefix != NULL) {
-        memset(null_addr.s6_addr, 0, 16);
-
-        if (memcmp(next_hop->s6_addr, null_addr.s6_addr, 16) == 0) {
-          // The next hop is the default route
-
-          if (memcmp(pkt->ip6_hdr.ip6_dst.s6_addr, prefix->s6_addr, 8) == 0) {
-            // The prefix of the destination matches our prefix.
-            // Drop the packet because the packet will come right back to us.
-            return FALSE;
-          }
-
-          if (pkt->ip6_hdr.ip6_dst.s6_addr[0] == 0xfe &&
-              pkt->ip6_hdr.ip6_dst.s6_addr[1] == 0x80) {
-            // This is a link local fe80:: packet. Don't let that leave the
-            // network.
-            return FALSE;
-          }
-        }
-      }
-    }
-
-    /* remove any RPL options in the hop-by-hop header by converting
-       them to a PadN option */
+    /* dont want hop hop headers */
     off = call IPPacket.findHeader(pkt->ip6_data, pkt->ip6_hdr.ip6_nxt, &nxt);
     if (off < 0) {
       return TRUE;
     } else if (off == 0) {
       uint8_t length_in_bytes = 0;
+
+      printf("Removing the hop by hop header\n");
 
       // Need to get rid of this header
 
@@ -94,8 +58,6 @@ implementation {
         pkt->ip6_data->iov_base[7] = ((udp_check >> 8) & 0xFF);
       }
 
-    } else {
-      call IPPacket.delTLV(pkt->ip6_data, off, RPL_HBH_RANK_TYPE);
     }
 
     return TRUE;
