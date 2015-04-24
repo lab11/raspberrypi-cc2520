@@ -6,6 +6,9 @@
 #include <lib6lowpan/lib6lowpan.h>
 #include <lib6lowpan/ip.h>
 
+#include "blip_printf.h"
+#include "neighbor_discovery.h"
+
 /**
  * Implementation of the RadioCountToLeds application. RadioCountToLeds
  * maintains a 4Hz counter, broadcasting its value in an AM packet

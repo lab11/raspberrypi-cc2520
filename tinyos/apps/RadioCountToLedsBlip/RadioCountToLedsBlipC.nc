@@ -10,6 +10,8 @@ implementation {
   App.Leds -> LedsC;
   App.MilliTimer -> TimerMilliC;
 
+  components StaticIPAddressC;
+
 
   // Radio
   components IPStackC;
