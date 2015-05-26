@@ -29,9 +29,9 @@ uint32_t count = 0;
   event message_t* RadioReceive.receive(message_t* packet,
                                         void* payload, uint8_t len) {
 
-    char *msg;
-    /*
+    char* msg;
     int i;
+    /*
     printf("%05i got packet (%i): 0x", count++, len);
     for (i=0; i<len; i++) {
       printf("%02x", ((uint8_t*) payload)[i]);
@@ -39,12 +39,14 @@ uint32_t count = 0;
     printf("\n");
     */
 
-    msg = (char*) payload + 26;
-    if (msg[len-26-1] != '!') {
-      printf("# Corrupted packet. Skip.\n");
+    msg = (char*) payload;
+    if (msg[len-1] != '!') {
+      printf("# Corrupted packet. Skip: ");
     }
-    msg[len-26-1] = '\0';
-    printf("%s\n", msg);
+    for (i=26; i<len; i++) {
+      putchar(msg[i]);
+    }
+    putchar('\n');
 
     return packet;
   }
